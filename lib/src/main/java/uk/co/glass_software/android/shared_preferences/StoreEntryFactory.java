@@ -33,6 +33,7 @@ public class StoreEntryFactory {
     
     private final SharedPreferenceStore store;
     private final SharedPreferenceStore encryptedStore;
+    private final boolean isEncryptionSupported;
     
     public StoreEntryFactory(Context context) {
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
@@ -42,31 +43,42 @@ public class StoreEntryFactory {
         
         encryptedStore = component.encryptedStore();
         store = component.store();
-        
-        open("test", String.class);
+        isEncryptionSupported = component.keyStoreManager() != null;
     }
     
     public <C> StoreEntry<StoreEntry.UniqueKeyProvider, C> open(String key,
                                                                 Class<C> valueClass) {
-        return open(() -> key, valueClass);
+        return open(() -> key, () -> valueClass);
     }
     
     public <C> StoreEntry<StoreEntry.UniqueKeyProvider, C> openEncrypted(String key,
                                                                          Class<C> valueClass) {
-        return openEncrypted(() -> key, valueClass);
+        return openEncrypted(() -> key, () -> valueClass);
     }
     
-    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> open(KEY key,
-                                                                                 Class<C> valueClass) {
-        return new StoreEntry<>(store, key, valueClass);
+    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> open(KEY keyProvider,
+                                                                                 StoreEntry.ValueClassProvider<C> valueClassProvider) {
+        return new StoreEntry<>(store, keyProvider, valueClassProvider);
     }
     
-    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> openEncrypted(KEY key,
-                                                                                          Class<C> valueClass) {
-        return new StoreEntry<>(encryptedStore, key, valueClass);
+    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> openEncrypted(KEY keyProvider,
+                                                                                          StoreEntry.ValueClassProvider<C> valueClassProvider) {
+        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
     }
     
-    public Observable<String> observeChanges(){
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<StoreEntry.UniqueKeyProvider, C> open(K key) {
+        return open(key, key);
+    }
+    
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<StoreEntry.UniqueKeyProvider, C> openEncrypted(K key) {
+        return openEncrypted(key, key);
+    }
+    
+    public boolean isEncryptionSupported() {
+        return isEncryptionSupported;
+    }
+    
+    public Observable<String> observeChanges() {
         return store.observeChanges().mergeWith(encryptedStore.observeChanges());
     }
     

@@ -36,10 +36,10 @@ public class SavedEncryptedAesKey extends StoreEntry<StoreEntry.UniqueKeyProvide
     private final Logger logger;
     private final RsaEncrypter rsaEncrypter;
     
-    public SavedEncryptedAesKey(KeyValueStore store,
-                                Logger logger,
-                                RsaEncrypter rsaEncrypter) {
-        super(store, () -> KEY, String.class, null);
+    SavedEncryptedAesKey(KeyValueStore store,
+                         Logger logger,
+                         RsaEncrypter rsaEncrypter) {
+        super(store, () -> KEY, () -> String.class, null);
         this.logger = logger;
         this.rsaEncrypter = rsaEncrypter;
     }

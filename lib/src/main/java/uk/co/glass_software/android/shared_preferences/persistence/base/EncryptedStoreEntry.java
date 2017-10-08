@@ -27,13 +27,9 @@ import android.support.annotation.Nullable;
 import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
 
 
-/**
- * Values saved here will only be persisted to disk if the KeyStoreManager is not null.
- * If it is, the value will only be held in memory for the the duration of the application context.
- */
 public class EncryptedStoreEntry<K extends StoreEntry.UniqueKeyProvider> extends StoreEntry<K, String> {
     
-    @Nullable
+    @NonNull
     private final KeyStoreManager keyStoreManager;
     
     @Nullable
@@ -42,7 +38,10 @@ public class EncryptedStoreEntry<K extends StoreEntry.UniqueKeyProvider> extends
     protected EncryptedStoreEntry(@NonNull KeyValueStore store,
                                   @Nullable KeyStoreManager keyStoreManager,
                                   @NonNull K storeKey) {
-        super(store, storeKey, String.class);
+        super(store, storeKey, () -> String.class);
+        if (keyStoreManager == null) {
+            throw new IllegalStateException("Encryption is not supported on this device");
+        }
         this.keyStoreManager = keyStoreManager;
     }
     
@@ -75,15 +74,11 @@ public class EncryptedStoreEntry<K extends StoreEntry.UniqueKeyProvider> extends
     
     @Nullable
     private String encrypt(@Nullable String clearText) {
-        return keyStoreManager == null || clearText == null
-               ? null
-               : keyStoreManager.encrypt(clearText);
+        return clearText == null ? null : keyStoreManager.encrypt(clearText);
     }
     
     @Nullable
     private String decrypt(@Nullable String encrypted) {
-        return keyStoreManager == null || encrypted == null
-               ? null
-               : keyStoreManager.decrypt(encrypted);
+        return encrypted == null ? null : keyStoreManager.decrypt(encrypted);
     }
 }

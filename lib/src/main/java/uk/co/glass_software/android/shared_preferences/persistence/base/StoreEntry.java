@@ -24,28 +24,26 @@ package uk.co.glass_software.android.shared_preferences.persistence.base;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class StoreEntry<KEY extends StoreEntry.UniqueKeyProvider, C> {
+public class StoreEntry<KP extends StoreEntry.UniqueKeyProvider, C> {
     
-    private final KEY key;
+    private final KeyValueStore store;
     private final String keyString;
     private final Class<C> valueClass;
     private final C defaultValue;
-    private final KeyValueStore store;
     
     public StoreEntry(@NonNull KeyValueStore store,
-                      @NonNull KEY key,
-                      @NonNull Class<C> valueClass){
-        this(store, key, valueClass, null);
+                      @NonNull KP keyProvider,
+                      @NonNull StoreEntry.ValueClassProvider<C> valueClassProvider) {
+        this(store, keyProvider, valueClassProvider, null);
     }
     
     public StoreEntry(@NonNull KeyValueStore store,
-                      @NonNull KEY key,
-                      @NonNull Class<C> valueClass,
+                      @NonNull KP keyProvider,
+                      @NonNull StoreEntry.ValueClassProvider<C> valueClassProvider,
                       @Nullable C defaultValue) {
         this.store = store;
-        this.key = key;
-        this.keyString = key.getUniqueKey();
-        this.valueClass = valueClass;
+        this.keyString = keyProvider.getUniqueKey();
+        this.valueClass = valueClassProvider.getValueClass();
         this.defaultValue = defaultValue;
     }
     
@@ -68,12 +66,7 @@ public class StoreEntry<KEY extends StoreEntry.UniqueKeyProvider, C> {
     }
     
     @NonNull
-    public KEY getKey() {
-        return key;
-    }
-    
-    @NonNull
-    public String getKeyString() {
+    public String getKey() {
         return keyString;
     }
     
@@ -81,8 +74,12 @@ public class StoreEntry<KEY extends StoreEntry.UniqueKeyProvider, C> {
         return get(null) != null;
     }
     
-    public interface UniqueKeyProvider{
+    public interface UniqueKeyProvider {
         String getUniqueKey();
+    }
+    
+    public interface ValueClassProvider<C> {
+        Class<C> getValueClass();
     }
 }
 

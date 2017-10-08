@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         for (Map.Entry<String, Object> entry : storeEntryFactory.getEncryptedStore().getCachedValues().entrySet()) {
             output(builder, entry);
         }
-    
+        
         entries.setText(builder.toString());
     }
     

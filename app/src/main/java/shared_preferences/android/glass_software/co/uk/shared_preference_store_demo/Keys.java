@@ -21,20 +21,33 @@
 
 package shared_preferences.android.glass_software.co.uk.shared_preference_store_demo;
 
+import java.util.Date;
+
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
-enum Keys implements StoreEntry.UniqueKeyProvider {
+enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
     
-    USER("user");
+    FIRST_NAME(String.class),
+    LAST_NAME(String.class),
+    EMAIL(String.class),
+    AGE(Integer.class),
+    JOIN_DATE(Date.class),
+    ADDRESS(String.class);
     
-    private final String key;
+    private final String prefix = getClass().getSimpleName();
+    private final Class<?> valueClass;
     
-    Keys(String key) {
-        this.key = key;
+    Keys(Class valueClass) {
+        this.valueClass = valueClass;
     }
     
     @Override
     public String getUniqueKey() {
-        return key;
+        return prefix + "." + this;
+    }
+    
+    @Override
+    public Class getValueClass() {
+        return valueClass;
     }
 }
