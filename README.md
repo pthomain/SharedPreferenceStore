@@ -44,7 +44,7 @@ can be replaced with:
 ```
 
 To encrypt the stored value, call ``openEncrypted(getString(R.string.saved_high_score), Integer.class)`` instead.
-*Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.*
+**Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
