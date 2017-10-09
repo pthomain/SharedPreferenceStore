@@ -41,7 +41,7 @@ import static android.os.Build.VERSION_CODES.M;
 @Module
 public class KeyStoreModule {
     
-    private final static String APP_KEY_ALIAS = "uk.co.glass_software.shared_preferences";
+    private final static String APP_KEY_ALIAS = "uk.co.glass_software.android.shared_preferences";
     public static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     public final static String ENCRYPTED_STORE_NAME = "encrypted";
     
