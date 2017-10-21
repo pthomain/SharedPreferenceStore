@@ -50,6 +50,12 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
+    Context provideContext() {
+        return context;
+    }
+    
+    @Provides
+    @Singleton
     Function<String, SharedPreferences> provideSharedPreferenceFactory() {
         return name -> context.getSharedPreferences(name, Context.MODE_PRIVATE);
     }
@@ -110,7 +116,7 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
-    Logger provideLogger(){
+    Logger provideLogger() {
         return new SimpleLogger(context);
     }
     

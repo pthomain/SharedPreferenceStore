@@ -19,11 +19,12 @@
  * under the License.
  */
 
-package shared_preferences.android.glass_software.co.uk.shared_preference_store_demo;
+package uk.co.glass_software.android.shared_preferences.demo;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -40,6 +41,9 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEnt
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry.UniqueKeyProvider;
 
 public class MainActivity extends AppCompatActivity {
+    static {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+    }
     
     private StoreEntryFactory storeEntryFactory;
     private Disposable subscription;

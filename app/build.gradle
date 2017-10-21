@@ -20,13 +20,26 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+retrolambda {
+    jvmArgs '-noverify'
+    defaultMethods true
+    incremental false
+}
 
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
 
     defaultConfig {
-        applicationId "shared_preferences.android.glass_software.co.uk.sharepreferencestoredemo"
+        applicationId "uk.co.glass_software.android.shared_preferences.demo"
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
@@ -50,15 +63,13 @@ android {
 }
 
 dependencies {
-    implementation project(":lib")
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile project(":lib")
 
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile 'com.android.support:appcompat-v7:26.1.0'
 
-    implementation "com.jakewharton:butterknife:8.5.1"
+    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+
+    compile "com.jakewharton:butterknife:8.5.1"
     annotationProcessor "com.jakewharton:butterknife-compiler:8.5.1"
-
-    testImplementation 'junit:junit:4.12'
 }

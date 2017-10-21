@@ -20,11 +20,17 @@
  */
 
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
+
+retrolambda {
+    jvmArgs '-noverify'
+    defaultMethods true
+    incremental false
+}
 
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
-
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -52,15 +58,16 @@ android {
 dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
     testAnnotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
-    implementation "com.google.dagger:dagger:$daggerVersion"
+    compile "com.google.dagger:dagger:$daggerVersion"
 
-    compileOnly "javax.annotation:jsr250-api:$jsr250Version"
-    implementation "com.android.support:support-annotations:$supportLibVersion"
+    provided "javax.annotation:jsr250-api:$jsr250Version"
+    compile "com.android.support:support-annotations:$supportLibVersion"
 
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 
-    implementation "com.google.code.gson:gson:2.8.1"
+    compile "com.google.code.gson:gson:2.8.1"
 
-    testImplementation 'junit:junit:4.12'
+    testCompile "junit:junit:$jUnitVersion"
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
 }

@@ -37,13 +37,18 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.M;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
 
 @Module
 public class KeyStoreModule {
     
-    private final static String APP_KEY_ALIAS = "uk.co.glass_software.shared_preferences";
+    private final static String APP_KEY_ALIAS = "uk.co.glass_software.android.shared_preferences";
     public static final String ANDROID_KEY_STORE = "AndroidKeyStore";
-    public final static String ENCRYPTED_STORE_NAME = "encrypted";
+    private final String keyAlias;
+    
+    public KeyStoreModule(Context context) {
+        keyAlias = APP_KEY_ALIAS + "$$" + context.getApplicationContext().getPackageName();
+    }
     
     @Provides
     @Singleton
@@ -86,7 +91,7 @@ public class KeyStoreModule {
     @Singleton
     @Nullable
     RsaEncrypter provideRsaEncrypter(@Nullable KeyStore keyStore) {
-        return new RsaEncrypter(keyStore, APP_KEY_ALIAS);
+        return new RsaEncrypter(keyStore, keyAlias);
     }
     
     @Provides
@@ -103,14 +108,14 @@ public class KeyStoreModule {
             return new PreMKeyStoreManager(logger,
                                            keyStore,
                                            encryptedAesKey,
-                                           APP_KEY_ALIAS,
+                                           keyAlias,
                                            applicationContext
             );
         }
         else {
             return new PostMKeyStoreManager(logger,
                                             keyStore,
-                                            APP_KEY_ALIAS
+                                            keyAlias
             );
         }
     }

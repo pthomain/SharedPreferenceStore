@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2017 Glass Software Ltd
   ~
   ~ Licensed to the Apache Software Foundation (ASF) under one
@@ -21,20 +20,19 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="shared_preferences.android.glass_software.co.uk.shared_preference_store_demo">
+    package="uk.co.glass_software.android.shared_preferences.demo">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="shared_preferences.android.glass_software.co.uk.shared_preference_store_demo.MainActivity">
+    <activity android:name="MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

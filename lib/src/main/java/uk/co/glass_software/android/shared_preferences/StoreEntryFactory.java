@@ -37,7 +37,7 @@ public class StoreEntryFactory {
     
     public StoreEntryFactory(Context context) {
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
-                                                                             .keyStoreModule(new KeyStoreModule())
+                                                                             .keyStoreModule(new KeyStoreModule(context.getApplicationContext()))
                                                                              .persistenceModule(new PersistenceModule(context.getApplicationContext()))
                                                                              .build();
         
