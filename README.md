@@ -82,7 +82,7 @@ Only Strings are supported for encryption, other entry types must be serialised 
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
-Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provides access to all the values rather than to an individual ``StoreEntry``.
+Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provide access to all the values by key rather than to an individual ``StoreEntry``.
 
 Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store. Because of this and because the cached is warmed up upon instantiation, it is recommended to instantiate the factory in the Application context and to use it as a Singleton.
 
