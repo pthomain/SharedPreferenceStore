@@ -31,6 +31,17 @@ public class StoreEntry<C> {
     private final Class<C> valueClass;
     private final C defaultValue;
     
+    public <K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry(@NonNull KeyValueStore store,
+                                                                                                  @NonNull K keyProvider) {
+        this(store, keyProvider, keyProvider);
+    }
+    
+    public <K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry(@NonNull KeyValueStore store,
+                                                                                                  @NonNull K keyProvider,
+                                                                                                  @Nullable C defaultValue) {
+        this(store, keyProvider, keyProvider, defaultValue);
+    }
+    
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull StoreEntry.UniqueKeyProvider keyProvider,
                       @NonNull StoreEntry.ValueClassProvider<C> valueClassProvider) {

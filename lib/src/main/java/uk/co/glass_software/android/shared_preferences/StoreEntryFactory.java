@@ -27,12 +27,13 @@ import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 public class StoreEntryFactory {
     
     private final SharedPreferenceStore store;
-    private final SharedPreferenceStore encryptedStore;
+    private final EncryptedSharedPreferenceStore encryptedStore;
     private final boolean isEncryptionSupported;
     
     public StoreEntryFactory(Context context) {
@@ -86,7 +87,7 @@ public class StoreEntryFactory {
         return store;
     }
     
-    public SharedPreferenceStore getEncryptedStore() {
+    public EncryptedSharedPreferenceStore getEncryptedStore() {
         return encryptedStore;
     }
 }

@@ -68,8 +68,8 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
             return getFromCache(key);
         }
         
-        O value = super.getValue(key, objectClass, defaultValue);
-        return value == null ? null : (O) decrypt(value.toString());
+        O value = super.getValue(key, objectClass, null);
+        return value == null ? defaultValue : (O) decrypt(value.toString());
     }
     
     @Nullable

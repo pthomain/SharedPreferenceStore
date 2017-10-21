@@ -129,11 +129,11 @@ public class KeyStoreModule {
     @Provides
     @Singleton
     @Named(ENCRYPTED_STORE_NAME)
-    SharedPreferenceStore provideEncryptedSharedPreferenceStore(@Named(ENCRYPTED_STORE_NAME) SharedPreferences sharedPreferences,
-                                                                Base64Serialiser base64Serialiser,
-                                                                @Named(ENCRYPTED_STORE_NAME) BehaviorSubject<String> changeSubject,
-                                                                Logger logger,
-                                                                @Nullable KeyStoreManager keyStoreManager) {
+    EncryptedSharedPreferenceStore provideEncryptedSharedPreferenceStore(@Named(ENCRYPTED_STORE_NAME) SharedPreferences sharedPreferences,
+                                                                         Base64Serialiser base64Serialiser,
+                                                                         @Named(ENCRYPTED_STORE_NAME) BehaviorSubject<String> changeSubject,
+                                                                         Logger logger,
+                                                                         @Nullable KeyStoreManager keyStoreManager) {
         return new EncryptedSharedPreferenceStore(sharedPreferences,
                                                   base64Serialiser,
                                                   changeSubject,
@@ -145,7 +145,7 @@ public class KeyStoreModule {
     @Provides
     @Singleton
     @Named(IS_ENCRYPTION_SUPPORTED)
-    Boolean provideIsEncryptionSupported(@Nullable KeyStoreManager keyStoreManager){
+    Boolean provideIsEncryptionSupported(@Nullable KeyStoreManager keyStoreManager) {
         return keyStoreManager != null;
     }
 }

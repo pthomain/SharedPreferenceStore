@@ -24,6 +24,7 @@ package uk.co.glass_software.android.shared_preferences.demo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -32,6 +33,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -40,17 +43,22 @@ import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.persistence.base.EncryptedStoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 
 public class MainActivity extends AppCompatActivity {
     static {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
     }
     
+    private final static SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
     private StoreEntryFactory storeEntryFactory;
     private SharedPreferences encryptedPreferences;
     private Disposable subscription;
-    private StoreEntry<Integer> counter;
+    private Counter counter;
+    private LastOpenDate lastOpenDate;
     
     @BindView(R.id.input_key)
     EditText keyEditText;
@@ -73,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         storeEntryFactory = new StoreEntryFactory(this);
         encryptedPreferences = getSharedPreferences(getEncryptedStoreName(this), Context.MODE_PRIVATE); //used only to display stored encrypted values, should not be used directly in practice
         
-        counter = storeEntryFactory.open(Keys.COUNTER);
-        counter.save(counter.get(0) + 1);
+        counter = new Counter(storeEntryFactory.getStore());
+        lastOpenDate = new LastOpenDate(storeEntryFactory.getEncryptedStore());
     }
     
     @Override
@@ -91,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         if (subscription != null) {
             subscription.dispose();
         }
+        counter.save(counter.get(1) + 1);
+        lastOpenDate.save(format.format(new Date()));
     }
     
     @Nullable
@@ -137,8 +147,10 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder builder = new StringBuilder();
         
         builder.append("\t\tApp opened ");
-        builder.append(counter.get());
-        builder.append(" time(s)\n\n");
+        builder.append(counter.get(1));
+        builder.append(" time(s), last open date: ");
+        builder.append(lastOpenDate.get("N/A"));
+        builder.append("\n\n");
         
         builder.append("* Plain text entries:\n");
         for (Map.Entry<String, Object> entry : storeEntryFactory.getStore().getCachedValues().entrySet()) {
@@ -169,5 +181,17 @@ public class MainActivity extends AppCompatActivity {
     
     private String getEncryptedStoreName(Context context) {
         return context.getPackageName() + "$" + PersistenceModule.ENCRYPTED_STORE_NAME;
+    }
+    
+    private class Counter extends StoreEntry<Integer> {
+        public Counter(@NonNull KeyValueStore store) {
+            super(store, Keys.COUNTER);
+        }
+    }
+    
+    private class LastOpenDate extends EncryptedStoreEntry {
+        public LastOpenDate(@NonNull EncryptedSharedPreferenceStore store) {
+            super(store, Keys.LAST_OPEN_DATE);
+        }
     }
 }

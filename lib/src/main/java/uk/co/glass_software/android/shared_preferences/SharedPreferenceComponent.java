@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
@@ -42,7 +43,7 @@ public interface SharedPreferenceComponent {
     SharedPreferenceStore store();
     
     @Named(PersistenceModule.ENCRYPTED_STORE_NAME)
-    SharedPreferenceStore encryptedStore();
+    EncryptedSharedPreferenceStore encryptedStore();
     
     @Named(IS_ENCRYPTION_SUPPORTED)
     Boolean isEncryptionSupported();
