@@ -1,58 +1,90 @@
-SharedPreferenceStore
-=====================
+SharedPreferenceStore (beta)
+============================
 
 Simple access to the Android shared preferences via object mapping with support for encryption when supported by the device (supports API level 16+).
 
-The following logic:
+TL;DR
+-----
+
+Encapsulate your SharedPreferences value in a DAO and use it as a dependency:
 
 ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
-        defaultScore = getResources().getInteger(R.string.saved_high_score_default);
-    }
-    
-    private void saveHighScore(int newHighScore) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(getString(R.string.saved_high_score), newHighScore);
-        editor.commit();
-    }
-    
-    private int getHighScore() {
-        return sharedPref.getInt(getString(R.string.saved_high_score), defaultScore);
-    }
+@Inject
+StoreEntry<String> address;
+
+private void updateAddress() {
+    address.exists();               //true or false whether a value exists in SharedPreferences
+    address.get();                  //gets the saved value or null if not present 
+    address.get("default address"); //gets the saved value or "default address" if not present
+    address.drop();                 //deletes the saved value
+}  
 ```
 
-can be replaced with:
+Define your dependencies in your Dagger modules:
 
-```java    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        highScoreEntry = new StoreEntryFactory(this).open(getString(R.string.saved_high_score), Integer.class);
-        defaultScore = getResources().getInteger(R.string.saved_high_score_default);
-    }
-    
-    private void saveHighScore(int newHighScore) {
-        highScoreEntry.save(newHighScore);
-    }
-    
-    private int getHighScore() {
-        return highScoreEntry.get(defaultScore);
-    }
+```java
+@Provides
+StoreEntryFactory provideStoreEntryFactory(Context context){
+    return new StoreEntryFactory(context.getApplicationContext());
+}
+      
+@Provides
+StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
+    return storeEntryFactory.open(Keys.ADDRESS); //or storeEntryFactory.openEncrypted(Keys.ADDRESS);
+}
 ```
 
-To encrypt the stored value, call ``openEncrypted(getString(R.string.saved_high_score), Integer.class)`` instead.
+or use on-the-fly if you don't use dependency injection:
+
+```java
+StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
+```
+
+use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted (if supported by the device).
+
+Define your entries in an enum:
+
+```java
+enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {  
+    FIRST_NAME(String.class),
+    LAST_NAME(String.class),
+    EMAIL(String.class),
+    AGE(Integer.class),
+    JOIN_DATE(Date.class),
+    ADDRESS(String.class);
+        
+    private final String prefix = getClass().getSimpleName();
+    private final Class<?> valueClass;
+        
+    Keys(Class valueClass) {
+        this.valueClass = valueClass;
+    }
+        
+    @Override
+    public String getUniqueKey() {
+        return prefix + "." + this; 
+    }
+        
+    @Override
+    public Class getValueClass() {
+        return valueClass;
+    }
+}
+```
+
+Overview
+--------
+
+To encrypt the stored value, call ``openEncrypted("AGE", Integer.class)``.
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
 Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provides access to all the values rather than to an individual ``StoreEntry``.
 
-Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially for the encrypted store.
-
+Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store.
 All primitives are supported along with objects implementing the Serializable interface which are serialised to Base64.
+Value udpates are logged in debug mode by default, the output is disabled in production (checking BuildConfig.DEBUG).
 
 Regarding keys
 --------------
@@ -62,7 +94,7 @@ In order to preserve the uniqueness of the keys, it is recommended to use an enu
 
 ```java
 enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {   
-    HIGH_SCORE(String.class)
+    AGE(Integer.class)
     
     private final String prefix = getClass().getSimpleName();
     private final Class<?> valueClass;
@@ -82,7 +114,8 @@ enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider
     }
 }
 ```
-This way, ``openEncrypted(getString(R.string.saved_high_score), Integer.class)`` can be replaced with ``storeEntryFactory.openEncrypted(Keys.HIGH_SCORE)``.
+
+This way, ``openEncrypted("AGE", Integer.class)`` can be replaced with ``storeEntryFactory.openEncrypted(Keys.AGE)``.
 
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
