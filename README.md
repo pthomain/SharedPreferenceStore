@@ -84,7 +84,8 @@ Individual entries are represented as a ``StoreEntry`` object which can be used 
 
 Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provides access to all the values rather than to an individual ``StoreEntry``.
 
-Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store.
+Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store. Because of this and because the cached is warmed up upon instantiation, it is recommended to instantiate the factory in the Application context and to use it as a Singleton.
+
 All primitives are supported along with objects implementing the Serializable interface which are serialised to Base64.
 Value udpates are logged in debug mode by default, the output is disabled in production (checking BuildConfig.DEBUG).
 
