@@ -30,7 +30,7 @@ StoreEntryFactory provideStoreEntryFactory(Context context){
       
 @Provides
 StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
-    return storeEntryFactory.open(Keys.ADDRESS); //or storeEntryFactory.openEncrypted(Keys.ADDRESS);
+    return storeEntryFactory.open(Keys.ADDRESS); //or openEncrypted(Keys.ADDRESS);
 }
 ```
 
@@ -40,7 +40,7 @@ or use on-the-fly if you don't use dependency injection:
 StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 ```
 
-use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted (if supported by the device).
+Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
 Define your entries in an enum:
 
@@ -77,6 +77,7 @@ Overview
 
 To encrypt the stored value, call ``openEncrypted("AGE", Integer.class)``.
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
+Only Strings are supported for encryption, other entry types must be serialised / deserialised manually. 
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
@@ -115,7 +116,7 @@ enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider
 }
 ```
 
-This way, ``openEncrypted("AGE", Integer.class)`` can be replaced with ``storeEntryFactory.openEncrypted(Keys.AGE)``.
+This way, ``open("AGE", Integer.class)`` can be replaced with ``open(Keys.AGE)``. It also prevents the use of magic strings for the keys and the risk of collisions if all keys are stored in the same enum.
 
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
