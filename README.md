@@ -115,7 +115,7 @@ enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider
 }
 ```
 
-This way, ``openEncrypted("AGE", Integer.class)`` can be replaced with ``storeEntryFactory.openEncrypted(Keys.AGE)``.
+This way, ``open("AGE", Integer.class)`` can be replaced with ``open(Keys.AGE)``. It also prevents the use of magic strings for the keys and the risk of collisions if all keys are stored in the same enum.
 
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
