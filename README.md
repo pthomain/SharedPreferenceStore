@@ -30,7 +30,7 @@ StoreEntryFactory provideStoreEntryFactory(Context context){
       
 @Provides
 StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
-    return storeEntryFactory.open(Keys.ADDRESS); //or storeEntryFactory.openEncrypted(Keys.ADDRESS);
+    return storeEntryFactory.open(Keys.ADDRESS); //or openEncrypted(Keys.ADDRESS);
 }
 ```
 
@@ -40,7 +40,7 @@ or use on-the-fly if you don't use dependency injection:
 StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 ```
 
-use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted (if supported by the device).
+Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
 Define your entries in an enum:
 
