@@ -20,5 +20,5 @@
   -->
 
 <resources>
-    <string name="app_name">SharePreferenceStoreDemo</string>
+    <string name="app_name">SharedPreferenceStore Demo</string>
 </resources>

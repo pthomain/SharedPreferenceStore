@@ -22,21 +22,12 @@
 package uk.co.glass_software.android.shared_preferences;
 
 
-import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import java.util.MissingFormatArgumentException;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import shared_preferences.android.glass_software.co.uk.shared_preferences.BuildConfig;
+import io.reactivex.android.BuildConfig;
+
 
 public class SimpleLogger implements Logger {
     
@@ -44,11 +35,7 @@ public class SimpleLogger implements Logger {
     private static boolean FORCE_STACK_TRACE_OUTPUT = false;
     private final static int STACK_TRACE_DESCRIPTION_LENGTH = 4;
     
-    private final Context applicationContext;
-    private final Handler handler;
     private final Printer printer;
-    private final Gson gson;
-    private final JsonParser jsonParser;
     
     public interface Printer {
         void print(int priority,
@@ -56,17 +43,12 @@ public class SimpleLogger implements Logger {
                    String message);
     }
     
-    public SimpleLogger(Context applicationContext) {
-        this(applicationContext, Log::println);
+    public SimpleLogger() {
+        this(Log::println);
     }
     
-    public SimpleLogger(Context applicationContext,
-                        Printer printer) {
-        this.applicationContext = applicationContext;
+    public SimpleLogger(Printer printer) {
         this.printer = printer;
-        handler = new Handler(applicationContext.getMainLooper());
-        gson = new GsonBuilder().setPrettyPrinting().create();
-        jsonParser = new JsonParser();
     }
     
     private String getTag(Object caller) {
@@ -142,7 +124,7 @@ public class SimpleLogger implements Logger {
     private void d(String tag,
                    String message,
                    boolean forceOutput) {
-        log(Log.DEBUG, tag, prettyPrint(message), null, forceOutput);
+        log(Log.DEBUG, tag, message, null, forceOutput);
     }
     
     
@@ -168,40 +150,13 @@ public class SimpleLogger implements Logger {
                 
                 logInternal(priority,
                             tag,
-                            " (" + file + ":" + line + ") " + (throwable == null ? prettyPrint(
-                                    message) : message),
+                            " (" + file + ":" + line + ") " + message,
                             throwable
                 );
             }
             catch (MissingFormatArgumentException e) {
                 e(SimpleLogger.class, e, e.getMessage());
             }
-        }
-    }
-    
-    public String prettyPrint(String message) {
-        if (message.contains("{")) {
-            int index = message.indexOf("{");
-            int lastIndex = message.lastIndexOf("}");
-            String messageBefore = message.substring(0, index);
-            String messageMiddle = message.substring(index, lastIndex + 1);
-            String messageAfter = message.substring(lastIndex + 1, message.length());
-            return getPrettyJson(messageMiddle, messageBefore, messageAfter);
-        }
-        else {
-            return message;
-        }
-    }
-    
-    private String getPrettyJson(String message,
-                                 String messageBefore,
-                                 String messageAfter) {
-        try {
-            JsonElement jsonElement = jsonParser.parse(message);
-            return messageBefore + gson.toJson(jsonElement) + messageAfter;
-        }
-        catch (Exception e) {
-            return message;
         }
     }
     
@@ -223,38 +178,4 @@ public class SimpleLogger implements Logger {
             }
         }
     }
-    
-    public void showToast(final Object object) {
-        showToast(object, false);
-    }
-    
-    public void showToast(final Object object,
-                          boolean speedUp) {
-        if (BuildConfig.DEBUG) {
-            d(SimpleLogger.class, "Logger.showToast: " + object);
-            handler.post(() -> showToastInternal(object, speedUp));
-        }
-    }
-    
-    private void showToastInternal(Object object,
-                                   boolean speedUp) {
-        Toast toast = Toast.makeText(applicationContext,
-                                     "DEBUG: " + object,
-                                     Toast.LENGTH_SHORT
-        );
-        if (speedUp) {
-            Observable.just(toast)
-                      .map(t -> {
-                          t.show();
-                          return t;
-                      })
-                      .delay(500, TimeUnit.MILLISECONDS)
-                      .doOnNext(Toast::cancel)
-                      .subscribe();
-        }
-        else {
-            toast.show();
-        }
-    }
-    
 }

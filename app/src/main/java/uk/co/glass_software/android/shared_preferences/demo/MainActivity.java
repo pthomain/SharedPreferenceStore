@@ -21,6 +21,8 @@
 
 package uk.co.glass_software.android.shared_preferences.demo;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -37,8 +39,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
+import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
-import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry.UniqueKeyProvider;
 
 public class MainActivity extends AppCompatActivity {
     static {
@@ -46,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private StoreEntryFactory storeEntryFactory;
+    private SharedPreferences encryptedPreferences;
     private Disposable subscription;
+    private StoreEntry<Integer> counter;
     
     @BindView(R.id.input_key)
     EditText keyEditText;
@@ -65,7 +69,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        
         storeEntryFactory = new StoreEntryFactory(this);
+        encryptedPreferences = getSharedPreferences(getEncryptedStoreName(this), Context.MODE_PRIVATE); //used only to display stored encrypted values, should not be used directly in practice
+        
+        counter = storeEntryFactory.open(Keys.COUNTER);
+        counter.save(counter.get(0) + 1);
     }
     
     @Override
@@ -85,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
     
     @Nullable
-    private StoreEntry<UniqueKeyProvider, String> getStoreEntry() {
+    private StoreEntry<String> getStoreEntry() {
         String key = keyEditText.getText().toString();
         
         if (key.isEmpty()) {
@@ -99,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     
     @OnClick(R.id.button_get)
     void onGetClicked() {
-        StoreEntry<UniqueKeyProvider, String> storeEntry = getStoreEntry();
+        StoreEntry<String> storeEntry = getStoreEntry();
         
         if (storeEntry != null) {
             String message = storeEntry.get("Entry doesn't exist");
@@ -109,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     
     @OnClick(R.id.button_save)
     void onSaveClicked() {
-        StoreEntry<UniqueKeyProvider, String> storeEntry = getStoreEntry();
+        StoreEntry<String> storeEntry = getStoreEntry();
         String value = valueEditText.getText().toString();
         if (storeEntry != null) {
             storeEntry.save(value.isEmpty() ? null : value);
@@ -118,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     
     @OnClick(R.id.button_delete)
     void onDeleteClicked() {
-        StoreEntry<UniqueKeyProvider, String> storeEntry = getStoreEntry();
+        StoreEntry<String> storeEntry = getStoreEntry();
         if (storeEntry != null) {
             storeEntry.drop();
         }
@@ -127,24 +136,38 @@ public class MainActivity extends AppCompatActivity {
     private void showEntries() {
         StringBuilder builder = new StringBuilder();
         
-        builder.append("\t\t* Plain text entries:\n");
+        builder.append("\t\tApp opened ");
+        builder.append(counter.get());
+        builder.append(" time(s)\n\n");
+        
+        builder.append("* Plain text entries:\n");
         for (Map.Entry<String, Object> entry : storeEntryFactory.getStore().getCachedValues().entrySet()) {
-            output(builder, entry);
+            output(builder, entry.getKey(), entry.getValue());
         }
         
-        builder.append("\n\n\t\t* Encrypted entries:\n");
+        builder.append("\n\n* Encrypted entries (as returned by the store):\n");
         for (Map.Entry<String, Object> entry : storeEntryFactory.getEncryptedStore().getCachedValues().entrySet()) {
-            output(builder, entry);
+            output(builder, entry.getKey(), entry.getValue());
+        }
+        
+        builder.append("\n\n* Encrypted entries (as stored on disk):\n");
+        for (Map.Entry<String, ?> entry : encryptedPreferences.getAll().entrySet()) {
+            output(builder, entry.getKey(), entry.getValue());
         }
         
         entries.setText(builder.toString());
     }
     
     private void output(StringBuilder builder,
-                        Map.Entry<String, Object> entry) {
-        builder.append("\n");
-        builder.append(entry.getKey());
+                        String key,
+                        Object value) {
+        builder.append("\n\t\t\t\t");
+        builder.append(key);
         builder.append(" => ");
-        builder.append(entry.getValue());
+        builder.append(value.toString().replaceAll("\\n", ""));
+    }
+    
+    private String getEncryptedStoreName(Context context) {
+        return context.getPackageName() + "$" + PersistenceModule.ENCRYPTED_STORE_NAME;
     }
 }

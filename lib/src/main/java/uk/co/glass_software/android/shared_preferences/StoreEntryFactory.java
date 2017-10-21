@@ -43,34 +43,34 @@ public class StoreEntryFactory {
         
         encryptedStore = component.encryptedStore();
         store = component.store();
-        isEncryptionSupported = component.keyStoreManager() != null;
+        isEncryptionSupported = component.isEncryptionSupported();
     }
     
-    public <C> StoreEntry<StoreEntry.UniqueKeyProvider, C> open(String key,
-                                                                Class<C> valueClass) {
+    public <C> StoreEntry<C> open(String key,
+                                  Class<C> valueClass) {
         return open(() -> key, () -> valueClass);
     }
     
-    public <C> StoreEntry<StoreEntry.UniqueKeyProvider, C> openEncrypted(String key,
-                                                                         Class<C> valueClass) {
+    public <C> StoreEntry<C> openEncrypted(String key,
+                                           Class<C> valueClass) {
         return openEncrypted(() -> key, () -> valueClass);
     }
     
-    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> open(KEY keyProvider,
-                                                                                 StoreEntry.ValueClassProvider<C> valueClassProvider) {
+    public <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
+                                  StoreEntry.ValueClassProvider<C> valueClassProvider) {
         return new StoreEntry<>(store, keyProvider, valueClassProvider);
     }
     
-    public <KEY extends StoreEntry.UniqueKeyProvider, C> StoreEntry<KEY, C> openEncrypted(KEY keyProvider,
-                                                                                          StoreEntry.ValueClassProvider<C> valueClassProvider) {
+    public <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
+                                           StoreEntry.ValueClassProvider<C> valueClassProvider) {
         return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
     }
     
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<StoreEntry.UniqueKeyProvider, C> open(K key) {
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> open(K key) {
         return open(key, key);
     }
     
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<StoreEntry.UniqueKeyProvider, C> openEncrypted(K key) {
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> openEncrypted(K key) {
         return openEncrypted(key, key);
     }
     

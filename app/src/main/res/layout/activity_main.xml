@@ -33,16 +33,16 @@
         <EditText
             android:id="@+id/input_key"
             android:layout_width="0dp"
-            android:hint="Key"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:hint="Key" />
 
         <EditText
             android:id="@+id/input_value"
             android:layout_width="0dp"
-            android:hint="Value"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:hint="Value" />
 
     </LinearLayout>
 
@@ -81,12 +81,18 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/entries"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:layout_weight="1"
-        android:lineSpacingMultiplier="1.5" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/entries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.5" />
+
+    </ScrollView>
 
 </LinearLayout>

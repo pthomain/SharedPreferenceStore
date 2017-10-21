@@ -24,7 +24,7 @@ package uk.co.glass_software.android.shared_preferences.persistence.base;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class StoreEntry<KP extends StoreEntry.UniqueKeyProvider, C> {
+public class StoreEntry<C> {
     
     private final KeyValueStore store;
     private final String keyString;
@@ -32,13 +32,13 @@ public class StoreEntry<KP extends StoreEntry.UniqueKeyProvider, C> {
     private final C defaultValue;
     
     public StoreEntry(@NonNull KeyValueStore store,
-                      @NonNull KP keyProvider,
+                      @NonNull StoreEntry.UniqueKeyProvider keyProvider,
                       @NonNull StoreEntry.ValueClassProvider<C> valueClassProvider) {
         this(store, keyProvider, valueClassProvider, null);
     }
     
     public StoreEntry(@NonNull KeyValueStore store,
-                      @NonNull KP keyProvider,
+                      @NonNull StoreEntry.UniqueKeyProvider keyProvider,
                       @NonNull StoreEntry.ValueClassProvider<C> valueClassProvider,
                       @Nullable C defaultValue) {
         this.store = store;

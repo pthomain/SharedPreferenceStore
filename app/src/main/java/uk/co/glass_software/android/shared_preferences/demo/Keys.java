@@ -27,7 +27,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEnt
 
 enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
     
-    FIRST_NAME(String.class),
+    COUNTER(Integer.class),
     LAST_NAME(String.class),
     EMAIL(String.class),
     AGE(Integer.class),

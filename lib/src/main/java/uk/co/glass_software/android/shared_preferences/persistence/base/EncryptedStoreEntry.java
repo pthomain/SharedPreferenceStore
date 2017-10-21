@@ -22,63 +22,15 @@
 package uk.co.glass_software.android.shared_preferences.persistence.base;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 
 
-public class EncryptedStoreEntry<K extends StoreEntry.UniqueKeyProvider> extends StoreEntry<K, String> {
+public class EncryptedStoreEntry extends StoreEntry<String> {
     
-    @NonNull
-    private final KeyStoreManager keyStoreManager;
-    
-    @Nullable
-    private String memoryValue;
-    
-    protected EncryptedStoreEntry(@NonNull KeyValueStore store,
-                                  @Nullable KeyStoreManager keyStoreManager,
-                                  @NonNull K storeKey) {
+    protected EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                                  @NonNull StoreEntry.UniqueKeyProvider storeKey) {
         super(store, storeKey, () -> String.class);
-        if (keyStoreManager == null) {
-            throw new IllegalStateException("Encryption is not supported on this device");
-        }
-        this.keyStoreManager = keyStoreManager;
     }
     
-    @Override
-    public synchronized final void save(@Nullable String value) {
-        super.save(encrypt(value));
-        memoryValue = value;
-    }
-    
-    @Override
-    @Nullable
-    public synchronized final String get() {
-        return get(null);
-    }
-    
-    @Override
-    @Nullable
-    public synchronized final String get(@Nullable String defaultValue) {
-        if (memoryValue == null) {
-            memoryValue = decrypt(super.get(defaultValue));
-        }
-        return memoryValue;
-    }
-    
-    @Override
-    public synchronized final void drop() {
-        super.drop();
-        memoryValue = null;
-    }
-    
-    @Nullable
-    private String encrypt(@Nullable String clearText) {
-        return clearText == null ? null : keyStoreManager.encrypt(clearText);
-    }
-    
-    @Nullable
-    private String decrypt(@Nullable String encrypted) {
-        return encrypted == null ? null : keyStoreManager.decrypt(encrypted);
-    }
 }

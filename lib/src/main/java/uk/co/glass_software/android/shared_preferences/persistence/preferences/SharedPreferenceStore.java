@@ -40,8 +40,8 @@ public class SharedPreferenceStore implements KeyValueStore {
     
     private final SharedPreferences sharedPreferences;
     private final Base64Serialiser serialiser;
-    private final BehaviorSubject<String> changeSubject;
-    private final Logger logger;
+    final BehaviorSubject<String> changeSubject;
+    final Logger logger;
     
     private Map<String, Object> cacheMap;
     
@@ -53,14 +53,16 @@ public class SharedPreferenceStore implements KeyValueStore {
         serialiser = base64Serialiser;
         this.changeSubject = changeSubject;
         this.logger = logger;
-        initCache();
+        if (cache()) {
+            initCache();
+        }
     }
     
-    public Observable<String> observeChanges() {
-        return changeSubject;
+    protected boolean cache() {
+        return true;
     }
     
-    private synchronized void initCache() {
+    synchronized void initCache() {
         if (cacheMap != null) {
             return;
         }
@@ -75,9 +77,18 @@ public class SharedPreferenceStore implements KeyValueStore {
                 value = serialiser.deserialise((String) value);
             }
             
-            cacheMap.put(entry.getKey(), value);
-            logger.d(this, entry.getKey() + " -> " + value);
+            Object readValue = readStoredValue(value);
+            saveToCache(entry.getKey(), readValue);
+            logger.d(this, entry.getKey() + " -> " + readValue);
         }
+    }
+    
+    Object readStoredValue(Object value) {
+        return value;
+    }
+    
+    public Observable<String> observeChanges() {
+        return changeSubject;
     }
     
     @Override
@@ -138,7 +149,7 @@ public class SharedPreferenceStore implements KeyValueStore {
                                                + " does not implement Serializable");
         }
         
-        if (!isBase64) {
+        if (!isBase64 && cache()) {
             saveToCache(key, value);
             logger.d(this, "Saving entry " + key + " -> " + value);
             changeSubject.onNext(key);
@@ -187,7 +198,9 @@ public class SharedPreferenceStore implements KeyValueStore {
                     value = serialiser.deserialise(getValue(key, String.class, null));
                 }
                 
-                saveToCache(key, value);
+                if (cache()) {
+                    saveToCache(key, value);
+                }
                 return value;
             }
         }
@@ -198,8 +211,8 @@ public class SharedPreferenceStore implements KeyValueStore {
         return defaultValue;
     }
     
-    private void saveToCache(@NonNull String key,
-                             @Nullable Object value) {
+    synchronized void saveToCache(@NonNull String key,
+                                  @Nullable Object value) {
         if (value == null) {
             if (hasValue(key)) {
                 cacheMap.remove(key);
@@ -216,7 +229,7 @@ public class SharedPreferenceStore implements KeyValueStore {
     }
     
     @Nullable
-    private <O> O getFromCache(@NonNull String key) {
+    <O> O getFromCache(@NonNull String key) {
         return (O) cacheMap.get(key);
     }
     

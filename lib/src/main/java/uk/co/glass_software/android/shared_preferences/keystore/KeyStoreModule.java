@@ -22,6 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.keystore;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
 import java.security.KeyStore;
@@ -31,13 +32,18 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.Base64Serialiser;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.M;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.STORE_NAME;
 
 @Module
 public class KeyStoreModule {
@@ -72,7 +78,7 @@ public class KeyStoreModule {
     @Provides
     @Singleton
     @Nullable
-    SavedEncryptedAesKey provideSavedEncryptedAesKey(@Named(ENCRYPTED_STORE_NAME) SharedPreferenceStore sharedPreferenceStore,
+    SavedEncryptedAesKey provideSavedEncryptedAesKey(@Named(STORE_NAME) SharedPreferenceStore sharedPreferenceStore,
                                                      @Nullable RsaEncrypter rsaEncrypter,
                                                      Logger logger) {
         if (SDK_INT < JELLY_BEAN_MR2 || SDK_INT >= M) {
@@ -120,4 +126,26 @@ public class KeyStoreModule {
         }
     }
     
+    @Provides
+    @Singleton
+    @Named(ENCRYPTED_STORE_NAME)
+    SharedPreferenceStore provideEncryptedSharedPreferenceStore(@Named(ENCRYPTED_STORE_NAME) SharedPreferences sharedPreferences,
+                                                                Base64Serialiser base64Serialiser,
+                                                                @Named(ENCRYPTED_STORE_NAME) BehaviorSubject<String> changeSubject,
+                                                                Logger logger,
+                                                                @Nullable KeyStoreManager keyStoreManager) {
+        return new EncryptedSharedPreferenceStore(sharedPreferences,
+                                                  base64Serialiser,
+                                                  changeSubject,
+                                                  logger,
+                                                  keyStoreManager
+        );
+    }
+    
+    @Provides
+    @Singleton
+    @Named(IS_ENCRYPTION_SUPPORTED)
+    Boolean provideIsEncryptionSupported(@Nullable KeyStoreManager keyStoreManager){
+        return keyStoreManager != null;
+    }
 }

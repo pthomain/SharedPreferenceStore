@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import uk.co.glass_software.android.shared_preferences.Function;
 import uk.co.glass_software.android.shared_preferences.StoreKey;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -19,19 +19,16 @@ import static org.mockito.Mockito.when;
 
 public class EncryptedStoreEntryUnitTest {
     
-    private KeyValueStore mockKeyValueStore;
-    private KeyStoreManager mockKeyStoreManager;
+    private EncryptedSharedPreferenceStore mockKeyValueStore;
     
     private TestEntry target;
     private StoreKey storeKey = StoreKey.TEST;
     
     @Before
     public void setUp() throws Exception {
-        mockKeyValueStore = mock(KeyValueStore.class);
-        mockKeyStoreManager = mock(KeyStoreManager.class);
+        mockKeyValueStore = mock(EncryptedSharedPreferenceStore.class);
         
         target = new TestEntry(mockKeyValueStore,
-                               mockKeyStoreManager,
                                storeKey
         );
     }
@@ -99,10 +96,9 @@ public class EncryptedStoreEntryUnitTest {
     }
     
     private class TestEntry extends EncryptedStoreEntry {
-        private TestEntry(KeyValueStore store,
-                          KeyStoreManager keyStoreManager,
+        private TestEntry(EncryptedSharedPreferenceStore store,
                           StoreKey storeKey) {
-            super(store, keyStoreManager, storeKey);
+            super(store, storeKey);
         }
     }
 }

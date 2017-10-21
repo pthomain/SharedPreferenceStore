@@ -17,11 +17,11 @@ import static org.mockito.Mockito.when;
 
 public class StoreEntryUnitTest {
     
-    private StoreEntry<StoreKey, String> target;
+    private StoreEntry<String> target;
     private KeyValueStore mockStore;
     private StoreKey storeKey = StoreKey.TEST;
     
-    private class TestEntry extends StoreEntry<StoreKey, String> {
+    private class TestEntry extends StoreEntry<String> {
         private TestEntry(KeyValueStore store) {
             super(store, storeKey, storeKey);
         }

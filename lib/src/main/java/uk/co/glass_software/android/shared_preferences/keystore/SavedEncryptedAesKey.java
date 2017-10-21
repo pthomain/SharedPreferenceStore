@@ -30,7 +30,7 @@ import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
-public class SavedEncryptedAesKey extends StoreEntry<StoreEntry.UniqueKeyProvider, String> {
+public class SavedEncryptedAesKey extends StoreEntry<String> {
     
     private static final String KEY = "SharedPreferenceStoreEncryptedAesKey";
     private final Logger logger;
