@@ -13,10 +13,11 @@ Encapsulate your SharedPreferences value in a DAO and use it as a dependency:
 StoreEntry<String> address;
 
 private void updateAddress() {
-    address.exists();               //true or false whether a value exists in SharedPreferences
-    address.get();                  //gets the saved value or null if not present 
-    address.get("default address"); //gets the saved value or "default address" if not present
-    address.drop();                 //deletes the saved value
+    address.exists();               // true or false whether a value exists in SharedPreferences
+    address.get();                  // gets the saved value or null if not present 
+    address.get("default address"); // gets the saved value or "default address" if not present
+    address.save("my new address"); // updates/saves a new value to the SharedPreferences
+    address.drop();                 // deletes the saved value
 }  
 ```
 
@@ -30,7 +31,7 @@ StoreEntryFactory provideStoreEntryFactory(Context context){
       
 @Provides
 StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
-    return storeEntryFactory.open(Keys.ADDRESS); //or openEncrypted(Keys.ADDRESS);
+    return storeEntryFactory.open(Keys.ADDRESS); // or openEncrypted(Keys.ADDRESS);
 }
 ```
 
