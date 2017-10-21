@@ -78,7 +78,7 @@ Overview
 
 To encrypt the stored value, call ``openEncrypted("AGE", Integer.class)``.
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
-Only Strings are supported for encryption, other entry types must be serialised / deserialised manually. 
+Only Strings are supported for encryption, other entry types must be serialised / deserialised beforehand manually. 
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
