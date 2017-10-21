@@ -14,7 +14,7 @@ StoreEntry<String> address;
 
 private void updateAddress() {
     address.exists();               // true or false whether a value exists in SharedPreferences
-    address.get();                  // gets the saved value or null if not present 
+    address.get();                  // gets the saved value or null if none present 
     address.get("default address"); // gets the saved value or "default address" if not present
     address.save("my new address"); // updates/saves a new value to the SharedPreferences
     address.drop();                 // deletes the saved value
