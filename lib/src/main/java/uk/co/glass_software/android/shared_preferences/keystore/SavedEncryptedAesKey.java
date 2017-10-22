@@ -46,13 +46,13 @@ public class SavedEncryptedAesKey extends StoreEntry<String> {
     
     @Override
     @Nullable
-    public synchronized String get() {
+    public synchronized final String get() {
         return get(null);
     }
     
     @Override
     @Nullable
-    public synchronized String get(String defaultValue) {
+    public synchronized final String get(String defaultValue) {
         String storedKey = super.get(defaultValue);
         
         if (storedKey == null) {
