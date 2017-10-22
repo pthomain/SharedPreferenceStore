@@ -73,6 +73,8 @@ enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider
 }
 ```
 
+<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" style="width: 240px;"/></a>
+
 Overview
 --------
 
