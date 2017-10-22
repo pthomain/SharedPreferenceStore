@@ -13,10 +13,11 @@ Encapsulate your SharedPreferences value in a DAO and use it as a dependency:
 StoreEntry<String> address;
 
 private void updateAddress() {
-    address.exists();               //true or false whether a value exists in SharedPreferences
-    address.get();                  //gets the saved value or null if not present 
-    address.get("default address"); //gets the saved value or "default address" if not present
-    address.drop();                 //deletes the saved value
+    address.exists();               // true or false whether a value exists in SharedPreferences
+    address.get();                  // gets the saved value or null if none present 
+    address.get("default address"); // gets the saved value or "default address" if not present
+    address.save("my new address"); // updates/saves a new value to the SharedPreferences
+    address.drop();                 // deletes the saved value
 }  
 ```
 
@@ -30,7 +31,7 @@ StoreEntryFactory provideStoreEntryFactory(Context context){
       
 @Provides
 StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
-    return storeEntryFactory.open(Keys.ADDRESS); //or openEncrypted(Keys.ADDRESS);
+    return storeEntryFactory.open(Keys.ADDRESS); // or openEncrypted(Keys.ADDRESS);
 }
 ```
 
@@ -77,13 +78,14 @@ Overview
 
 To encrypt the stored value, call ``openEncrypted("AGE", Integer.class)``.
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
-Only Strings are supported for encryption, other entry types must be serialised / deserialised manually. 
+Only Strings are supported for encryption, other entry types must be serialised / deserialised beforehand manually. 
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
-Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provides access to all the values rather than to an individual ``StoreEntry``.
+Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provide access to all the values by key rather than to an individual ``StoreEntry``.
 
-Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store.
+Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store. Because of this and because the cached is warmed up upon instantiation, it is recommended to instantiate the factory in the Application context and to use it as a Singleton.
+
 All primitives are supported along with objects implementing the Serializable interface which are serialised to Base64.
 Value udpates are logged in debug mode by default, the output is disabled in production (checking BuildConfig.DEBUG).
 
