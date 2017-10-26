@@ -3,6 +3,8 @@ SharedPreferenceStore (beta)
 
 Simple access to the Android shared preferences via object mapping with support for encryption when supported by the device (supports API level 16+).
 
+<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="350"/></a>
+
 TL;DR
 -----
 
@@ -72,8 +74,6 @@ enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider
     }
 }
 ```
-
-<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" style="width: 240px;"/></a>
 
 Overview
 --------
