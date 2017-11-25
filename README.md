@@ -1,9 +1,9 @@
-SharedPreferenceStore (beta)
+SharedPreferenceStore (beta) 
+<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="150"/></a>
 ============================
 
 Simple access to the Android shared preferences via object mapping with support for encryption when supported by the device (supports API level 16+).
 
-<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="350"/></a>
 
 TL;DR
 -----
@@ -125,3 +125,24 @@ This way, ``open("AGE", Integer.class)`` can be replaced with ``open(Keys.AGE)``
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
 
+Adding the dependency
+---------------------
+
+To add the library to your project, add the following block to your root gradle file:
+
+```
+allprojects {
+ repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+ }
+}
+ ```
+ 
+ Then add the following dependency to your module:
+ 
+ ```
+ dependencies {
+    compile 'com.github.pthomain:SharedPreferenceStore:1.0.0'
+}
+```
