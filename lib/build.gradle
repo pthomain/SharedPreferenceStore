@@ -21,6 +21,8 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.pthomain'
 
 retrolambda {
     jvmArgs '-noverify'
