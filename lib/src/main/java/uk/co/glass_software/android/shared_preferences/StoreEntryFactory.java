@@ -22,8 +22,10 @@
 package uk.co.glass_software.android.shared_preferences;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import io.reactivex.Observable;
+import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
 import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
@@ -36,6 +38,9 @@ public class StoreEntryFactory {
     private final EncryptedSharedPreferenceStore encryptedStore;
     private final boolean isEncryptionSupported;
     
+    @Nullable
+    private final KeyStoreManager keyStoreManager;
+    
     public StoreEntryFactory(Context context) {
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
                                                                              .keyStoreModule(new KeyStoreModule(context.getApplicationContext()))
@@ -45,6 +50,7 @@ public class StoreEntryFactory {
         encryptedStore = component.encryptedStore();
         store = component.store();
         isEncryptionSupported = component.isEncryptionSupported();
+        keyStoreManager = component.keyStoreManager();
     }
     
     public <C> StoreEntry<C> open(String key,
@@ -89,5 +95,21 @@ public class StoreEntryFactory {
     
     public EncryptedSharedPreferenceStore getEncryptedStore() {
         return encryptedStore;
+    }
+    
+    public byte[] encrypt(byte[] toEncrypt) {
+        checkEncryptionSupported();
+        return keyStoreManager.encryptBytes(toEncrypt);
+    }
+    
+    public byte[] decrypt(byte[] toDecrypt) {
+        checkEncryptionSupported();
+        return keyStoreManager.decryptBytes(toDecrypt);
+    }
+    
+    private void checkEncryptionSupported() {
+        if (!isEncryptionSupported) {
+            throw new IllegalStateException("Encryption isn't supported on this device");
+        }
     }
 }

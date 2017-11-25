@@ -42,23 +42,28 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
-import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.EncryptedStoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
+
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
 
 public class MainActivity extends AppCompatActivity {
     static {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
     }
     
-    private final static SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
+    private final static SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss");
     private StoreEntryFactory storeEntryFactory;
     private SharedPreferences encryptedPreferences;
     private Disposable subscription;
     private Counter counter;
     private LastOpenDate lastOpenDate;
+    
+    private SharedPreferenceStore store;
+    private EncryptedSharedPreferenceStore encryptedStore;
     
     @BindView(R.id.input_key)
     EditText keyEditText;
@@ -68,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
     
     @BindView(R.id.encrypted_switch)
     Switch encryptedSwitch;
-    
     @BindView(R.id.entries)
     TextView entries;
     
@@ -78,11 +82,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         
+        encryptedPreferences = getSharedPreferences(getPackageName() + "$" + ENCRYPTED_STORE_NAME,
+                                                    Context.MODE_PRIVATE
+        ); //used only to display encrypted values as stored on disk, should not be used directly in practice
+    
         storeEntryFactory = new StoreEntryFactory(this);
-        encryptedPreferences = getSharedPreferences(getEncryptedStoreName(this), Context.MODE_PRIVATE); //used only to display stored encrypted values, should not be used directly in practice
+        store = storeEntryFactory.getStore();
+        encryptedStore = storeEntryFactory.getEncryptedStore();
         
-        counter = new Counter(storeEntryFactory.getStore());
-        lastOpenDate = new LastOpenDate(storeEntryFactory.getEncryptedStore());
+        counter = new Counter(store);
+        lastOpenDate = new LastOpenDate(encryptedStore);
     }
     
     @Override
@@ -152,22 +161,33 @@ public class MainActivity extends AppCompatActivity {
         builder.append(lastOpenDate.get("N/A"));
         builder.append("\n\n");
         
-        builder.append("* Plain text entries:\n");
-        for (Map.Entry<String, Object> entry : storeEntryFactory.getStore().getCachedValues().entrySet()) {
-            output(builder, entry.getKey(), entry.getValue());
-        }
+        showEntries(builder,
+                    "Plain text entries",
+                    store.getCachedValues()
+        );
         
-        builder.append("\n\n* Encrypted entries (as returned by the store):\n");
-        for (Map.Entry<String, Object> entry : storeEntryFactory.getEncryptedStore().getCachedValues().entrySet()) {
-            output(builder, entry.getKey(), entry.getValue());
-        }
+        showEntries(builder,
+                    "Encrypted entries (as returned by the store)",
+                    encryptedStore.getCachedValues()
+        );
         
-        builder.append("\n\n* Encrypted entries (as stored on disk):\n");
-        for (Map.Entry<String, ?> entry : encryptedPreferences.getAll().entrySet()) {
-            output(builder, entry.getKey(), entry.getValue());
-        }
+        showEntries(builder,
+                    "Encrypted entries (as stored on disk)",
+                    encryptedPreferences.getAll()
+        );
         
         entries.setText(builder.toString());
+    }
+    
+    private void showEntries(StringBuilder builder,
+                             String title,
+                             Map<String, ?> entries) {
+        builder.append("* ");
+        builder.append(title);
+        builder.append(":\n");
+        for (Map.Entry<String, ?> entry : entries.entrySet()) {
+            output(builder, entry.getKey(), entry.getValue());
+        }
     }
     
     private void output(StringBuilder builder,
@@ -179,18 +199,14 @@ public class MainActivity extends AppCompatActivity {
         builder.append(value.toString().replaceAll("\\n", ""));
     }
     
-    private String getEncryptedStoreName(Context context) {
-        return context.getPackageName() + "$" + PersistenceModule.ENCRYPTED_STORE_NAME;
-    }
-    
     private class Counter extends StoreEntry<Integer> {
-        public Counter(@NonNull KeyValueStore store) {
+        private Counter(@NonNull KeyValueStore store) {
             super(store, Keys.COUNTER);
         }
     }
     
     private class LastOpenDate extends EncryptedStoreEntry {
-        public LastOpenDate(@NonNull EncryptedSharedPreferenceStore store) {
+        private LastOpenDate(@NonNull EncryptedSharedPreferenceStore store) {
             super(store, Keys.LAST_OPEN_DATE);
         }
     }

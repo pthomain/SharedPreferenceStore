@@ -1,4 +1,4 @@
-package uk.co.glass_software.android.shared_preferences.persistence.base;
+package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
 
 import org.junit.Before;
@@ -6,14 +6,12 @@ import org.junit.Test;
 
 import uk.co.glass_software.android.shared_preferences.Function;
 import uk.co.glass_software.android.shared_preferences.StoreKey;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.base.EncryptedStoreEntry;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,8 +26,9 @@ public class EncryptedStoreEntryUnitTest {
     public void setUp() throws Exception {
         mockKeyValueStore = mock(EncryptedSharedPreferenceStore.class);
         
-        target = new TestEntry(mockKeyValueStore,
-                               storeKey
+        target = new TestEntry(
+                mockKeyValueStore,
+                storeKey
         );
     }
     
@@ -38,11 +37,8 @@ public class EncryptedStoreEntryUnitTest {
         String someValue = "someValue";
         String someEncryptedValue = "someEncryptedValue";
         
-        when(mockKeyStoreManager.encrypt(eq(someValue))).thenReturn(someEncryptedValue);
-        
         target.save(someValue);
         
-        verify(mockKeyStoreManager).encrypt(eq(someValue));
         verify(mockKeyValueStore).saveValue(eq(storeKey.getUniqueKey()), eq(someEncryptedValue));
     }
     
@@ -50,7 +46,6 @@ public class EncryptedStoreEntryUnitTest {
     public void testSaveNull() {
         target.save(null);
         
-        verify(mockKeyStoreManager, never()).encrypt(anyString());
         verify(mockKeyValueStore).saveValue(eq(storeKey.getUniqueKey()), isNull());
     }
     
@@ -77,8 +72,6 @@ public class EncryptedStoreEntryUnitTest {
              )
         ).thenReturn(someValue);
         
-        when(mockKeyStoreManager.decrypt(eq(someValue))).thenReturn(someDecryptedValue);
-        
         String result = lambda.get(null);
         
         verify(mockKeyValueStore).getValue(
@@ -86,8 +79,6 @@ public class EncryptedStoreEntryUnitTest {
                 eq(String.class),
                 eq(givenValue)
         );
-        
-        verify(mockKeyStoreManager).decrypt(eq(someValue));
         
         assertEquals("EncryptedStoreEntry.get() returned the wrong value",
                      someDecryptedValue,
