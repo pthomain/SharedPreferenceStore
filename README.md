@@ -45,36 +45,6 @@ StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 
 Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
-Define your entries in an enum:
-
-```java
-enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {  
-    FIRST_NAME(String.class),
-    LAST_NAME(String.class),
-    EMAIL(String.class),
-    AGE(Integer.class),
-    JOIN_DATE(Date.class),
-    ADDRESS(String.class);
-        
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-        
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
-    }
-        
-    @Override
-    public String getUniqueKey() {
-        return prefix + "." + this; 
-    }
-        
-    @Override
-    public Class getValueClass() {
-        return valueClass;
-    }
-}
-```
-
 Overview
 --------
 
