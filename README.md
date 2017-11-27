@@ -1,5 +1,5 @@
-SharedPreferenceStore (beta) 
-============================
+SharedPreferenceStore  
+=====================
 
 Simple access to the Android shared preferences via object mapping with support for encryption when supported by the device (supports API level 16+).
 
