@@ -45,18 +45,40 @@ StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 
 Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
+Adding the dependency
+---------------------
+
+To add the library to your project, add the following block to your root gradle file:
+
+```
+allprojects {
+ repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+ }
+}
+ ```
+ 
+ Then add the following dependency to your module:
+ 
+ ```
+ dependencies {
+    compile 'com.github.pthomain:SharedPreferenceStore:1.0.0'
+}
+```
+
 Overview
 --------
 
 To encrypt the stored value, call ``openEncrypted("AGE", Integer.class)``.
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.**
-Only Strings are supported for encryption, other entry types must be serialised / deserialised beforehand manually. 
+Only Strings are supported for encryption, other entry types must be serialised / deserialised manually beforehand. 
 
 Individual entries are represented as a ``StoreEntry`` object which can be used as a normal dependency and contains 4 methods: ``exists()``, ``get()``, ``save()`` and ``drop()``. This simplifies mocking in unit tests.
 
-Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and an encrypted ``SharedPreferenceStore`` which provide access to all the values by key rather than to an individual ``StoreEntry``.
+Alternatively, the ``StoreEntryFactory`` object provides 2 getters for a plain-text and encrypted ``SharedPreferenceStore`` which provide access to all the values by key rather than as a ``StoreEntry``.
 
-Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance, especially needed for the encrypted store. Because of this and because the cached is warmed up upon instantiation, it is recommended to instantiate the factory in the Application context and to use it as a Singleton.
+Values stored in the ``SharedPreferenceStore`` are cached in memory to improve performance. Because of this and because the cached is warmed up upon instantiation, it is recommended to instantiate the factory in the Application context and to use it as a Singleton.
 
 All primitives are supported along with objects implementing the Serializable interface which are serialised to Base64.
 Value udpates are logged in debug mode by default, the output is disabled in production (checking BuildConfig.DEBUG).
@@ -94,25 +116,3 @@ This way, ``open("AGE", Integer.class)`` can be replaced with ``open(Keys.AGE)``
 
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
-
-Adding the dependency
----------------------
-
-To add the library to your project, add the following block to your root gradle file:
-
-```
-allprojects {
- repositories {
-    jcenter()
-    maven { url "https://jitpack.io" }
- }
-}
- ```
- 
- Then add the following dependency to your module:
- 
- ```
- dependencies {
-    compile 'com.github.pthomain:SharedPreferenceStore:1.0.0'
-}
-```
