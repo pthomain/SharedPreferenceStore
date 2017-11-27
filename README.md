@@ -37,7 +37,7 @@ StoreEntry<String> provideAddress(StoreEntryFactory storeEntryFactory){
 }
 ```
 
-or use on-the-fly if you don't use dependency injection:
+or use on the fly if you don't use dependency injection:
 
 ```java
 StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
