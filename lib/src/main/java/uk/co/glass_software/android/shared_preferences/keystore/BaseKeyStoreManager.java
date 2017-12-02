@@ -52,7 +52,8 @@ public abstract class BaseKeyStoreManager implements KeyStoreManager {
         if (toDecrypt == null) {
             return null;
         }
-        byte[] bytes = decryptBytes(toDecrypt.getBytes());
+        byte[] decode = Base64.decode(toDecrypt.getBytes(), Base64.DEFAULT);
+        byte[] bytes = decryptBytes(decode);
         return bytes == null ? null : new String(bytes);
     }
     
@@ -83,8 +84,7 @@ public abstract class BaseKeyStoreManager implements KeyStoreManager {
         
         try {
             Cipher cipher = getCipher(false);
-            byte[] decode = Base64.decode(toDecrypt, Base64.DEFAULT);
-            return cipher.doFinal(decode);
+            return cipher.doFinal(toDecrypt);
         }
         catch (Exception e) {
             logger.e(this, "Could not decrypt the given bytes");
