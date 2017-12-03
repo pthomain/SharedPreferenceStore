@@ -23,9 +23,11 @@ package uk.co.glass_software.android.shared_preferences.demo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.widget.EditText;
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     
     @BindView(R.id.encrypted_switch)
     Switch encryptedSwitch;
+    
     @BindView(R.id.entries)
     TextView entries;
     
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         encryptedPreferences = getSharedPreferences(getPackageName() + "$" + ENCRYPTED_STORE_NAME,
                                                     Context.MODE_PRIVATE
         ); //used only to display encrypted values as stored on disk, should not be used directly in practice
-    
+        
         storeEntryFactory = new StoreEntryFactory(this);
         store = storeEntryFactory.getStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
@@ -209,5 +212,12 @@ public class MainActivity extends AppCompatActivity {
         private LastOpenDate(@NonNull EncryptedSharedPreferenceStore store) {
             super(store, Keys.LAST_OPEN_DATE);
         }
+    }
+    
+    @OnClick(R.id.github)
+    void openGithub() {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse("https://github.com/pthomain/SharedPreferenceStore"));
     }
 }

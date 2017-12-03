@@ -47,6 +47,11 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
+        aaptOptions {
+            additionalParameters "--no-version-vectors"
+        }
     }
 
     buildTypes {
@@ -69,6 +74,9 @@ dependencies {
 
     compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+
+    compile "com.android.support:appcompat-v7:$supportLibVersion"
+    compile "com.android.support:customtabs:$supportLibVersion"
 
     compile "com.jakewharton:butterknife:8.5.1"
     annotationProcessor "com.jakewharton:butterknife-compiler:8.5.1"
