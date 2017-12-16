@@ -20,9 +20,9 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:padding="10dp">
 
@@ -82,46 +82,43 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <ExpandableListView
+        android:id="@+id/result"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/entries"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"/>
-
-    </ScrollView>
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:id="@+id/github"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:gravity="center">
+        android:layout_marginTop="10dp"
+        android:background="@drawable/selector_link"
+        android:clickable="true"
+        android:gravity="center"
+        android:padding="6dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="6dp"
+            android:textColor="@android:color/white"
             android:text="View this library on"/>
 
         <android.support.v7.widget.AppCompatImageView
-            app:srcCompat="@drawable/ic_github_mark"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
-            android:tint="@android:color/white"/>
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_github_mark"/>
 
         <android.support.v7.widget.AppCompatImageView
-            app:srcCompat="@drawable/ic_github_logo"
             android:layout_width="82dp"
             android:layout_height="24dp"
             android:layout_marginLeft="-8dp"
             android:padding="4dp"
-            android:tint="@android:color/white"/>
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_github_logo"/>
 
     </LinearLayout>
 </LinearLayout>

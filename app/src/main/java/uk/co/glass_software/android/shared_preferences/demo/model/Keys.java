@@ -19,11 +19,11 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo;
+package uk.co.glass_software.android.shared_preferences.demo.model;
 
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
-enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
+public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
     
     COUNTER(Integer.class),
     LAST_OPEN_DATE(String.class);
