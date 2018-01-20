@@ -1,8 +1,10 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
@@ -42,9 +44,17 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Override
+    @SuppressLint("RestrictedApi")
     public synchronized final void saveValue(@NonNull String key,
                                              @Nullable Object value) {
-        if (value != null && !String.class.equals(value.getClass())) {
+        saveValueInternal(key, value);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @RestrictTo(RestrictTo.Scope.TESTS)
+    void saveValueInternal(@NonNull String key,
+                           @Nullable Object value) {
+        if (value != null && !String.class.isInstance(value)) {
             throw new IllegalArgumentException("Only Strings are accepted");
         }
         super.saveValue(key, encrypt(value == null ? null : value.toString()));
@@ -56,11 +66,18 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressLint("RestrictedApi")
     public synchronized final <O> O getValue(@NonNull String key,
                                              @NonNull Class<O> objectClass,
                                              @Nullable O defaultValue) {
-        if (!String.class.equals(objectClass)) {
+        return getValueInternal(key, objectClass, defaultValue);
+    }
+    
+    @RestrictTo(RestrictTo.Scope.TESTS)
+    <O> O getValueInternal(@NonNull String key,
+                           @NonNull Class<O> objectClass,
+                           @Nullable O defaultValue) {
+        if (!String.class.isAssignableFrom(objectClass)) {
             throw new IllegalArgumentException("Only Strings are accepted");
         }
         

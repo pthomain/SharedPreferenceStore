@@ -30,8 +30,8 @@ public class SharedPreferenceStoreUnitTest {
     private BehaviorSubject behaviorSubject;
     private SharedPreferences.Editor mockEditor;
     private Logger mockLogger;
-    private String key;
-    private String value;
+    private final String key = "someKey";
+    private final String value = "someValue";
     
     private SharedPreferenceStore target;
     
@@ -46,14 +46,16 @@ public class SharedPreferenceStoreUnitTest {
         mockEditor = mock(SharedPreferences.Editor.class);
         when(mockSharedPreferences.edit()).thenReturn(mockEditor);
         
-        key = "someKey";
-        value = "someValue";
-        
         target = new SharedPreferenceStore(mockSharedPreferences,
                                            mockBase64Serialiser,
                                            behaviorSubject,
                                            mockLogger
         );
+    }
+    
+    @Test
+    public void cache() {
+        assertTrue(target.cache());
     }
     
     @SuppressWarnings("unchecked")
@@ -170,10 +172,10 @@ public class SharedPreferenceStoreUnitTest {
         assertTrue("Cached values did not contain the key", cachedValues.containsKey(key));
         assertEquals("Cached values did not contain the value", value, cachedValues.get(key));
         
-        try{
+        try {
             cachedValues.put("something", "something");
         }
-        catch (Exception e){
+        catch (Exception e) {
             return;
         }
         
