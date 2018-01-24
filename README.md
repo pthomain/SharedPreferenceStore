@@ -45,7 +45,7 @@ StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 
 Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
-Adding the dependency
+Adding the dependency [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
 ---------------------
 
 To add the library to your project, add the following block to your root gradle file:
