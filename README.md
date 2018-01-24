@@ -123,7 +123,19 @@ This is also why it is recommended to use ``getClass().getSimpleName()`` rather 
 Unique entry types
 ------------------
 
-Rather than injecting a `StoreEntry` as `@Inject @Name("savedPin") StoreEntry<Integer> savedPin`, you might want to create a `SavedPin` object extending from `StoreEntry` and thus inject it as `@Inject SavedPin savedPin`.
+Rather than injecting a `StoreEntry` as:
+
+```java
+@Inject 
+@Name("savedPin") 
+StoreEntry<Integer> savedPin
+```
+you might want to create a `SavedPin` object extending from `StoreEntry` and thus inject it as
+
+```java
+@Inject 
+SavedPin savedPin
+```
 
 To do so, you can declare `SavedPin` as:
 
@@ -135,7 +147,7 @@ public class SavedPin extends StoreEntry<Integer> {
 }
 ```
 
-and set up your injection as such:
+and set your injection up as such:
 
 ```java
 public class PersistenceModule {
