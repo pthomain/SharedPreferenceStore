@@ -45,6 +45,9 @@ StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 
 Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
+Injecting `StoreEntry<T>` dependencies this way is faster but means that you will have to use the `@Named` annotation to differentiate them.
+See the [Unique entry types](#unique-entry-types) section for how to address this issue.
+
 Adding the dependency [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
 ---------------------
 
@@ -116,3 +119,50 @@ This way, ``open("AGE", Integer.class)`` can be replaced with ``open(Keys.AGE)``
 
 However, if you do use such an approach, be aware that refactoring the enum's name could break the store's behaviour.
 This is also why it is recommended to use ``getClass().getSimpleName()`` rather than ``getClass().getName()`` as the latter is susceptible to break during a move of the class to a different package. One way to prevent this entirely is to use an arbitrary final value for the ``prefix``.
+
+Unique entry types
+------------------
+
+Rather than injecting a `StoreEntry` as `@Inject @Name("savedPin") StoreEntry<Integer> savedPin`, you might want to create a `SavedPin` object extending from `StoreEntry` and thus inject it as `@Inject SavedPin savedPin`.
+
+To do so, you can declare `SavedPin` as:
+
+```java
+public class SavedPin extends StoreEntry<Integer> {
+    public SavedPin(SharedPreferenceStore store) {
+        super(store, StoreKey.SAVED_PIN);
+    }
+}
+```
+
+and set up your injection as such:
+
+```java
+public class PersistenceModule {
+    private final Context context;
+    
+    public PersistenceModule(Context context) {
+        this.context = context.getApplicationContext();
+    }
+    
+    @Provides
+    StoreEntryFactory provideStoreEntryFactory() {
+        return new StoreEntryFactory(context);
+    }
+    
+    @Provides
+    SharedPreferenceStore provideSharedPreferenceStore(StoreEntryFactory factory) {
+        return factory.getStore();
+    }
+    
+    @Provides
+    EncryptedSharedPreferenceStore provideEncryptedSharedPreferenceStore(StoreEntryFactory factory) {
+        return factory.getEncryptedStore();
+    }
+    
+    @Provides
+    SavedPin provideSavedPin(SharedPreferenceStore store) {
+        return new SavedPin(store);
+    } 
+}
+```
