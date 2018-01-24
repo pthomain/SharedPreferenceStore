@@ -1,7 +1,7 @@
 SharedPreferenceStore  
 =====================
 
-Simple access to the Android shared preferences via object mapping with support for encryption when supported by the device (supports API level 16+).
+Simple access to the Android SharedPreferences via object mapping with support for secure encryption when available on device (API level 16+).
 
 <a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="250"/></a>
 
@@ -45,8 +45,7 @@ StoreEntry<String> address = new StoreEntryFactory(context).open(Keys.ADDRESS);
 
 Use ``StoreEntryFactory.open()`` to store in plain-text and ``StoreEntryFactory.openEncrypted()`` to store encrypted values (if supported by the device). The encryption is done using AES, following the method described here: https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 
-Injecting `StoreEntry<T>` dependencies this way is faster but means that you will have to use the `@Named` annotation to differentiate them.
-See the [Unique entry types](#unique-entry-types) section for how to address this issue.
+Injecting `StoreEntry<T>` dependencies this way is faster but means that you will have to use the `@Named` annotation to differentiate them. A better solution is to use a specific type for your entry. See the [Unique entry types](#unique-entry-types) section for how to do this.
 
 Adding the dependency [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
 ---------------------
