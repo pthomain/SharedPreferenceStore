@@ -30,6 +30,7 @@ import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 public class StoreEntryFactory {
@@ -42,9 +43,15 @@ public class StoreEntryFactory {
     private final KeyStoreManager keyStoreManager;
     
     public StoreEntryFactory(Context context) {
+        this(context, null);
+    }
+    
+    public StoreEntryFactory(Context context,
+                             @Nullable Serialiser customSerialiser) {
+        Context applicationContext = context.getApplicationContext();
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
-                                                                             .keyStoreModule(new KeyStoreModule(context.getApplicationContext()))
-                                                                             .persistenceModule(new PersistenceModule(context.getApplicationContext()))
+                                                                             .keyStoreModule(new KeyStoreModule(applicationContext))
+                                                                             .persistenceModule(new PersistenceModule(applicationContext, customSerialiser))
                                                                              .build();
         
         encryptedStore = component.encryptedStore();

@@ -23,6 +23,7 @@ package uk.co.glass_software.android.shared_preferences.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,6 +35,7 @@ import uk.co.glass_software.android.shared_preferences.Function;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.SimpleLogger;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.Base64Serialiser;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 @Module
@@ -43,11 +45,18 @@ public class PersistenceModule {
     public final static String STORE_NAME = "plain_text";
     public final static String ENCRYPTED_STORE_NAME = "encrypted";
     public final static String IS_ENCRYPTION_SUPPORTED = "IS_ENCRYPTION_SUPPORTED";
+    public final static String BASE_64 = "base_64";
+    public final static String CUSTOM = "custom";
     
     private final Context context;
     
-    public PersistenceModule(Context context) {
+    @Nullable
+    private final Serialiser customSerialiser;
+    
+    public PersistenceModule(Context context,
+                             @Nullable Serialiser customSerialiser) {
         this.context = context;
+        this.customSerialiser = customSerialiser;
     }
     
     @Provides
@@ -90,8 +99,17 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
-    Base64Serialiser provideBase64Serialiser(Logger logger) {
+    @Named(BASE_64)
+    Serialiser provideBase64Serialiser(Logger logger) {
         return new Base64Serialiser(logger);
+    }
+    
+    @Provides
+    @Singleton
+    @Named(CUSTOM)
+    @Nullable
+    Serialiser provideCustomSerialiser() {
+        return customSerialiser;
     }
     
     @Provides
@@ -112,16 +130,19 @@ public class PersistenceModule {
     @Singleton
     @Named(STORE_NAME)
     SharedPreferenceStore provideSharedPreferenceStore(@Named(STORE_NAME) SharedPreferences sharedPreferences,
-                                                       Base64Serialiser base64Serialiser,
+                                                       @Named(BASE_64) Serialiser base64Serialiser,
+                                                       @Nullable @Named(CUSTOM) Serialiser customSerialiser,
                                                        @Named(STORE_NAME) BehaviorSubject<String> changeSubject,
                                                        Logger logger) {
-        return new SharedPreferenceStore(sharedPreferences,
-                                         base64Serialiser,
-                                         changeSubject,
-                                         logger
+        return new SharedPreferenceStore(
+                sharedPreferences,
+                base64Serialiser,
+                customSerialiser,
+                changeSubject,
+                logger
         );
     }
-
+    
     @Provides
     @Singleton
     Logger provideLogger() {

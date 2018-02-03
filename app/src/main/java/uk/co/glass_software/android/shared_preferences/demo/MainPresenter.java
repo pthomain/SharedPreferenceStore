@@ -3,6 +3,8 @@ package uk.co.glass_software.android.shared_preferences.demo;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,12 +34,20 @@ class MainPresenter {
                 Context.MODE_PRIVATE
         ); //used only to display encrypted values as stored on disk, should not be used directly in practice
         
-        storeEntryFactory = new StoreEntryFactory(context);
+        Gson gson = new Gson();
+        storeEntryFactory = new StoreEntryFactory(context, new GsonSerialiser(gson));
         store = storeEntryFactory.getStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
         
         counter = new Counter(store);
         lastOpenDate = new LastOpenDate(encryptedStore);
+    
+        Person person = new Person();
+        person.setAge(30);
+        person.setFirstName("John");
+        person.setName("Smith");
+        
+        store.saveValue("User", person);
     }
     
     void onPause() {

@@ -16,20 +16,32 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     private final KeyStoreManager keyStoreManager;
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                          @NonNull Base64Serialiser base64Serialiser,
+                                          @NonNull Serialiser base64Serialiser,
+                                          @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger) {
-        this(sharedPreferences, base64Serialiser, changeSubject, logger, null);
+        this(sharedPreferences,
+             base64Serialiser,
+             customSerialiser,
+             changeSubject,
+             logger,
+             null
+        );
     }
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                          @NonNull Base64Serialiser base64Serialiser,
+                                          @NonNull Serialiser base64Serialiser,
+                                          @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger,
                                           @Nullable KeyStoreManager keyStoreManager) {
-        super(sharedPreferences, base64Serialiser, changeSubject, logger);
+        super(sharedPreferences,
+              base64Serialiser,
+              customSerialiser,
+              changeSubject,
+              logger
+        );
         this.keyStoreManager = keyStoreManager;
-        initCache();
     }
     
     @Override

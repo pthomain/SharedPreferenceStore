@@ -34,13 +34,15 @@ import dagger.Module;
 import dagger.Provides;
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.Base64Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.M;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.BASE_64;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.CUSTOM;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.STORE_NAME;
@@ -130,15 +132,18 @@ public class KeyStoreModule {
     @Singleton
     @Named(ENCRYPTED_STORE_NAME)
     EncryptedSharedPreferenceStore provideEncryptedSharedPreferenceStore(@Named(ENCRYPTED_STORE_NAME) SharedPreferences sharedPreferences,
-                                                                         Base64Serialiser base64Serialiser,
+                                                                         @Named(BASE_64) Serialiser base64Serialiser,
+                                                                         @Nullable @Named(CUSTOM) Serialiser customSerialiser,
                                                                          @Named(ENCRYPTED_STORE_NAME) BehaviorSubject<String> changeSubject,
                                                                          Logger logger,
                                                                          @Nullable KeyStoreManager keyStoreManager) {
-        return new EncryptedSharedPreferenceStore(sharedPreferences,
-                                                  base64Serialiser,
-                                                  changeSubject,
-                                                  logger,
-                                                  keyStoreManager
+        return new EncryptedSharedPreferenceStore(
+                sharedPreferences,
+                base64Serialiser,
+                customSerialiser,
+                changeSubject,
+                logger,
+                keyStoreManager
         );
     }
     

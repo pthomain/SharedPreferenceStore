@@ -21,7 +21,9 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
+import android.support.annotation.NonNull;
 import android.util.Base64;
+import android.util.Pair;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,68 +35,44 @@ import java.io.Serializable;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-public class Base64Serialiser {
+public class Base64Serialiser implements Serialiser {
     
-    private final static String delimiter = "_START_DATA_";
-    private final static String prefix = "BASE_64_";
+    private final static String PREFIX = "BASE_64_";
+    private final static String DELIMITER = "_START_DATA_";
     private final Logger logger;
     
     public Base64Serialiser(Logger logger) {
         this.logger = logger;
     }
     
-    boolean isBase64(Object value) {
-        return value != null
-               && value instanceof String
-               && ((String) value).startsWith(prefix)
-               && ((String) value).contains(delimiter);
+    @Override
+    public boolean canHandleType(@NonNull Class<?> targetClass) {
+        return Serializable.class.isAssignableFrom(targetClass);
     }
     
-    @SuppressWarnings("unchecked")
-    <O> O deserialise(String objectBase64) {
-        if (objectBase64 != null) {
-            String read = read(objectBase64);
-            if (read != null) {
-                byte[] objectBytes = Base64.decode(read, Base64.DEFAULT);
-                ByteArrayInputStream bis = new ByteArrayInputStream(objectBytes);
-                ObjectInput in = null;
-                try {
-                    in = new ObjectInputStream(bis);
-                    return (O) in.readObject();
-                }
-                catch (Exception e) {
-                    logger.e(this, e, e.getMessage());
-                }
-                finally {
-                    try {
-                        if (in != null) {
-                            in.close();
-                        }
-                        bis.close();
-                    }
-                    catch (IOException e) {
-                        logger.e(this, e, "An error occurred while trying to close the input stream");
-                    }
-                }
-            }
+    @Override
+    public boolean canHandleSerialisedFormat(@NonNull String serialised) {
+        return serialised.startsWith(PREFIX) && serialised.contains(DELIMITER);
+    }
+    
+    @Override
+    public <O> String serialise(@NonNull O deserialised) throws SerialisationException {
+        if (!canHandleType(deserialised.getClass())) {
+            throw new IllegalArgumentException("Cannot serialise objects of type:" + deserialised.getClass());
         }
-        return null;
-    }
-    
-    String serialise(Serializable value) {
+        
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = null;
         try {
             out = new ObjectOutputStream(bos);
-            if (value != null) {
-                out.writeObject(value);
-                byte[] valueBytes = bos.toByteArray();
-                String base64 = new String(Base64.encode(valueBytes, Base64.DEFAULT));
-                return format(base64, value.getClass());
-            }
+            out.writeObject(deserialised);
+            byte[] valueBytes = bos.toByteArray();
+            String base64 = new String(Base64.encode(valueBytes, Base64.DEFAULT));
+            return format(base64, deserialised.getClass());
         }
         catch (IOException e) {
             logger.e(this, e, e.getMessage());
+            throw new SerialisationException(e);
         }
         finally {
             if (out != null) {
@@ -107,18 +85,53 @@ public class Base64Serialiser {
                 }
             }
         }
-        return null;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public <O> O deserialise(@NonNull String objectBase64,
+                             Class<O> targetClass) throws SerialisationException {
+        ByteArrayInputStream bis = null;
+        ObjectInput in = null;
+        
+        try {
+            Pair<Class<?>, String> read = read(objectBase64);
+            byte[] objectBytes = Base64.decode(read.second, Base64.DEFAULT);
+            bis = new ByteArrayInputStream(objectBytes);
+            in = new ObjectInputStream(bis);
+            return (O) in.readObject();
+        }
+        catch (Exception e) {
+            logger.e(this, e, e.getMessage());
+            throw new SerialisationException(e);
+        }
+        finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (bis != null) {
+                    bis.close();
+                }
+            }
+            catch (IOException e) {
+                logger.e(this, e, "An error occurred while trying to close the input stream");
+            }
+        }
     }
     
     private String format(String base64,
                           Class objectClass) {
-        return prefix + objectClass.getCanonicalName() + delimiter + base64;
+        return PREFIX + objectClass.getCanonicalName() + DELIMITER + base64;
     }
     
-    private String read(String base64) {
-        if (isBase64(base64)) {
-            return base64.substring(base64.indexOf(delimiter) + delimiter.length());
+    private Pair<Class<?>, String> read(@NonNull String base64) throws ClassNotFoundException {
+        if (canHandleSerialisedFormat(base64)) {
+            String payload = base64.substring(base64.indexOf(DELIMITER) + DELIMITER.length());
+            String className = base64.substring(base64.indexOf(PREFIX) + PREFIX.length(), base64.indexOf(DELIMITER));
+            Class<?> targetClass = Class.forName(className);
+            return new Pair<>(targetClass, className);
         }
-        return null;
+        throw new IllegalArgumentException("Not a Base64 string: " + base64);
     }
 }
