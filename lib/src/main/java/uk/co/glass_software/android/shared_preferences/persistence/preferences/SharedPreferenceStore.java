@@ -226,7 +226,7 @@ public class SharedPreferenceStore implements KeyValueStore {
     
     @Override
     public synchronized boolean hasValue(@NonNull String key) {
-        return cacheMap.containsKey(key);
+        return sharedPreferences.contains(key);
     }
     
     @Nullable
