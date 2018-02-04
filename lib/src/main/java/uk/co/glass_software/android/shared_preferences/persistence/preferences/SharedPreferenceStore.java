@@ -38,10 +38,10 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValue
 public class SharedPreferenceStore implements KeyValueStore {
     
     private final SharedPreferences sharedPreferences;
-    private final Serialiser base64Serialiser;
+    protected final Serialiser base64Serialiser;
     
     @Nullable
-    private final Serialiser customSerialiser;
+    protected final Serialiser customSerialiser;
     
     final BehaviorSubject<String> changeSubject;
     final Logger logger;
@@ -96,10 +96,6 @@ public class SharedPreferenceStore implements KeyValueStore {
                 }
                 changeSubject.onNext(key);
             }
-            return;
-        }
-        else if (value.equals(getValue(key, value.getClass(), null))) {
-            //value hasn't changed
             return;
         }
         

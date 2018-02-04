@@ -44,7 +44,7 @@ class MainPresenter {
         
         counter = new Counter(store);
         lastOpenDate = new LastOpenDate(encryptedStore);
-        personEntry = new PersonEntry(store);
+        personEntry = new PersonEntry(encryptedStore);
         createOrUpdatePerson();
     }
     

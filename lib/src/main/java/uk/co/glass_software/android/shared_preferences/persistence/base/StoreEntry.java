@@ -82,7 +82,7 @@ public class StoreEntry<C> {
     }
     
     public boolean exists() {
-        return get(null) != null;
+        return get(null) != null; //TODO check key instead, performance issue
     }
     
     public interface UniqueKeyProvider {
