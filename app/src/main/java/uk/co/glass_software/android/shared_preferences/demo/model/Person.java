@@ -1,10 +1,13 @@
-package uk.co.glass_software.android.shared_preferences.demo;
+package uk.co.glass_software.android.shared_preferences.demo.model;
+
+import java.util.Date;
 
 public class Person {
     
     private int age;
     private String firstName;
     private String name;
+    private Date lastSeenDate;
     
     public int getAge() {
         return age;
@@ -30,6 +33,14 @@ public class Person {
         this.firstName = firstName;
     }
     
+    public Date getLastSeenDate() {
+        return lastSeenDate;
+    }
+    
+    public void setLastSeenDate(Date lastSeenDate) {
+        this.lastSeenDate = lastSeenDate;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -47,7 +58,10 @@ public class Person {
         if (firstName != null ? !firstName.equals(person.firstName) : person.firstName != null) {
             return false;
         }
-        return name != null ? name.equals(person.name) : person.name == null;
+        if (name != null ? !name.equals(person.name) : person.name != null) {
+            return false;
+        }
+        return lastSeenDate != null ? lastSeenDate.equals(person.lastSeenDate) : person.lastSeenDate == null;
     }
     
     @Override
@@ -55,6 +69,7 @@ public class Person {
         int result = age;
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (lastSeenDate != null ? lastSeenDate.hashCode() : 0);
         return result;
     }
     
@@ -64,6 +79,7 @@ public class Person {
         sb.append("age=").append(age);
         sb.append(", firstName='").append(firstName).append('\'');
         sb.append(", name='").append(name).append('\'');
+        sb.append(", lastSeenDate=").append(lastSeenDate);
         sb.append('}');
         return sb.toString();
     }

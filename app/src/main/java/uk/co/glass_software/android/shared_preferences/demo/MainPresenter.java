@@ -11,6 +11,8 @@ import java.util.Date;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;
+import uk.co.glass_software.android.shared_preferences.demo.model.Person;
+import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
@@ -25,6 +27,7 @@ class MainPresenter {
     private final StoreEntryFactory storeEntryFactory;
     private final Counter counter;
     private final LastOpenDate lastOpenDate;
+    private final PersonEntry personEntry;
     
     MainPresenter(Context context) {
         simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -41,18 +44,32 @@ class MainPresenter {
         
         counter = new Counter(store);
         lastOpenDate = new LastOpenDate(encryptedStore);
+        personEntry = new PersonEntry(store);
+        createOrUpdatePerson();
+    }
     
-        Person person = new Person();
-        person.setAge(30);
-        person.setFirstName("John");
-        person.setName("Smith");
+    private void createOrUpdatePerson() {
+        Date lastSeenDate = new Date();
+        Person person;
         
-        store.saveValue("User", person);
+        if (personEntry.exists()) {
+            person = personEntry.get();
+        }
+        else {
+            person = new Person();
+            person.setAge(30);
+            person.setFirstName("John");
+            person.setName("Smith");
+        }
+        
+        person.setLastSeenDate(lastSeenDate);
+        personEntry.save(person);
     }
     
     void onPause() {
         counter.save(counter.get(1) + 1);
         lastOpenDate.save(simpleDateFormat.format(new Date()));
+        createOrUpdatePerson();
     }
     
     StoreEntryFactory storeEntryFactory() {
