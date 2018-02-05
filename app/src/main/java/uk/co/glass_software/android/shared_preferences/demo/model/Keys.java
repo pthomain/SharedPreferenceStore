@@ -26,7 +26,8 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEnt
 public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
     
     COUNTER(Integer.class),
-    LAST_OPEN_DATE(String.class);
+    LAST_OPEN_DATE(String.class),
+    PERSON(Person.class);
     
     private final String prefix = getClass().getSimpleName();
     private final Class<?> valueClass;

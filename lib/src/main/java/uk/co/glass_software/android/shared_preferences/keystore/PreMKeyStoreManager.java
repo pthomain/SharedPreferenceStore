@@ -55,11 +55,11 @@ public class PreMKeyStoreManager extends BaseKeyStoreManager {
     private final String alias;
     private final Context applicationContext;
     
-    public PreMKeyStoreManager(Logger logger,
-                               KeyStore keyStore,
-                               @Nullable SavedEncryptedAesKey encryptedAesKey,
-                               String alias,
-                               Context applicationContext) {
+    PreMKeyStoreManager(Logger logger,
+                        KeyStore keyStore,
+                        @Nullable SavedEncryptedAesKey encryptedAesKey,
+                        String alias,
+                        Context applicationContext) {
         super(logger);
         this.keyStore = keyStore;
         this.encryptedAesKey = encryptedAesKey;

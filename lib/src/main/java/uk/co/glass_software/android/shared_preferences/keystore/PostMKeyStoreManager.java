@@ -56,9 +56,9 @@ public class PostMKeyStoreManager extends BaseKeyStoreManager {
     private final KeyStore keyStore;
     private final String alias;
     
-    public PostMKeyStoreManager(Logger logger,
-                                @Nullable KeyStore keyStore,
-                                String alias) {
+    PostMKeyStoreManager(Logger logger,
+                         @Nullable KeyStore keyStore,
+                         String alias) {
         super(logger);
         this.logger = logger;
         this.keyStore = keyStore;

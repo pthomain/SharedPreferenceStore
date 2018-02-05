@@ -16,20 +16,32 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     private final KeyStoreManager keyStoreManager;
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                          @NonNull Base64Serialiser base64Serialiser,
+                                          @NonNull Serialiser base64Serialiser,
+                                          @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger) {
-        this(sharedPreferences, base64Serialiser, changeSubject, logger, null);
+        this(sharedPreferences,
+             base64Serialiser,
+             customSerialiser,
+             changeSubject,
+             logger,
+             null
+        );
     }
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                          @NonNull Base64Serialiser base64Serialiser,
+                                          @NonNull Serialiser base64Serialiser,
+                                          @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger,
                                           @Nullable KeyStoreManager keyStoreManager) {
-        super(sharedPreferences, base64Serialiser, changeSubject, logger);
+        super(sharedPreferences,
+              base64Serialiser,
+              customSerialiser,
+              changeSubject,
+              logger
+        );
         this.keyStoreManager = keyStoreManager;
-        initCache();
     }
     
     @Override
@@ -54,14 +66,77 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     @RestrictTo(RestrictTo.Scope.TESTS)
     void saveValueInternal(@NonNull String key,
                            @Nullable Object value) {
-        if (value != null && !String.class.isInstance(value)) {
-            throw new IllegalArgumentException("Only Strings are accepted");
+        String serialised = null;
+        
+        if (value != null) {
+            serialised = String.class.isInstance(value) ? value.toString() : serialise(value);
         }
-        super.saveValue(key, encrypt(value == null ? null : value.toString()));
+        
+        if (serialised == null) {
+            logger.e(this, "Could not save value: " + key + " -> " + value);
+            return;
+        }
+        
+        super.saveValue(key, encrypt(serialised));
         saveToCache(key, value);
         
         logger.d(this, "Saving entry " + key + " -> " + value);
         changeSubject.onNext(key);
+    }
+    
+    @Nullable
+    private String serialise(@NonNull Object value) {
+        Class<?> targetClass = value.getClass();
+        try {
+            if (customSerialiser != null && customSerialiser.canHandleType(targetClass)) {
+                return customSerialiser.serialise(value);
+            }
+            else if (base64Serialiser.canHandleType(targetClass)) {
+                return base64Serialiser.serialise(value);
+            }
+        }
+        catch (Serialiser.SerialisationException e) {
+            logger.e(this, e, "Could not serialise " + value);
+        }
+        
+        return null;
+    }
+    
+    @Nullable
+    private <O> O deserialise(String value,
+                              Class<O> objectClass) {
+        if (Boolean.class.isAssignableFrom(objectClass)
+            || boolean.class.isAssignableFrom(objectClass)) {
+            return (O) Boolean.valueOf(value);
+        }
+        else if (Float.class.isAssignableFrom(objectClass)
+                 || float.class.isAssignableFrom(objectClass)) {
+            return (O) Float.valueOf(value);
+        }
+        else if (Long.class.isAssignableFrom(objectClass)
+                 || long.class.isAssignableFrom(objectClass)) {
+            return (O) Long.valueOf(value);
+        }
+        else if (Integer.class.isAssignableFrom(objectClass)
+                 || int.class.isAssignableFrom(objectClass)) {
+            return (O) Integer.valueOf(value);
+        }
+        else if (String.class.isAssignableFrom(objectClass)) {
+            return (O) value;
+        }
+        
+        try {
+            if (base64Serialiser.canHandleSerialisedFormat(value)) {
+                return base64Serialiser.deserialise(value, objectClass);
+            }
+            else if (customSerialiser != null && customSerialiser.canHandleSerialisedFormat(value)) {
+                return customSerialiser.deserialise(value, objectClass);
+            }
+        }
+        catch (Serialiser.SerialisationException e) {
+            logger.e(this, e, "Could not deserialise " + value);
+        }
+        return null;
     }
     
     @Nullable
@@ -74,19 +149,15 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @RestrictTo(RestrictTo.Scope.TESTS)
+    @SuppressWarnings("unchecked")
     <O> O getValueInternal(@NonNull String key,
                            @NonNull Class<O> objectClass,
                            @Nullable O defaultValue) {
-        if (!String.class.isAssignableFrom(objectClass)) {
-            throw new IllegalArgumentException("Only Strings are accepted");
-        }
+        String value = super.getValue(key, String.class, null);
         
-        if (hasValue(key)) {
-            return getFromCache(key);
-        }
-        
-        O value = super.getValue(key, objectClass, null);
-        return value == null ? defaultValue : (O) decrypt(value.toString());
+        return value == null
+               ? defaultValue
+               : decrypt(value, objectClass);
     }
     
     @Nullable
@@ -96,9 +167,10 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Nullable
-    private String decrypt(@Nullable String encrypted) {
+    private <O> O decrypt(@Nullable String encrypted,
+                          Class<O> targetClass) {
         checkEncryptionAvailable();
-        return encrypted == null ? null : keyStoreManager.decrypt(encrypted);
+        return encrypted == null ? null : deserialise(keyStoreManager.decrypt(encrypted), targetClass);
     }
     
     private void checkEncryptionAvailable() {

@@ -3,12 +3,16 @@ package uk.co.glass_software.android.shared_preferences.demo;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;
+import uk.co.glass_software.android.shared_preferences.demo.model.Person;
+import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
@@ -23,6 +27,7 @@ class MainPresenter {
     private final StoreEntryFactory storeEntryFactory;
     private final Counter counter;
     private final LastOpenDate lastOpenDate;
+    private final PersonEntry personEntry;
     
     MainPresenter(Context context) {
         simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -32,17 +37,39 @@ class MainPresenter {
                 Context.MODE_PRIVATE
         ); //used only to display encrypted values as stored on disk, should not be used directly in practice
         
-        storeEntryFactory = new StoreEntryFactory(context);
+        Gson gson = new Gson();
+        storeEntryFactory = new StoreEntryFactory(context, new GsonSerialiser(gson));
         store = storeEntryFactory.getStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
         
         counter = new Counter(store);
         lastOpenDate = new LastOpenDate(encryptedStore);
+        personEntry = new PersonEntry(encryptedStore);
+        createOrUpdatePerson();
+    }
+    
+    private void createOrUpdatePerson() {
+        Date lastSeenDate = new Date();
+        Person person;
+        
+        if (personEntry.exists()) {
+            person = personEntry.get();
+        }
+        else {
+            person = new Person();
+            person.setAge(30);
+            person.setFirstName("John");
+            person.setName("Smith");
+        }
+        
+        person.setLastSeenDate(lastSeenDate);
+        personEntry.save(person);
     }
     
     void onPause() {
         counter.save(counter.get(1) + 1);
         lastOpenDate.save(simpleDateFormat.format(new Date()));
+        createOrUpdatePerson();
     }
     
     StoreEntryFactory storeEntryFactory() {

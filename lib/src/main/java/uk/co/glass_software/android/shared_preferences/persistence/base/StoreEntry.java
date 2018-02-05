@@ -82,7 +82,7 @@ public class StoreEntry<C> {
     }
     
     public boolean exists() {
-        return get(null) != null;
+        return store.hasValue(keyString);
     }
     
     public interface UniqueKeyProvider {

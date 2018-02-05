@@ -90,10 +90,12 @@ public class StoreEntryUnitTest {
     
     @Test
     public void testExists() throws Exception {
-        when(mockStore.getValue(eq(storeKey.getUniqueKey()), eq(String.class), eq(null))).thenReturn("something");
+        when(mockStore.hasValue(eq(storeKey.getUniqueKey()))).thenReturn(true);
         assertTrue("Entry should exists", target.exists());
-        when(mockStore.getValue(eq(storeKey.getUniqueKey()), eq(String.class), eq(null))).thenReturn(null);
+
+        when(mockStore.hasValue(eq(storeKey.getUniqueKey()))).thenReturn(false);
         assertFalse("Entry should exists", target.exists());
-        verify(mockStore, times(2)).getValue(eq(storeKey.getUniqueKey()), eq(String.class), eq(null));
+
+        verify(mockStore, times(2)).hasValue(eq(storeKey.getUniqueKey()));
     }
 }
