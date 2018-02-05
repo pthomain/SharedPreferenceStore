@@ -153,10 +153,6 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     <O> O getValueInternal(@NonNull String key,
                            @NonNull Class<O> objectClass,
                            @Nullable O defaultValue) {
-        if (hasValue(key)) {
-            return getFromCache(key);
-        }
-        
         String value = super.getValue(key, String.class, null);
         
         return value == null

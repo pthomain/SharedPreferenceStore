@@ -148,8 +148,10 @@ public class SharedPreferenceStore implements KeyValueStore {
     public synchronized <O> O getValue(@NonNull String key,
                                        @NonNull Class<O> objectClass,
                                        @Nullable O defaultValue) {
-        if (hasValue(key)) {
-            return getFromCache(key);
+        Object fromCache = getFromCache(key);
+
+        if(fromCache != null){
+            return (O) fromCache;
         }
         
         try {

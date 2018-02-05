@@ -24,7 +24,8 @@ import static org.mockito.Mockito.when;
 public class EncryptedSharedPreferenceStoreUnitTest {
     
     private SharedPreferences mockSharedPreferences;
-    private Base64Serialiser mockBase64Serialiser;
+    private Serialiser mockBase64Serialiser;
+    private Serialiser mockCustomSerialiser;
     private BehaviorSubject behaviorSubject;
     private SharedPreferences.Editor mockEditor;
     private KeyStoreManager mockKeyStoreManager;
@@ -38,9 +39,9 @@ public class EncryptedSharedPreferenceStoreUnitTest {
     
     @Before
     public void setUp() throws Exception {
-        
         mockSharedPreferences = mock(SharedPreferences.class);
-        mockBase64Serialiser = mock(Base64Serialiser.class);
+        mockBase64Serialiser = mock(Serialiser.class);
+        mockCustomSerialiser = mock(Serialiser.class);
         behaviorSubject = BehaviorSubject.create();
         mockLogger = mock(Logger.class);
         mockKeyStoreManager = mock(KeyStoreManager.class);
@@ -51,6 +52,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
         target = new EncryptedSharedPreferenceStore(
                 mockSharedPreferences,
                 mockBase64Serialiser,
+                mockCustomSerialiser,
                 behaviorSubject,
                 mockLogger,
                 mockKeyStoreManager
