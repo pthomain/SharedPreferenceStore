@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
 import android.annotation.TargetApi;
 import android.security.keystore.KeyGenParameterSpec;
@@ -44,21 +44,21 @@ import static android.os.Build.VERSION_CODES.M;
 import static android.security.keystore.KeyProperties.KEY_ALGORITHM_AES;
 import static android.security.keystore.KeyProperties.PURPOSE_DECRYPT;
 import static android.security.keystore.KeyProperties.PURPOSE_ENCRYPT;
-import static uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule.ANDROID_KEY_STORE;
 
-public class PostMKeyStoreManager extends BaseKeyStoreManager {
+public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     
     //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
     private final static String FIXED_IV = "ABkbm8HC1ytJ";
-    private static final String AES_MODE = "AES/GCM/NoPadding";
+    private static final String AES_MODE = "AES/CBC/NoPadding";
     
     private final Logger logger;
     private final KeyStore keyStore;
     private final String alias;
     
-    PostMKeyStoreManager(Logger logger,
-                         @Nullable KeyStore keyStore,
-                         String alias) {
+    PostMEncryptionManager(Logger logger,
+                           @Nullable KeyStore keyStore,
+                           String alias) {
         super(logger);
         this.logger = logger;
         this.keyStore = keyStore;
@@ -94,8 +94,9 @@ public class PostMKeyStoreManager extends BaseKeyStoreManager {
     protected synchronized void createNewKeyPairIfNeeded() {
         try {
             if (keyStore != null && !keyStore.containsAlias(alias)) {
-                KeyGenerator keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM_AES,
-                                                                     ANDROID_KEY_STORE
+                KeyGenerator keyGenerator = KeyGenerator.getInstance(
+                        KEY_ALGORITHM_AES,
+                        ANDROID_KEY_STORE
                 );
                 
                 AlgorithmParameterSpec spec = new KeyGenParameterSpec.Builder(

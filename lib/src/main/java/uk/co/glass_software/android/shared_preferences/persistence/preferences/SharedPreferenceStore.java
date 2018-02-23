@@ -65,7 +65,8 @@ public class SharedPreferenceStore implements KeyValueStore {
         return true;
     }
     
-    Object readStoredValue(Object value) {
+    Object readStoredValue(Object value,
+                           String key) {
         return value;
     }
     

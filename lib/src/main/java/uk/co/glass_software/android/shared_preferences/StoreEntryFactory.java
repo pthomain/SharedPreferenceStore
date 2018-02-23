@@ -25,95 +25,114 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import io.reactivex.Observable;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.encryption.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 public class StoreEntryFactory {
-    
+
     private final SharedPreferenceStore store;
     private final EncryptedSharedPreferenceStore encryptedStore;
+    private final KeyValueStore lenientEncryptedStore;
     private final boolean isEncryptionSupported;
-    
+
     @Nullable
-    private final KeyStoreManager keyStoreManager;
-    
+    private final EncryptionManager encryptionManager;
+
     public StoreEntryFactory(Context context) {
         this(context, null);
     }
-    
+
     public StoreEntryFactory(Context context,
                              @Nullable Serialiser customSerialiser) {
         Context applicationContext = context.getApplicationContext();
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
-                                                                             .keyStoreModule(new KeyStoreModule(applicationContext))
-                                                                             .persistenceModule(new PersistenceModule(applicationContext, customSerialiser))
-                                                                             .build();
-        
+                .keyStoreModule(new KeyStoreModule())
+                .persistenceModule(new PersistenceModule(applicationContext, customSerialiser))
+                .build();
+
         encryptedStore = component.encryptedStore();
         store = component.store();
+        lenientEncryptedStore = component.lenientEncryptedStore();
         isEncryptionSupported = component.isEncryptionSupported();
-        keyStoreManager = component.keyStoreManager();
+        encryptionManager = component.keyStoreManager();
     }
-    
+
     public <C> StoreEntry<C> open(String key,
                                   Class<C> valueClass) {
         return open(() -> key, () -> valueClass);
     }
-    
+
     public <C> StoreEntry<C> openEncrypted(String key,
                                            Class<C> valueClass) {
         return openEncrypted(() -> key, () -> valueClass);
     }
-    
-    public <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
-                                  StoreEntry.ValueClassProvider<C> valueClassProvider) {
-        return new StoreEntry<>(store, keyProvider, valueClassProvider);
+
+    public <C> StoreEntry<C> openLenientEncrypted(String key,
+                                                  Class<C> valueClass) {
+        return openLenientEncrypted(() -> key, () -> valueClass);
     }
-    
-    public <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
-                                           StoreEntry.ValueClassProvider<C> valueClassProvider) {
-        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
-    }
-    
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> open(K key) {
+
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> open(K key) {
         return open(key, key);
     }
-    
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> openEncrypted(K key) {
+
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openEncrypted(K key) {
         return openEncrypted(key, key);
     }
-    
+
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openLenientEncrypted(K key) {
+        return openEncrypted(key, key);
+    }
+
+    private <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
+                                   StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(store, keyProvider, valueClassProvider);
+    }
+
+    private <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
+                                            StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
+    }
+
+    private <C> StoreEntry<C> openLenientEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
+                                            StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
+    }
+
     public boolean isEncryptionSupported() {
         return isEncryptionSupported;
     }
-    
+
     public Observable<String> observeChanges() {
         return store.observeChanges().mergeWith(encryptedStore.observeChanges());
     }
-    
+
     public SharedPreferenceStore getStore() {
         return store;
     }
-    
+
     public EncryptedSharedPreferenceStore getEncryptedStore() {
         return encryptedStore;
     }
-    
-    public byte[] encrypt(byte[] toEncrypt) {
+
+    public byte[] encrypt(byte[] toEncrypt,
+                          String tag) {
         checkEncryptionSupported();
-        return keyStoreManager.encryptBytes(toEncrypt);
+        return encryptionManager.encryptBytes(toEncrypt, tag);
     }
-    
-    public byte[] decrypt(byte[] toDecrypt) {
+
+    public byte[] decrypt(byte[] toDecrypt,
+                          String tag) {
         checkEncryptionSupported();
-        return keyStoreManager.decryptBytes(toDecrypt);
+        return encryptionManager.decryptBytes(toDecrypt, tag);
     }
-    
+
     private void checkEncryptionSupported() {
         if (!isEncryptionSupported) {
             throw new IllegalStateException("Encryption isn't supported on this device");

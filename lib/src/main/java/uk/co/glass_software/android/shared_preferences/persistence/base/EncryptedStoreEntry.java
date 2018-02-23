@@ -22,15 +22,48 @@
 package uk.co.glass_software.android.shared_preferences.persistence.base;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 
 
-public class EncryptedStoreEntry extends StoreEntry<String> {
-    
-    protected EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
-                                  @NonNull StoreEntry.UniqueKeyProvider storeKey) {
-        super(store, storeKey, () -> String.class);
+public class EncryptedStoreEntry<C> extends StoreEntry<C> {
+
+    public EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                               @NonNull String key,
+                               @NonNull Class<C> valueClass) {
+        super(store, key, valueClass);
     }
-    
+
+    public EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                               @NonNull String key,
+                               @NonNull Class<C> valueClass,
+                               @Nullable C defaultValue) {
+        super(store, key, valueClass, defaultValue);
+    }
+
+    public <K extends UniqueKeyProvider & ValueClassProvider> EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                                                                                  @NonNull K keyProvider) {
+        super(store, keyProvider);
+    }
+
+    public <K extends UniqueKeyProvider & ValueClassProvider> EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                                                                                  @NonNull K keyProvider,
+                                                                                  @Nullable C defaultValue) {
+        super(store, keyProvider, defaultValue);
+    }
+
+    public EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                               @NonNull UniqueKeyProvider keyProvider,
+                               @NonNull ValueClassProvider valueClassProvider) {
+        super(store, keyProvider, valueClassProvider);
+    }
+
+    public EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
+                               @NonNull UniqueKeyProvider keyProvider,
+                               @NonNull ValueClassProvider valueClassProvider,
+                               @Nullable C defaultValue) {
+        super(store, keyProvider, valueClassProvider, defaultValue);
+    }
+
 }

@@ -8,12 +8,12 @@ import android.support.annotation.RestrictTo;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 
 public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
-    private final KeyStoreManager keyStoreManager;
+    private final EncryptionManager encryptionManager;
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                                           @NonNull Serialiser base64Serialiser,
@@ -34,14 +34,18 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
                                           @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger,
-                                          @Nullable KeyStoreManager keyStoreManager) {
+                                          @Nullable EncryptionManager encryptionManager) {
         super(sharedPreferences,
               base64Serialiser,
               customSerialiser,
               changeSubject,
               logger
         );
-        this.keyStoreManager = keyStoreManager;
+        this.encryptionManager = encryptionManager;
+    }
+    
+    public boolean isEncryptionSupported() {
+        return encryptionManager != null;
     }
     
     @Override
@@ -50,9 +54,11 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Override
-    final Object readStoredValue(Object value) {
+    final Object readStoredValue(Object value,
+                                 String key) {
+        
         checkEncryptionAvailable();
-        return keyStoreManager.decrypt(value.toString());
+        return encryptionManager.decrypt(value.toString(), key);
     }
     
     @Override
@@ -77,7 +83,7 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
             return;
         }
         
-        super.saveValue(key, encrypt(serialised));
+        super.saveValue(key, encrypt(serialised, key));
         saveToCache(key, value);
         
         logger.d(this, "Saving entry " + key + " -> " + value);
@@ -157,24 +163,28 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
         
         return value == null
                ? defaultValue
-               : decrypt(value, objectClass);
+               : decrypt(value, key, objectClass);
     }
     
     @Nullable
-    private String encrypt(@Nullable String clearText) {
+    private String encrypt(@Nullable String clearText,
+                           String key) {
         checkEncryptionAvailable();
-        return clearText == null ? null : keyStoreManager.encrypt(clearText);
+        return clearText == null ? null : encryptionManager.encrypt(clearText, key);
     }
     
     @Nullable
     private <O> O decrypt(@Nullable String encrypted,
+                          String key,
                           Class<O> targetClass) {
         checkEncryptionAvailable();
-        return encrypted == null ? null : deserialise(keyStoreManager.decrypt(encrypted), targetClass);
+        return encrypted == null
+               ? null
+               : deserialise(encryptionManager.decrypt(encrypted, key), targetClass);
     }
     
     private void checkEncryptionAvailable() {
-        if (keyStoreManager == null) {
+        if (!isEncryptionSupported()) {
             throw new IllegalStateException("Encryption is not supported on this device");
         }
     }

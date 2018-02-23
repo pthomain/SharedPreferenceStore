@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.key;
 
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -70,7 +70,7 @@ public class SavedEncryptedAesKey extends StoreEntry<String> {
     }
     
     @Nullable
-    byte[] getBytes() throws Exception {
+    public byte[] getBytes() throws Exception {
         String storedKey = get();
         
         if (storedKey == null) {

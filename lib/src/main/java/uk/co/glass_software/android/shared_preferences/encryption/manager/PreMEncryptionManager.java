@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -38,12 +38,13 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.encryption.key.SavedEncryptedAesKey;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule.ANDROID_KEY_STORE;
 
 //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
-public class PreMKeyStoreManager extends BaseKeyStoreManager {
+public class PreMEncryptionManager extends BaseCustomEncryptionManager {
     
     private static final String ASYMMETRIC_ENCRYPTION = "RSA";
     private static final String ENCRYPTION = "AES";
@@ -55,11 +56,11 @@ public class PreMKeyStoreManager extends BaseKeyStoreManager {
     private final String alias;
     private final Context applicationContext;
     
-    PreMKeyStoreManager(Logger logger,
-                        KeyStore keyStore,
-                        @Nullable SavedEncryptedAesKey encryptedAesKey,
-                        String alias,
-                        Context applicationContext) {
+    PreMEncryptionManager(Logger logger,
+                          KeyStore keyStore,
+                          @Nullable SavedEncryptedAesKey encryptedAesKey,
+                          String alias,
+                          Context applicationContext) {
         super(logger);
         this.keyStore = keyStore;
         this.encryptedAesKey = encryptedAesKey;

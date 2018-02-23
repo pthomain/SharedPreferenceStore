@@ -24,10 +24,6 @@ package uk.co.glass_software.android.shared_preferences.persistence;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.subjects.BehaviorSubject;
@@ -38,72 +34,76 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.B
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Module
 public class PersistenceModule {
-    
+
     private final static int MAX_FILE_NAME_LENGTH = 127;
     public final static String STORE_NAME = "plain_text";
     public final static String ENCRYPTED_STORE_NAME = "encrypted";
+    public final static String LENIENT_ENCRYPTED_STORE_NAME = "lenient";
     public final static String IS_ENCRYPTION_SUPPORTED = "IS_ENCRYPTION_SUPPORTED";
     public final static String BASE_64 = "base_64";
     public final static String CUSTOM = "custom";
-    
+
     private final Context context;
-    
+
     @Nullable
     private final Serialiser customSerialiser;
-    
+
     public PersistenceModule(Context context,
                              @Nullable Serialiser customSerialiser) {
         this.context = context;
         this.customSerialiser = customSerialiser;
     }
-    
+
     @Provides
     @Singleton
     Context provideContext() {
         return context;
     }
-    
+
     @Provides
     @Singleton
     Function<String, SharedPreferences> provideSharedPreferenceFactory() {
         return name -> context.getSharedPreferences(getStoreName(name), Context.MODE_PRIVATE);
     }
-    
+
     private String getStoreName(String name) {
         int nameLength = Math.max(STORE_NAME.length(), ENCRYPTED_STORE_NAME.length()) + 1;
         int availableLength = MAX_FILE_NAME_LENGTH - nameLength;
         String packageName = context.getPackageName();
-        
+
         if (packageName.length() > availableLength) {
             packageName = packageName.substring(packageName.length() - availableLength, packageName.length());
         }
-        
+
         return packageName + "$" + name;
     }
-    
+
     @Provides
     @Singleton
     @Named(STORE_NAME)
     SharedPreferences provideSharedPreferences(Function<String, SharedPreferences> storeFactory) {
         return storeFactory.get(STORE_NAME);
     }
-    
+
     @Provides
     @Singleton
     @Named(ENCRYPTED_STORE_NAME)
     SharedPreferences provideEncryptedSharedPreferences(Function<String, SharedPreferences> storeFactory) {
         return storeFactory.get(ENCRYPTED_STORE_NAME);
     }
-    
+
     @Provides
     @Singleton
     @Named(BASE_64)
     Serialiser provideBase64Serialiser(Logger logger) {
         return new Base64Serialiser(logger);
     }
-    
+
     @Provides
     @Singleton
     @Named(CUSTOM)
@@ -111,21 +111,21 @@ public class PersistenceModule {
     Serialiser provideCustomSerialiser() {
         return customSerialiser;
     }
-    
+
     @Provides
     @Singleton
     @Named(STORE_NAME)
     BehaviorSubject<String> provideBehaviorSubject() {
         return BehaviorSubject.create();
     }
-    
+
     @Provides
     @Singleton
     @Named(ENCRYPTED_STORE_NAME)
     BehaviorSubject<String> provideEncryptedBehaviorSubject() {
         return BehaviorSubject.create();
     }
-    
+
     @Provides
     @Singleton
     @Named(STORE_NAME)
@@ -142,11 +142,11 @@ public class PersistenceModule {
                 logger
         );
     }
-    
+
     @Provides
     @Singleton
     Logger provideLogger() {
         return new SimpleLogger();
     }
-    
+
 }

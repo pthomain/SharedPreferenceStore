@@ -19,16 +19,16 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
-public interface KeyStoreManager {
+public interface EncryptionManager {
     
-    String encrypt(String toEncrypt);
+    String encrypt(String toEncrypt, String dataTag);
     
-    byte[] encryptBytes(byte[] toEncrypt);
+    byte[] encryptBytes(byte[] toEncrypt, String dataTag);
     
-    String decrypt(String toDecrypt);
+    String decrypt(String toDecrypt, String dataTag);
     
-    byte[] decryptBytes(byte[] toDecrypt);
+    byte[] decryptBytes(byte[] toDecrypt, String dataTag);
     
 }

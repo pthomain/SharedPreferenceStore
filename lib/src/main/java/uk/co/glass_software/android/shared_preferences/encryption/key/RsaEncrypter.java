@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.key;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

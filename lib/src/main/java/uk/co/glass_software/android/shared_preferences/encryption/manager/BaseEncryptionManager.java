@@ -19,81 +19,42 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
 import android.support.annotation.Nullable;
 import android.util.Base64;
 
-import javax.crypto.Cipher;
-
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-public abstract class BaseKeyStoreManager implements KeyStoreManager {
+abstract class BaseEncryptionManager implements EncryptionManager {
     
     protected final Logger logger;
     
-    BaseKeyStoreManager(Logger logger) {
+    BaseEncryptionManager(Logger logger) {
         this.logger = logger;
     }
     
     @Nullable
     @Override
-    public String encrypt(String toEncrypt) {
+    public final String encrypt(String toEncrypt,
+                                String dataTag) {
         if (toEncrypt == null) {
             return null;
         }
-        byte[] input = encryptBytes(toEncrypt.getBytes());
+        byte[] input = encryptBytes(toEncrypt.getBytes(), dataTag);
         return input == null ? null : Base64.encodeToString(input, Base64.DEFAULT);
     }
     
     @Nullable
     @Override
-    public String decrypt(String toDecrypt) {
+    public final String decrypt(String toDecrypt,
+                                String dataTag) {
         if (toDecrypt == null) {
             return null;
         }
         byte[] decode = Base64.decode(toDecrypt.getBytes(), Base64.DEFAULT);
-        byte[] bytes = decryptBytes(decode);
+        byte[] bytes = decryptBytes(decode, dataTag);
         return bytes == null ? null : new String(bytes);
     }
-    
-    @Override
-    @Nullable
-    public byte[] encryptBytes(byte[] toEncrypt) {
-        if (toEncrypt == null) {
-            return null;
-        }
-        
-        createNewKeyPairIfNeeded();
-        
-        try {
-            Cipher cipher = getCipher(true);
-            return cipher.doFinal(toEncrypt);
-        }
-        catch (Exception e) {
-            logger.e(this, e, "Could not encrypt the given bytes");
-            return null;
-        }
-    }
-    
-    @Override
-    public byte[] decryptBytes(byte[] toDecrypt) {
-        if (toDecrypt == null) {
-            return null;
-        }
-        
-        try {
-            Cipher cipher = getCipher(false);
-            return cipher.doFinal(toDecrypt);
-        }
-        catch (Exception e) {
-            logger.e(this, "Could not decrypt the given bytes");
-            return null;
-        }
-    }
-    
-    protected abstract void createNewKeyPairIfNeeded();
-    
-    protected abstract Cipher getCipher(boolean isEncrypt) throws Exception;
     
 }
