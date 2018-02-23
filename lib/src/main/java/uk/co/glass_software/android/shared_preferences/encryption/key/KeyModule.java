@@ -22,7 +22,8 @@ import static uk.co.glass_software.android.shared_preferences.persistence.Persis
 public class KeyModule {
     
     public static final String KEY_ALIAS = "KEY_ALIAS";
-   
+    public static final String ANDROID_KEY_STORE = "AndroidKeyStore";
+    
     private final String keyAlias;
     
     public KeyModule(Context context) {
@@ -32,8 +33,27 @@ public class KeyModule {
     @Provides
     @Singleton
     @Named(KEY_ALIAS)
-    String provideKeyAlias(){
+    String provideKeyAlias() {
         return keyAlias;
+    }
+    
+    @Provides
+    @Singleton
+    @Nullable
+    KeyStore provideKeyStore() {
+        if (SDK_INT < JELLY_BEAN_MR2) {
+            return null;
+        }
+        else {
+            try {
+                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
+                keyStore.load(null);
+                return keyStore;
+            }
+            catch (Exception e) {
+                return null;
+            }
+        }
     }
     
     @Provides
@@ -59,5 +79,17 @@ public class KeyModule {
     @Nullable
     RsaEncrypter provideRsaEncrypter(@Nullable KeyStore keyStore) {
         return new RsaEncrypter(keyStore, keyAlias);
+    }
+    
+    @Provides
+    @Singleton
+    PreMSecureKeyProvider providePreMSecureKeyProvider(@Nullable SavedEncryptedAesKey savedEncryptedAesKey) {
+        return new PreMSecureKeyProvider(savedEncryptedAesKey);
+    }
+    
+    @Provides
+    @Singleton
+    PostMSecureKeyProvider providePostMSecureKeyProvider(@Nullable KeyStore keyStore) {
+        return new PostMSecureKeyProvider(keyStore, keyAlias);
     }
 }

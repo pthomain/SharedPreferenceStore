@@ -21,6 +21,8 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.key;
 
+import android.support.annotation.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.KeyStore;
@@ -35,22 +37,30 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 
-public class RsaEncrypter {
+class RsaEncrypter {
     
     private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
     private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
     
+    @Nullable
     private final KeyStore keyStore;
+    
     private final String alias;
     
-    public RsaEncrypter(KeyStore keyStore,
-                        String alias) {
+    RsaEncrypter(@Nullable KeyStore keyStore,
+                 String alias) {
         this.keyStore = keyStore;
         this.alias = alias;
     }
     
+    @Nullable
     byte[] encrypt(byte[] secret) throws Exception {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
+    
+        if (privateKeyEntry == null) {
+            return null;
+        }
+        
         Cipher inputCipher = getCipherInstance();
         inputCipher.init(Cipher.ENCRYPT_MODE, privateKeyEntry.getCertificate().getPublicKey());
         
@@ -62,8 +72,14 @@ public class RsaEncrypter {
         return outputStream.toByteArray();
     }
     
+    @Nullable
     byte[] decrypt(byte[] encrypted) throws Exception {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
+        
+        if (privateKeyEntry == null) {
+            return null;
+        }
+        
         Cipher outputCipher = getCipherInstance();
         outputCipher.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
         
@@ -89,13 +105,16 @@ public class RsaEncrypter {
         return Cipher.getInstance(RSA_MODE, CIPHER_PROVIDER);
     }
     
+    @Nullable
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry() throws NoSuchAlgorithmException,
                                                                  UnrecoverableEntryException,
                                                                  KeyStoreException {
-        return (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-                alias,
-                null
-        );
+        return keyStore == null
+               ? null
+               : (KeyStore.PrivateKeyEntry) keyStore.getEntry(
+                       alias,
+                       null
+               );
     }
     
 }

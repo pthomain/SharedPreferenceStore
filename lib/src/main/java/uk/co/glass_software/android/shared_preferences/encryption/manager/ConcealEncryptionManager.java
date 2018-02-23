@@ -13,30 +13,31 @@ import com.facebook.soloader.SoLoader;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-public class ConcealEncryptionManager extends BaseEncryptionManager {
+class ConcealEncryptionManager extends BaseEncryptionManager {
     
-    private final boolean isConcealAvailable;
+    private final boolean isAvailable;
     private final Crypto crypto;
     private Logger logger;
     
     ConcealEncryptionManager(Context context,
-                             Logger logger) {
+                             Logger logger,
+                             AndroidConceal androidConceal) {
         super(logger);
         this.logger = logger;
         SoLoader.init(context, false);
         
         // Creates a new Crypto object with default implementations of a key chain
         KeyChain keyChain = new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
-        crypto = AndroidConceal.get().createDefaultCrypto(keyChain);
+        crypto = androidConceal.createDefaultCrypto(keyChain);
         
         // Check for whether the crypto functionality is available
         // This might fail if Android does not load libraries correctly.
-        isConcealAvailable = crypto.isAvailable();
-        logger.d(this, "Conceal is" + (isConcealAvailable ? "" : " not") + " available");
+        isAvailable = crypto.isAvailable();
+        logger.d(this, "Conceal is" + (isAvailable ? "" : " not") + " available");
     }
     
-    public boolean isConcealAvailable() {
-        return isConcealAvailable;
+    public boolean isAvailable() {
+        return isAvailable;
     }
     
     @Override
@@ -61,7 +62,7 @@ public class ConcealEncryptionManager extends BaseEncryptionManager {
         if (toDecrypt == null) {
             return null;
         }
-    
+        
         try {
             return crypto.decrypt(toDecrypt, Entity.create(dataTag));
         }

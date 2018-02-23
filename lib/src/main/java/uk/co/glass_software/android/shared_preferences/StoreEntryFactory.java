@@ -25,8 +25,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import io.reactivex.Observable;
+import uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
-import uk.co.glass_software.android.shared_preferences.encryption.KeyStoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
@@ -52,7 +52,7 @@ public class StoreEntryFactory {
                              @Nullable Serialiser customSerialiser) {
         Context applicationContext = context.getApplicationContext();
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
-                .keyStoreModule(new KeyStoreModule())
+                .keyModule(new KeyModule(applicationContext))
                 .persistenceModule(new PersistenceModule(applicationContext, customSerialiser))
                 .build();
 

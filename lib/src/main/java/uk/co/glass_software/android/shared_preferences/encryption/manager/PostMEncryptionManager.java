@@ -29,9 +29,6 @@ import android.support.annotation.Nullable;
 
 import java.security.Key;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.Cipher;
@@ -39,12 +36,13 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.spec.GCMParameterSpec;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.encryption.key.SecureKeyProvider;
 
 import static android.os.Build.VERSION_CODES.M;
 import static android.security.keystore.KeyProperties.KEY_ALGORITHM_AES;
 import static android.security.keystore.KeyProperties.PURPOSE_DECRYPT;
 import static android.security.keystore.KeyProperties.PURPOSE_ENCRYPT;
-import static uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule.ANDROID_KEY_STORE;
 
 public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     
@@ -53,14 +51,17 @@ public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     private static final String AES_MODE = "AES/CBC/NoPadding";
     
     private final Logger logger;
+    private final SecureKeyProvider secureKeyProvider;
     private final KeyStore keyStore;
     private final String alias;
     
     PostMEncryptionManager(Logger logger,
+                           SecureKeyProvider secureKeyProvider,
                            @Nullable KeyStore keyStore,
                            String alias) {
         super(logger);
         this.logger = logger;
+        this.secureKeyProvider = secureKeyProvider;
         this.keyStore = keyStore;
         this.alias = alias;
     }
@@ -68,7 +69,8 @@ public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     @NonNull
     @TargetApi(M)
     protected Cipher getCipher(boolean isEncrypt) throws Exception {
-        Key secretKey = getSecretKey();
+        Key secretKey = secureKeyProvider.getKey();
+        
         if (secretKey == null) {
             throw new IllegalStateException("Could not retrieve the secret key");
         }
@@ -82,12 +84,6 @@ public class PostMEncryptionManager extends BaseCustomEncryptionManager {
         }
     }
     
-    @Nullable
-    private Key getSecretKey() throws UnrecoverableKeyException,
-                                      NoSuchAlgorithmException,
-                                      KeyStoreException {
-        return keyStore == null ? null : keyStore.getKey(alias, null);
-    }
     
     @Override
     @TargetApi(M)

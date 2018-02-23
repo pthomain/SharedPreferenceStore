@@ -30,7 +30,7 @@ import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
-public class SavedEncryptedAesKey extends StoreEntry<String> {
+class SavedEncryptedAesKey extends StoreEntry<String> {
     
     private static final String KEY = "SharedPreferenceStoreEncryptedAesKey";
     private final Logger logger;
@@ -72,11 +72,6 @@ public class SavedEncryptedAesKey extends StoreEntry<String> {
     @Nullable
     public byte[] getBytes() throws Exception {
         String storedKey = get();
-        
-        if (storedKey == null) {
-            return null;
-        }
-        
         byte[] encryptedKey = Base64.decode(storedKey, Base64.DEFAULT);
         return rsaEncrypter.decrypt(encryptedKey);
     }
@@ -87,6 +82,11 @@ public class SavedEncryptedAesKey extends StoreEntry<String> {
         secureRandom.nextBytes(key);
         
         byte[] encryptedKey = rsaEncrypter.encrypt(key);
+        
+        if(encryptedKey == null){
+            throw new IllegalStateException("RSA encrypter could not encrypt the key");
+        }
+        
         return Base64.encodeToString(encryptedKey, Base64.DEFAULT);
     }
     

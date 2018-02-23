@@ -41,10 +41,11 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         children.clear();
         
         Date lastOpenDate = presenter.lastOpenDate().get();
-        String formattedDate = simpleDateFormat.format(lastOpenDate);
+        String formattedDate = lastOpenDate == null ? null : simpleDateFormat.format(lastOpenDate);
+        
         addEntries("App opened",
                    "Count: " + presenter.counter().get(1) + " time(s)",
-                   "Last open date: " + (lastOpenDate == null ? "N/A" : formattedDate)
+                   "Last open date: " + (formattedDate == null ? "N/A" : formattedDate)
         );
         
         addEntries("Plain text entries",

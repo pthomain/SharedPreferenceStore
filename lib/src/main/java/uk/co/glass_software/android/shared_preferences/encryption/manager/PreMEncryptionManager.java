@@ -34,44 +34,42 @@ import java.security.KeyStore;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.key.SavedEncryptedAesKey;
+import uk.co.glass_software.android.shared_preferences.encryption.key.SecureKeyProvider;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule.ANDROID_KEY_STORE;
 
 //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 public class PreMEncryptionManager extends BaseCustomEncryptionManager {
     
     private static final String ASYMMETRIC_ENCRYPTION = "RSA";
-    private static final String ENCRYPTION = "AES";
     private static final String ENCRYPTION_PROVIDER = "BC";
     private static final String AES_MODE = "AES/ECB/PKCS7Padding";
     
     private final KeyStore keyStore;
-    private final SavedEncryptedAesKey encryptedAesKey;
-    private final String alias;
+    private final String keyAlias;
+    private final SecureKeyProvider secureKeyProvider;
     private final Context applicationContext;
     
     PreMEncryptionManager(Logger logger,
-                          KeyStore keyStore,
-                          @Nullable SavedEncryptedAesKey encryptedAesKey,
-                          String alias,
+                          @Nullable KeyStore keyStore,
+                          String keyAlias,
+                          SecureKeyProvider secureKeyProvider,
                           Context applicationContext) {
         super(logger);
         this.keyStore = keyStore;
-        this.encryptedAesKey = encryptedAesKey;
-        this.alias = alias;
+        this.keyAlias = keyAlias;
+        this.secureKeyProvider = secureKeyProvider;
         this.applicationContext = applicationContext;
     }
     
     @NonNull
     @Override
     protected Cipher getCipher(boolean isEncrypt) throws Exception {
-        Key secretKey = getSecretKey();
+        Key secretKey = secureKeyProvider.getKey();
         if (secretKey == null) {
             throw new IllegalStateException("Could not retrieve the secret key");
         }
@@ -84,33 +82,18 @@ public class PreMEncryptionManager extends BaseCustomEncryptionManager {
         }
     }
     
-    @Nullable
-    private Key getSecretKey() throws Exception {
-        if (encryptedAesKey == null) {
-            throw new NullPointerException("Could not load encrypted AES key");
-        }
-        
-        byte[] storedKey = encryptedAesKey.getBytes();
-        
-        if (storedKey == null) {
-            return null;
-        }
-        
-        return new SecretKeySpec(storedKey, ENCRYPTION);
-    }
-    
     @Override
     @TargetApi(JELLY_BEAN_MR2)
     protected synchronized void createNewKeyPairIfNeeded() {
         try {
-            if (keyStore != null && !keyStore.containsAlias(alias)) {
+            if (keyStore != null && !keyStore.containsAlias(keyAlias)) {
                 Calendar start = Calendar.getInstance();
                 Calendar end = Calendar.getInstance();
                 end.add(Calendar.YEAR, 30);
                 
                 KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(applicationContext)
-                        .setAlias(alias)
-                        .setSubject(new X500Principal("CN=" + alias))
+                        .setAlias(keyAlias)
+                        .setSubject(new X500Principal("CN=" + keyAlias))
                         .setSerialNumber(BigInteger.TEN)
                         .setStartDate(start.getTime())
                         .setEndDate(end.getTime())

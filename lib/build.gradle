@@ -68,7 +68,6 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     compile 'com.facebook.conceal:conceal:2.0.2'
-    compile 'com.facebook.soloader:soloader:0.3.0'
 
     testCompile "junit:junit:$jUnitVersion"
     testCompile "org.mockito:mockito-core:$mockitoVersion"
