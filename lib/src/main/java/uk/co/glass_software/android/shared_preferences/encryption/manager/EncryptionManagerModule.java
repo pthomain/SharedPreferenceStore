@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
+import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
+import com.facebook.crypto.CryptoConfig;
+import com.facebook.crypto.keychain.KeyChain;
 
 import java.security.KeyStore;
 
@@ -68,11 +71,19 @@ public class EncryptionManagerModule {
     
     @Provides
     @Singleton
+    KeyChain provideKeyChain(Context context) {
+        return new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
+    }
+    
+    @Provides
+    @Singleton
     ConcealEncryptionManager provideConcealEncryptionManager(Logger logger,
+                                                             KeyChain keyChain,
                                                              Context applicationContext) {
         return new ConcealEncryptionManager(
                 applicationContext,
                 logger,
+                keyChain,
                 AndroidConceal.get()
         );
     }

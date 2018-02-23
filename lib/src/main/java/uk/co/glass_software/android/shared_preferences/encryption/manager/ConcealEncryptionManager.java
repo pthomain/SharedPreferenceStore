@@ -4,9 +4,7 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager;
 import android.content.Context;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
-import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
 import com.facebook.crypto.Crypto;
-import com.facebook.crypto.CryptoConfig;
 import com.facebook.crypto.Entity;
 import com.facebook.crypto.keychain.KeyChain;
 import com.facebook.soloader.SoLoader;
@@ -21,13 +19,13 @@ class ConcealEncryptionManager extends BaseEncryptionManager {
     
     ConcealEncryptionManager(Context context,
                              Logger logger,
+                             KeyChain keyChain,
                              AndroidConceal androidConceal) {
         super(logger);
         this.logger = logger;
         SoLoader.init(context, false);
         
         // Creates a new Crypto object with default implementations of a key chain
-        KeyChain keyChain = new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
         crypto = androidConceal.createDefaultCrypto(keyChain);
         
         // Check for whether the crypto functionality is available
