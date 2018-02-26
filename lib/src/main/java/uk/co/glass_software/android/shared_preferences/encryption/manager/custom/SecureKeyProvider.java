@@ -1,4 +1,4 @@
-package uk.co.glass_software.android.shared_preferences.encryption.key;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
 
 import android.support.annotation.Nullable;
 

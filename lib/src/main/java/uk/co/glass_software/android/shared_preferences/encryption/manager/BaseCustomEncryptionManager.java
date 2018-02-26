@@ -6,9 +6,9 @@ import javax.crypto.Cipher;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-abstract class BaseCustomEncryptionManager extends BaseEncryptionManager {
+public abstract class BaseCustomEncryptionManager extends BaseEncryptionManager {
     
-    BaseCustomEncryptionManager(Logger logger) {
+    protected BaseCustomEncryptionManager(Logger logger) {
         super(logger);
     }
     

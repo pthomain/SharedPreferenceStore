@@ -1,91 +1,28 @@
 package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.facebook.android.crypto.keychain.AndroidConceal;
-import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
-import com.facebook.crypto.CryptoConfig;
-import com.facebook.crypto.keychain.KeyChain;
-
-import java.security.KeyStore;
-
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule;
-import uk.co.glass_software.android.shared_preferences.encryption.key.PostMSecureKeyProvider;
-import uk.co.glass_software.android.shared_preferences.encryption.key.PreMSecureKeyProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealEncryptionManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.CustomModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.PostMEncryptionManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.PreMEncryptionManager;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static android.os.Build.VERSION_CODES.M;
-import static uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule.KEY_ALIAS;
-
-@Module(includes = KeyModule.class)
+@Module(includes = {
+        ConcealModule.class,
+        CustomModule.class
+})
 public class EncryptionManagerModule {
     
-    @Provides
-    @Singleton
-    @Nullable
-    PreMEncryptionManager providePreMEncryptionManager(Logger logger,
-                                                       PreMSecureKeyProvider secureKeyProvider,
-                                                       @Named(KEY_ALIAS) String keyAlias,
-                                                       @Nullable KeyStore keyStore,
-                                                       Context applicationContext) {
-        if (SDK_INT >= JELLY_BEAN_MR2
-            && SDK_INT < M
-            && keyStore != null) {
-            return new PreMEncryptionManager(
-                    logger,
-                    keyStore,
-                    keyAlias,
-                    secureKeyProvider,
-                    applicationContext
-            );
-        }
-        return null;
-    }
+    private final boolean fallbackToCustomEncryption;
     
-    @Provides
-    @Singleton
-    @Nullable
-    PostMEncryptionManager providePostMEncryptionManager(Logger logger,
-                                                         PostMSecureKeyProvider secureKeyProvider,
-                                                         @Named(KEY_ALIAS) String keyAlias,
-                                                         @Nullable KeyStore keyStore) {
-        if (SDK_INT >= M
-            && keyStore != null) {
-            return new PostMEncryptionManager(
-                    logger,
-                    secureKeyProvider,
-                    keyStore,
-                    keyAlias
-            );
-        }
-        return null;
-    }
-    
-    @Provides
-    @Singleton
-    KeyChain provideKeyChain(Context context) {
-        return new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
-    }
-    
-    @Provides
-    @Singleton
-    ConcealEncryptionManager provideConcealEncryptionManager(Logger logger,
-                                                             KeyChain keyChain,
-                                                             Context applicationContext) {
-        return new ConcealEncryptionManager(
-                applicationContext,
-                logger,
-                keyChain,
-                AndroidConceal.get()
-        );
+    public EncryptionManagerModule(boolean fallbackToCustomEncryption) {
+        this.fallbackToCustomEncryption = fallbackToCustomEncryption;
     }
     
     @Provides
@@ -93,14 +30,23 @@ public class EncryptionManagerModule {
     @Nullable
     EncryptionManager provideDefaultEncryptionManager(@Nullable PreMEncryptionManager preMEncryptionManager,
                                                       @Nullable PostMEncryptionManager postMEncryptionManager,
-                                                      ConcealEncryptionManager concealEncryptionManager) {
-        if (concealEncryptionManager.isAvailable()) {
+                                                      ConcealEncryptionManager concealEncryptionManager,
+                                                      Logger logger) {
+        if (concealEncryptionManager.isAvailable() || !fallbackToCustomEncryption) {
+            if (concealEncryptionManager.isAvailable()) {
+                logger.d(this, "Using Conceal encryption manager");
+            }
+            else {
+                logger.e(this, "Encryption is NOT supported: Conceal is not available and there is no fallback to custom encryption as per config");
+            }
             return concealEncryptionManager;
         }
         else if (postMEncryptionManager != null) {
+            logger.d(this, "Using post-M encryption manager");
             return postMEncryptionManager;
         }
         else {
+            logger.d(this, "Using pre-M encryption manager");
             return preMEncryptionManager;
         }
     }

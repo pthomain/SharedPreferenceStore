@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -37,10 +37,10 @@ import javax.crypto.Cipher;
 import javax.security.auth.x500.X500Principal;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.key.SecureKeyProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseCustomEncryptionManager;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.ANDROID_KEY_STORE;
 
 //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 public class PreMEncryptionManager extends BaseCustomEncryptionManager {

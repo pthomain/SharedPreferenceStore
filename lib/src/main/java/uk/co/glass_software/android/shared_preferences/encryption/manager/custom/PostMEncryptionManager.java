@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
 
 import android.annotation.TargetApi;
 import android.security.keystore.KeyGenParameterSpec;
@@ -36,13 +36,13 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.spec.GCMParameterSpec;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.key.SecureKeyProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseCustomEncryptionManager;
 
 import static android.os.Build.VERSION_CODES.M;
 import static android.security.keystore.KeyProperties.KEY_ALGORITHM_AES;
 import static android.security.keystore.KeyProperties.PURPOSE_DECRYPT;
 import static android.security.keystore.KeyProperties.PURPOSE_ENCRYPT;
-import static uk.co.glass_software.android.shared_preferences.encryption.key.KeyModule.ANDROID_KEY_STORE;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.ANDROID_KEY_STORE;
 
 public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     

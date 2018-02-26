@@ -35,6 +35,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.E
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
+import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_KEY_SECURE;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.LENIENT_ENCRYPTED_STORE_NAME;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.STORE_NAME;
@@ -58,6 +59,11 @@ public interface SharedPreferenceComponent {
     @Named(IS_ENCRYPTION_SUPPORTED)
     Boolean isEncryptionSupported();
     
+    @Named(IS_ENCRYPTION_KEY_SECURE)
+    Boolean isEncryptionKeySecure();
+    
     @Nullable
     EncryptionManager keyStoreManager();
+    
+    Logger logger();
 }

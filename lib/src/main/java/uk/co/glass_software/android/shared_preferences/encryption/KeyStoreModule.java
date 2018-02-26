@@ -88,4 +88,5 @@ public class KeyStoreModule {
     Boolean provideIsEncryptionSupported(@Nullable EncryptionManager encryptionManager) {
         return encryptionManager != null;
     }
+   
 }

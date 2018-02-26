@@ -44,7 +44,7 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
         this.encryptionManager = encryptionManager;
     }
     
-    public boolean isEncryptionSupported() {
+    boolean isEncryptionSupported() {
         return encryptionManager != null;
     }
     

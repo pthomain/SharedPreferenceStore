@@ -1,4 +1,4 @@
-package uk.co.glass_software.android.shared_preferences.encryption.manager;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.conceal;
 
 
 import android.content.Context;
@@ -10,8 +10,9 @@ import com.facebook.crypto.keychain.KeyChain;
 import com.facebook.soloader.SoLoader;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseEncryptionManager;
 
-class ConcealEncryptionManager extends BaseEncryptionManager {
+public class ConcealEncryptionManager extends BaseEncryptionManager {
     
     private final boolean isAvailable;
     private final Crypto crypto;
@@ -31,7 +32,7 @@ class ConcealEncryptionManager extends BaseEncryptionManager {
         // Check for whether the crypto functionality is available
         // This might fail if Android does not load libraries correctly.
         isAvailable = crypto.isAvailable();
-        logger.d(this, "Conceal is" + (isAvailable ? "" : " not") + " available");
+        logger.d(this, "Conceal is" + (isAvailable ? "" : " NOT") + " available");
     }
     
     public boolean isAvailable() {

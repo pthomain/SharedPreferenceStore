@@ -26,11 +26,11 @@ import android.util.Base64;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-abstract class BaseEncryptionManager implements EncryptionManager {
+public abstract class BaseEncryptionManager implements EncryptionManager {
     
     protected final Logger logger;
     
-    BaseEncryptionManager(Logger logger) {
+    protected BaseEncryptionManager(Logger logger) {
         this.logger = logger;
     }
     

@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.key;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
 import android.support.annotation.Nullable;
 
@@ -56,7 +56,7 @@ class RsaEncrypter {
     @Nullable
     byte[] encrypt(byte[] secret) throws Exception {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
-    
+        
         if (privateKeyEntry == null) {
             return null;
         }
