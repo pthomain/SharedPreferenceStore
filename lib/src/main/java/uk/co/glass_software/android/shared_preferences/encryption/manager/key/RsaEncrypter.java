@@ -30,7 +30,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -85,7 +86,7 @@ class RsaEncrypter {
         
         ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
         CipherInputStream cipherInputStream = new CipherInputStream(inputStream, outputCipher);
-        ArrayList<Byte> values = new ArrayList<>();
+        List<Byte> values = new LinkedList<>();
         
         int nextByte;
         while ((nextByte = cipherInputStream.read()) != -1) {

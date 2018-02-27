@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 
-public class KeyPairProvider {
+public class RsaEncryptedKeyPairProvider {
     
     private final static String DELIMITER = "~";
     
@@ -21,11 +21,11 @@ public class KeyPairProvider {
     private final IsKeyPairEncrypted isKeyPairEncrypted;
     private Pair pair;
     
-    KeyPairProvider(RsaEncrypter rsaEncrypter,
-                    Logger logger,
-                    KeyPair keyPair,
-                    CryptoConfig cryptoConfig,
-                    IsKeyPairEncrypted isKeyPairEncrypted) {
+    RsaEncryptedKeyPairProvider(RsaEncrypter rsaEncrypter,
+                                Logger logger,
+                                KeyPair keyPair,
+                                CryptoConfig cryptoConfig,
+                                IsKeyPairEncrypted isKeyPairEncrypted) {
         this.rsaEncrypter = rsaEncrypter;
         this.logger = logger;
         this.keyPair = keyPair;
@@ -38,7 +38,7 @@ public class KeyPairProvider {
             getOrGenerate();
         }
         catch (Exception e) {
-            logger.e(this, e, "Could not initialise KeyPairProvider");
+            logger.e(this, e, "Could not initialise RsaEncryptedKeyPairProvider");
         }
     }
     

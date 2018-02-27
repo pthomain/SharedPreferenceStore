@@ -38,7 +38,7 @@ public class PostMEncryptionManager extends BaseCustomEncryptionManager {
     
     //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
     private final static String FIXED_IV = "ABkbm8HC1ytJ";
-    private static final String AES_MODE = "AES/CBC/NoPadding";
+    private static final String AES_MODE = "AES/GCM/NoPadding";
     
     private final SecureKeyProvider secureKeyProvider;
     

@@ -46,12 +46,9 @@ class MainPresenter {
     
     private void createOrUpdatePerson() {
         Date lastSeenDate = new Date();
-        Person person;
+        Person person = personEntry.get();
         
-        if (personEntry.exists()) {
-            person = personEntry.get();
-        }
-        else {
+        if (person == null) {
             person = new Person();
             person.setAge(30);
             person.setFirstName("John");

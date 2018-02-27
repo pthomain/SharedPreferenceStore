@@ -15,16 +15,16 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyPairProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.ANDROID_KEY_STORE;
 
 public class PreMSecureKeyProvider implements SecureKeyProvider {
     
-    private static final String ASYMMETRIC_ENCRYPTION = "RSA";
-    private static final String ENCRYPTION = "AES";
-    private final KeyPairProvider keyPairProvider;
+    private static final String KEY_ALGORITHM_RSA = "RSA";
+    private static final String KEY_ALGORITHM_AES = "AES";
+    private final RsaEncryptedKeyPairProvider keyPairProvider;
     private final Context applicationContext;
     private final String keyAlias;
     private final Logger logger;
@@ -32,7 +32,7 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
     @Nullable
     private final KeyStore keyStore;
     
-    PreMSecureKeyProvider(KeyPairProvider keyPairProvider,
+    PreMSecureKeyProvider(RsaEncryptedKeyPairProvider keyPairProvider,
                           Context applicationContext,
                           Logger logger,
                           @Nullable KeyStore keyStore,
@@ -48,7 +48,7 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
     
     @Override
     public Key getKey() throws Exception {
-        return new SecretKeySpec(keyPairProvider.getCipherKey(), ENCRYPTION);
+        return new SecretKeySpec(keyPairProvider.getCipherKey(), KEY_ALGORITHM_AES);
     }
     
     @Override
@@ -69,7 +69,7 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
                         .build();
                 
                 KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-                        ASYMMETRIC_ENCRYPTION,
+                        KEY_ALGORITHM_RSA,
                         ANDROID_KEY_STORE
                 );
                 

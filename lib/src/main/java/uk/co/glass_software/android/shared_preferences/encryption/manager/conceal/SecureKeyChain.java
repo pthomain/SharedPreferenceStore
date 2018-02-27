@@ -7,16 +7,16 @@ import com.facebook.crypto.keychain.KeyChain;
 
 import java.security.SecureRandom;
 
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyPairProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
 
 public class SecureKeyChain implements KeyChain {
     
     private final CryptoConfig mCryptoConfig;
     private final SecureRandom mSecureRandom;
-    private final KeyPairProvider keyPairProvider;
+    private final RsaEncryptedKeyPairProvider keyPairProvider;
     
     SecureKeyChain(CryptoConfig config,
-                   KeyPairProvider keyPairProvider) {
+                   RsaEncryptedKeyPairProvider keyPairProvider) {
         this.keyPairProvider = keyPairProvider;
         mSecureRandom = SecureRandomFix.createLocalSecureRandom();
         mCryptoConfig = config;

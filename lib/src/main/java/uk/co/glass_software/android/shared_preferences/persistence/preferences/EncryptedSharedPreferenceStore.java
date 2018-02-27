@@ -178,9 +178,16 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
                           String key,
                           Class<O> targetClass) {
         checkEncryptionAvailable();
-        return encrypted == null
-               ? null
-               : deserialise(encryptionManager.decrypt(encrypted, key), targetClass);
+        if (encrypted == null) {
+            return null;
+        }
+        else {
+            String decrypted = encryptionManager.decrypt(encrypted, key);
+            if(decrypted == null){
+                return null;
+            }
+            return deserialise(decrypted, targetClass);
+        }
     }
     
     private void checkEncryptionAvailable() {

@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyPairProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
@@ -24,7 +24,7 @@ public class CustomModule {
     
     @Provides
     @Singleton
-    PreMSecureKeyProvider providePreMSecureKeyProvider(KeyPairProvider keyPairProvider,
+    PreMSecureKeyProvider providePreMSecureKeyProvider(RsaEncryptedKeyPairProvider keyPairProvider,
                                                        Context context,
                                                        @Nullable KeyStore keyStore,
                                                        Logger logger,

@@ -11,9 +11,8 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.PreMSecureKeyProvider;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyPairProvider;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
 
 @Module(includes = KeyModule.class)
 public class ConcealModule {
@@ -21,7 +20,7 @@ public class ConcealModule {
     @Provides
     @Singleton
     KeyChain provideKeyChain(CryptoConfig cryptoConfig,
-                             KeyPairProvider keyPairProvider) {
+                             RsaEncryptedKeyPairProvider keyPairProvider) {
         return new SecureKeyChain(
                 cryptoConfig,
                 keyPairProvider

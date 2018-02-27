@@ -86,12 +86,12 @@ public class KeyModule {
     
     @Provides
     @Singleton
-    KeyPairProvider provideKeyPairProvider(RsaEncrypter rsaEncrypter,
-                                                   Logger logger,
-                                                   KeyPair keyPair,
-                                                   CryptoConfig cryptoConfig,
-                                                   IsKeyPairEncrypted isKeyPairEncrypted) {
-        return new KeyPairProvider(
+    RsaEncryptedKeyPairProvider provideKeyPairProvider(RsaEncrypter rsaEncrypter,
+                                                       Logger logger,
+                                                       KeyPair keyPair,
+                                                       CryptoConfig cryptoConfig,
+                                                       IsKeyPairEncrypted isKeyPairEncrypted) {
+        return new RsaEncryptedKeyPairProvider(
                 rsaEncrypter,
                 logger,
                 keyPair,
