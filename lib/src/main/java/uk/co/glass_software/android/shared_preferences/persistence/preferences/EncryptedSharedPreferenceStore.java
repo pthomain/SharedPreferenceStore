@@ -1,16 +1,14 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
 
-public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
+public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
     private final KeyStoreManager keyStoreManager;
@@ -45,119 +43,86 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Override
-    protected final boolean cache() {
-        return false;
+    synchronized void saveValueInternal(@NonNull String key,
+                                        @Nullable Object value) {
+        if (value != null
+            && (Boolean.class.isAssignableFrom(value.getClass())
+                || boolean.class.isAssignableFrom(value.getClass())
+                || Float.class.isAssignableFrom(value.getClass())
+                || float.class.isAssignableFrom(value.getClass())
+                || Long.class.isAssignableFrom(value.getClass())
+                || long.class.isAssignableFrom(value.getClass())
+                || Integer.class.isAssignableFrom(value.getClass())
+                || int.class.isAssignableFrom(value.getClass())
+                || String.class.isAssignableFrom(value.getClass()))) {
+            super.saveValueInternal(key, encrypt(String.valueOf(value)));
+        }
+        else {
+            super.saveValueInternal(key, value);
+        }
     }
     
     @Override
-    final Object readStoredValue(Object value) {
-        checkEncryptionAvailable();
-        return keyStoreManager.decrypt(value.toString());
-    }
-    
-    @Override
-    @SuppressLint("RestrictedApi")
-    public synchronized final void saveValue(@NonNull String key,
-                                             @Nullable Object value) {
-        saveValueInternal(key, value);
-    }
-    
-    @SuppressWarnings("unchecked")
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    void saveValueInternal(@NonNull String key,
-                           @Nullable Object value) {
-        String serialised = null;
-        
-        if (value != null) {
-            serialised = String.class.isInstance(value) ? value.toString() : serialise(value);
-        }
-        
-        if (serialised == null) {
-            logger.e(this, "Could not save value: " + key + " -> " + value);
-            return;
-        }
-        
-        super.saveValue(key, encrypt(serialised));
-        saveToCache(key, value);
-        
-        logger.d(this, "Saving entry " + key + " -> " + value);
-        changeSubject.onNext(key);
-    }
-    
-    @Nullable
-    private String serialise(@NonNull Object value) {
-        Class<?> targetClass = value.getClass();
-        try {
-            if (customSerialiser != null && customSerialiser.canHandleType(targetClass)) {
-                return customSerialiser.serialise(value);
-            }
-            else if (base64Serialiser.canHandleType(targetClass)) {
-                return base64Serialiser.serialise(value);
-            }
-        }
-        catch (Serialiser.SerialisationException e) {
-            logger.e(this, e, "Could not serialise " + value);
-        }
-        
-        return null;
-    }
-    
-    @Nullable
-    private <O> O deserialise(String value,
-                              Class<O> objectClass) {
+    synchronized <O> O getValueInternal(@NonNull String key,
+                                        @NonNull Class<O> objectClass,
+                                        @Nullable O defaultValue) {
         if (Boolean.class.isAssignableFrom(objectClass)
             || boolean.class.isAssignableFrom(objectClass)) {
-            return (O) Boolean.valueOf(value);
+            value = (O) Boolean.valueOf(sharedPreferences.getBoolean(
+                    key,
+                    defaultValue == null ? false : (Boolean) defaultValue
+            ));
         }
         else if (Float.class.isAssignableFrom(objectClass)
                  || float.class.isAssignableFrom(objectClass)) {
-            return (O) Float.valueOf(value);
+            value = (O) Float.valueOf(sharedPreferences.getFloat(
+                    key,
+                    defaultValue == null ? 0f : (Float) defaultValue
+            ));
         }
         else if (Long.class.isAssignableFrom(objectClass)
                  || long.class.isAssignableFrom(objectClass)) {
-            return (O) Long.valueOf(value);
+            value = (O) Long.valueOf(sharedPreferences.getLong(
+                    key,
+                    defaultValue == null ? 0L : (Long) defaultValue
+            ));
         }
         else if (Integer.class.isAssignableFrom(objectClass)
                  || int.class.isAssignableFrom(objectClass)) {
-            return (O) Integer.valueOf(value);
+            value = (O) Integer.valueOf(sharedPreferences.getInt(
+                    key,
+                    defaultValue == null ? 0 : (Integer) defaultValue
+            ));
         }
         else if (String.class.isAssignableFrom(objectClass)) {
-            return (O) value;
+            value = (O) sharedPreferences.getString(key, (String) defaultValue);
         }
         
-        try {
-            if (base64Serialiser.canHandleSerialisedFormat(value)) {
-                return base64Serialiser.deserialise(value, objectClass);
-            }
-            else if (customSerialiser != null && customSerialiser.canHandleSerialisedFormat(value)) {
-                return customSerialiser.deserialise(value, objectClass);
-            }
-        }
-        catch (Serialiser.SerialisationException e) {
-            logger.e(this, e, "Could not deserialise " + value);
-        }
-        return null;
+        
+        
+        return super.getValueInternal(key, objectClass, defaultValue);
     }
     
     @Nullable
     @Override
-    @SuppressLint("RestrictedApi")
-    public synchronized final <O> O getValue(@NonNull String key,
-                                             @NonNull Class<O> objectClass,
-                                             @Nullable O defaultValue) {
-        return getValueInternal(key, objectClass, defaultValue);
+    String serialise(@NonNull Object value) {
+        String serialised = super.serialise(value);
+        
+        if (serialised == null) {
+            return null;
+        }
+        
+        return encrypt(serialised);
     }
     
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    @SuppressWarnings("unchecked")
-    <O> O getValueInternal(@NonNull String key,
-                           @NonNull Class<O> objectClass,
-                           @Nullable O defaultValue) {
-        String value = super.getValue(key, String.class, null);
+    @Override
+    <O> O deserialise(String serialised,
+                      Class<O> objectClass) throws Serialiser.SerialisationException {
+        if (serialised == null) {
+            return null;
+        }
         
-        return value == null
-               ? defaultValue
-               : decrypt(value, objectClass);
+        return super.deserialise(decrypt(serialised), objectClass);
     }
     
     @Nullable
@@ -167,10 +132,9 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Nullable
-    private <O> O decrypt(@Nullable String encrypted,
-                          Class<O> targetClass) {
+    private String decrypt(@Nullable String encrypted) {
         checkEncryptionAvailable();
-        return encrypted == null ? null : deserialise(keyStoreManager.decrypt(encrypted), targetClass);
+        return encrypted == null ? null : keyStoreManager.decrypt(encrypted);
     }
     
     private void checkEncryptionAvailable() {

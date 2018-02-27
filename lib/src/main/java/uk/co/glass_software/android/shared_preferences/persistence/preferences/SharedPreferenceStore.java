@@ -38,15 +38,12 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValue
 public class SharedPreferenceStore implements KeyValueStore {
     
     private final SharedPreferences sharedPreferences;
-    protected final Serialiser base64Serialiser;
-    
-    @Nullable
-    protected final Serialiser customSerialiser;
-    
-    final BehaviorSubject<String> changeSubject;
-    final Logger logger;
-    
+    private final BehaviorSubject<String> changeSubject;
     private final Map<String, Object> cacheMap;
+    
+    final Serialiser base64Serialiser;
+    @Nullable final Serialiser customSerialiser;
+    final Logger logger;
     
     public SharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                                  @NonNull Serialiser base64Serialiser,
@@ -61,32 +58,23 @@ public class SharedPreferenceStore implements KeyValueStore {
         cacheMap = new HashMap<>();
     }
     
-    protected boolean cache() {
-        return true;
-    }
-    
-    Object readStoredValue(Object value) {
-        return value;
-    }
-    
-    public Observable<String> observeChanges() {
+    public final Observable<String> observeChanges() {
         return changeSubject;
     }
     
     @Override
-    public synchronized void deleteValue(@NonNull String key) {
+    public final synchronized void deleteValue(@NonNull String key) {
         saveValue(key, null);
     }
     
     @Override
-    public synchronized void saveValue(@NonNull String key,
-                                       @Nullable Object value) {
-        saveValue(key, value, false);
+    public final synchronized void saveValue(@NonNull String key,
+                                             @Nullable Object value) {
+        saveValueInternal(key, value);
     }
     
-    private void saveValue(@NonNull String key,
-                           @Nullable Object value,
-                           boolean isSerialised) {
+    synchronized void saveValueInternal(@NonNull String key,
+                                        @Nullable Object value) {
         if (value == null) {
             logger.d(this, "Deleting entry " + key);
             if (sharedPreferences.contains(key)) {
@@ -119,38 +107,41 @@ public class SharedPreferenceStore implements KeyValueStore {
             else if (String.class.isAssignableFrom(value.getClass())) {
                 sharedPreferences.edit().putString(key, (String) value).apply();
             }
-            else if (customSerialiser != null && customSerialiser.canHandleType(value.getClass())) {
-                saveValue(key, customSerialiser.serialise(value), true);
-            }
-            else if (base64Serialiser.canHandleType(value.getClass())) {
-                saveValue(key, base64Serialiser.serialise(value), true);
-            }
             else {
-                throw new IllegalArgumentException("Value of type "
-                                                   + value.getClass().getSimpleName()
-                                                   + " does not implement Serializable");
+                String serialised = serialise(value);
+                
+                if (serialised == null) {
+                    throw new IllegalArgumentException("Value of type "
+                                                       + value.getClass().getSimpleName()
+                                                       + " does not implement Serializable");
+                }
+                
+                sharedPreferences.edit().putString(key, serialised).apply();
             }
-        }
-        catch (Serialiser.SerialisationException e) {
-            logger.e(this, e, "Could not save serialised entry " + key + " -> " + value);
-            return;
-        }
-        
-        if (!isSerialised && cache()) {
+            
             saveToCache(key, value);
             logger.d(this, "Saving entry " + key + " -> " + value);
             changeSubject.onNext(key);
+        }
+        catch (Exception e) {
+            logger.e(this, e, e.getMessage());
         }
     }
     
     @Override
     @Nullable
-    public synchronized <O> O getValue(@NonNull String key,
-                                       @NonNull Class<O> objectClass,
-                                       @Nullable O defaultValue) {
+    public final synchronized <O> O getValue(@NonNull String key,
+                                             @NonNull Class<O> objectClass,
+                                             @Nullable O defaultValue) {
+        return getValueInternal(key, objectClass, defaultValue);
+    }
+    
+    synchronized <O> O getValueInternal(@NonNull String key,
+                                        @NonNull Class<O> objectClass,
+                                        @Nullable O defaultValue) {
         Object fromCache = getFromCache(key);
-
-        if(fromCache != null){
+        
+        if (fromCache != null) {
             return (O) fromCache;
         }
         
@@ -189,21 +180,13 @@ public class SharedPreferenceStore implements KeyValueStore {
                 else if (String.class.isAssignableFrom(objectClass)) {
                     value = (O) sharedPreferences.getString(key, (String) defaultValue);
                 }
-                else if (base64Serialiser.canHandleType(objectClass)) {
-                    String deserialised = getValue(key, String.class, null);
-                    value = deserialised == null ? null : base64Serialiser.deserialise(deserialised, objectClass);
-                }
-                else if (customSerialiser != null && customSerialiser.canHandleType(objectClass)) {
-                    String deserialised = getValue(key, String.class, null);
-                    value = deserialised == null ? null : customSerialiser.deserialise(deserialised, objectClass);
-                }
                 else {
-                    throw new IllegalArgumentException("Can't handle value of type " + objectClass + " for key " + key);
+                    String serialised = sharedPreferences.getString(key, (String) defaultValue);
+                    value = deserialise(serialised, objectClass);
                 }
                 
-                if (cache()) {
-                    saveToCache(key, value);
-                }
+                saveToCache(key, value);
+                logger.d(this, "Reading entry " + key + " -> " + value);
                 return value;
             }
         }
@@ -214,8 +197,39 @@ public class SharedPreferenceStore implements KeyValueStore {
         return defaultValue;
     }
     
-    synchronized void saveToCache(@NonNull String key,
-                                  @Nullable Object value) {
+    @Nullable
+    String serialise(@NonNull Object value) {
+        Class<?> targetClass = value.getClass();
+        try {
+            if (customSerialiser != null && customSerialiser.canHandleType(targetClass)) {
+                return customSerialiser.serialise(value);
+            }
+            else if (base64Serialiser.canHandleType(targetClass)) {
+                return base64Serialiser.serialise(value);
+            }
+        }
+        catch (Serialiser.SerialisationException e) {
+            logger.e(this, e, "Could not serialise " + value);
+        }
+        
+        return null;
+    }
+    
+    <O> O deserialise(String serialised,
+                      Class<O> objectClass) throws Serialiser.SerialisationException {
+        if (serialised != null) {
+            if (customSerialiser != null && customSerialiser.canHandleType(objectClass)) {
+                return customSerialiser.deserialise(serialised, objectClass);
+            }
+            else if (base64Serialiser.canHandleType(objectClass)) {
+                return base64Serialiser.deserialise(serialised, objectClass);
+            }
+        }
+        return null;
+    }
+    
+    private synchronized void saveToCache(@NonNull String key,
+                                          @Nullable Object value) {
         if (value == null) {
             if (hasValue(key)) {
                 cacheMap.remove(key);
@@ -227,16 +241,16 @@ public class SharedPreferenceStore implements KeyValueStore {
     }
     
     @Override
-    public synchronized boolean hasValue(@NonNull String key) {
+    public final synchronized boolean hasValue(@NonNull String key) {
         return sharedPreferences.contains(key);
     }
     
     @Nullable
-    <O> O getFromCache(@NonNull String key) {
+    private <O> O getFromCache(@NonNull String key) {
         return (O) cacheMap.get(key);
     }
     
-    public synchronized Map<String, Object> getCachedValues() {
+    public final synchronized Map<String, Object> getCachedValues() {
         return Collections.unmodifiableMap(cacheMap);
     }
     

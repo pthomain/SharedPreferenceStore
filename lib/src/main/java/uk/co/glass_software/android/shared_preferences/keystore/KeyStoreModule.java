@@ -40,7 +40,6 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static android.os.Build.VERSION_CODES.M;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.BASE_64;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.CUSTOM;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
@@ -83,16 +82,16 @@ public class KeyStoreModule {
     SavedEncryptedAesKey provideSavedEncryptedAesKey(@Named(STORE_NAME) SharedPreferenceStore sharedPreferenceStore,
                                                      @Nullable RsaEncrypter rsaEncrypter,
                                                      Logger logger) {
-        if (SDK_INT < JELLY_BEAN_MR2 || SDK_INT >= M) {
-            return null;
-        }
-        else {
+//        if (SDK_INT < JELLY_BEAN_MR2 || SDK_INT >= M) {
+//            return null;
+//        }
+//        else {
             return new SavedEncryptedAesKey(
                     sharedPreferenceStore,
                     logger,
                     rsaEncrypter
             );
-        }
+//        }
     }
     
     @Provides
@@ -109,23 +108,23 @@ public class KeyStoreModule {
                                            @Nullable SavedEncryptedAesKey encryptedAesKey,
                                            @Nullable KeyStore keyStore,
                                            Context applicationContext) {
-        if (SDK_INT < JELLY_BEAN_MR2 || keyStore == null) {
-            return null;
-        }
-        else if (SDK_INT < M) {
-            return new PreMKeyStoreManager(logger,
-                                           keyStore,
-                                           encryptedAesKey,
-                                           keyAlias,
-                                           applicationContext
-            );
-        }
-        else {
+//        if (SDK_INT < JELLY_BEAN_MR2 || keyStore == null) {
+//            return null;
+//        }
+//        else if (SDK_INT < M) {
+//            return new PreMKeyStoreManager(logger,
+//                                           keyStore,
+//                                           encryptedAesKey,
+//                                           keyAlias,
+//                                           applicationContext
+//            );
+//        }
+//        else {
             return new PostMKeyStoreManager(logger,
                                             keyStore,
                                             keyAlias
             );
-        }
+//        }
     }
     
     @Provides
