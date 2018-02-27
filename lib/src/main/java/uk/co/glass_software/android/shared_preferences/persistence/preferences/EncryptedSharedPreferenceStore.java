@@ -63,44 +63,56 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     synchronized <O> O getValueInternal(@NonNull String key,
                                         @NonNull Class<O> objectClass,
                                         @Nullable O defaultValue) {
         if (Boolean.class.isAssignableFrom(objectClass)
-            || boolean.class.isAssignableFrom(objectClass)) {
-            value = (O) Boolean.valueOf(sharedPreferences.getBoolean(
-                    key,
-                    defaultValue == null ? false : (Boolean) defaultValue
-            ));
+            || boolean.class.isAssignableFrom(objectClass)
+            || Float.class.isAssignableFrom(objectClass)
+            || float.class.isAssignableFrom(objectClass)
+            || Long.class.isAssignableFrom(objectClass)
+            || long.class.isAssignableFrom(objectClass)
+            || Integer.class.isAssignableFrom(objectClass)
+            || int.class.isAssignableFrom(objectClass)
+            || String.class.isAssignableFrom(objectClass)) {
+            String serialised = super.getValueInternal(key, String.class, null);
+
+            if (serialised == null) {
+                return null;
+            }
+
+            String decrypted = decrypt(serialised);
+
+            if (decrypted == null) {
+                return null;
+            }
+
+            if (Boolean.class.isAssignableFrom(objectClass)
+                || boolean.class.isAssignableFrom(objectClass)) {
+                return (O) Boolean.valueOf(decrypted);
+            }
+            else if (Float.class.isAssignableFrom(objectClass)
+                     || float.class.isAssignableFrom(objectClass)) {
+                return (O) Float.valueOf(decrypted);
+            }
+            else if (Long.class.isAssignableFrom(objectClass)
+                     || long.class.isAssignableFrom(objectClass)) {
+                return (O) Long.valueOf(decrypted);
+            }
+            else if (Integer.class.isAssignableFrom(objectClass)
+                     || int.class.isAssignableFrom(objectClass)) {
+                return (O) Integer.valueOf(decrypted);
+            }
+            else if (String.class.isAssignableFrom(objectClass)) {
+                return (O) decrypted;
+            }
         }
-        else if (Float.class.isAssignableFrom(objectClass)
-                 || float.class.isAssignableFrom(objectClass)) {
-            value = (O) Float.valueOf(sharedPreferences.getFloat(
-                    key,
-                    defaultValue == null ? 0f : (Float) defaultValue
-            ));
+        else {
+           return super.getValueInternal(key, objectClass, defaultValue);
         }
-        else if (Long.class.isAssignableFrom(objectClass)
-                 || long.class.isAssignableFrom(objectClass)) {
-            value = (O) Long.valueOf(sharedPreferences.getLong(
-                    key,
-                    defaultValue == null ? 0L : (Long) defaultValue
-            ));
-        }
-        else if (Integer.class.isAssignableFrom(objectClass)
-                 || int.class.isAssignableFrom(objectClass)) {
-            value = (O) Integer.valueOf(sharedPreferences.getInt(
-                    key,
-                    defaultValue == null ? 0 : (Integer) defaultValue
-            ));
-        }
-        else if (String.class.isAssignableFrom(objectClass)) {
-            value = (O) sharedPreferences.getString(key, (String) defaultValue);
-        }
-        
-        
-        
-        return super.getValueInternal(key, objectClass, defaultValue);
+
+        return null;
     }
     
     @Nullable
