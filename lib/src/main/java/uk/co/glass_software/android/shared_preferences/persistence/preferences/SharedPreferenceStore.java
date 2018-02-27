@@ -70,6 +70,7 @@ public class SharedPreferenceStore implements KeyValueStore {
     @Override
     public final synchronized void saveValue(@NonNull String key,
                                              @Nullable Object value) {
+        saveToCache(key, value);
         saveValueInternal(key, value);
     }
     
@@ -119,7 +120,6 @@ public class SharedPreferenceStore implements KeyValueStore {
                 sharedPreferences.edit().putString(key, serialised).apply();
             }
             
-            saveToCache(key, value);
             logger.d(this, "Saving entry " + key + " -> " + value);
             changeSubject.onNext(key);
         }
@@ -133,7 +133,9 @@ public class SharedPreferenceStore implements KeyValueStore {
     public final synchronized <O> O getValue(@NonNull String key,
                                              @NonNull Class<O> objectClass,
                                              @Nullable O defaultValue) {
-        return getValueInternal(key, objectClass, defaultValue);
+        O valueInternal = getValueInternal(key, objectClass, defaultValue);
+        saveToCache(key, valueInternal);
+        return valueInternal;
     }
     
     synchronized <O> O getValueInternal(@NonNull String key,
@@ -185,7 +187,6 @@ public class SharedPreferenceStore implements KeyValueStore {
                     value = deserialise(serialised, objectClass);
                 }
                 
-                saveToCache(key, value);
                 logger.d(this, "Reading entry " + key + " -> " + value);
                 return value;
             }
@@ -228,12 +229,10 @@ public class SharedPreferenceStore implements KeyValueStore {
         return null;
     }
     
-    private synchronized void saveToCache(@NonNull String key,
-                                          @Nullable Object value) {
+    final synchronized void saveToCache(@NonNull String key,
+                                        @Nullable Object value) {
         if (value == null) {
-            if (hasValue(key)) {
-                cacheMap.remove(key);
-            }
+            cacheMap.remove(key);
         }
         else {
             cacheMap.put(key, value);

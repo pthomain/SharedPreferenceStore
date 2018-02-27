@@ -45,6 +45,8 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     @Override
     synchronized void saveValueInternal(@NonNull String key,
                                         @Nullable Object value) {
+        saveToCache(key, value);
+        
         if (value != null
             && (Boolean.class.isAssignableFrom(value.getClass())
                 || boolean.class.isAssignableFrom(value.getClass())
@@ -67,6 +69,7 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     synchronized <O> O getValueInternal(@NonNull String key,
                                         @NonNull Class<O> objectClass,
                                         @Nullable O defaultValue) {
+        O valueInternal = null;
         if (Boolean.class.isAssignableFrom(objectClass)
             || boolean.class.isAssignableFrom(objectClass)
             || Float.class.isAssignableFrom(objectClass)
@@ -77,42 +80,43 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
             || int.class.isAssignableFrom(objectClass)
             || String.class.isAssignableFrom(objectClass)) {
             String serialised = super.getValueInternal(key, String.class, null);
-
+            
             if (serialised == null) {
                 return null;
             }
-
+            
             String decrypted = decrypt(serialised);
-
+            
             if (decrypted == null) {
                 return null;
             }
-
+            
             if (Boolean.class.isAssignableFrom(objectClass)
                 || boolean.class.isAssignableFrom(objectClass)) {
-                return (O) Boolean.valueOf(decrypted);
+                valueInternal = (O) Boolean.valueOf(decrypted);
             }
             else if (Float.class.isAssignableFrom(objectClass)
                      || float.class.isAssignableFrom(objectClass)) {
-                return (O) Float.valueOf(decrypted);
+                valueInternal = (O) Float.valueOf(decrypted);
             }
             else if (Long.class.isAssignableFrom(objectClass)
                      || long.class.isAssignableFrom(objectClass)) {
-                return (O) Long.valueOf(decrypted);
+                valueInternal = (O) Long.valueOf(decrypted);
             }
             else if (Integer.class.isAssignableFrom(objectClass)
                      || int.class.isAssignableFrom(objectClass)) {
-                return (O) Integer.valueOf(decrypted);
+                valueInternal = (O) Integer.valueOf(decrypted);
             }
             else if (String.class.isAssignableFrom(objectClass)) {
-                return (O) decrypted;
+                valueInternal = (O) decrypted;
             }
         }
         else {
-           return super.getValueInternal(key, objectClass, defaultValue);
+            valueInternal = super.getValueInternal(key, objectClass, defaultValue);
         }
-
-        return null;
+        
+        saveToCache(key, valueInternal);
+        return valueInternal;
     }
     
     @Nullable
