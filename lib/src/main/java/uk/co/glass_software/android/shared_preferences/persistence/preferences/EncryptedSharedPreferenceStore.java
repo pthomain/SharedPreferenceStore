@@ -1,16 +1,14 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 
-public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
+public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
     private final EncryptionManager encryptionManager;
@@ -49,121 +47,102 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     }
     
     @Override
-    protected final boolean cache() {
-        return false;
-    }
-    
-    @Override
-    final Object readStoredValue(Object value,
-                                 String key) {
-        
-        checkEncryptionAvailable();
-        return encryptionManager.decrypt(value.toString(), key);
-    }
-    
-    @Override
-    @SuppressLint("RestrictedApi")
-    public synchronized final void saveValue(@NonNull String key,
-                                             @Nullable Object value) {
-        saveValueInternal(key, value);
-    }
-    
-    @SuppressWarnings("unchecked")
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    void saveValueInternal(@NonNull String key,
-                           @Nullable Object value) {
-        String serialised = null;
-        
-        if (value != null) {
-            serialised = String.class.isInstance(value) ? value.toString() : serialise(value);
-        }
-        
-        if (serialised == null) {
-            logger.e(this, "Could not save value: " + key + " -> " + value);
-            return;
-        }
-        
-        super.saveValue(key, encrypt(serialised, key));
+    synchronized void saveValueInternal(@NonNull String key,
+                                        @Nullable Object value) {
         saveToCache(key, value);
         
-        logger.d(this, "Saving entry " + key + " -> " + value);
-        changeSubject.onNext(key);
+        if (value != null
+            && (Boolean.class.isAssignableFrom(value.getClass())
+                || boolean.class.isAssignableFrom(value.getClass())
+                || Float.class.isAssignableFrom(value.getClass())
+                || float.class.isAssignableFrom(value.getClass())
+                || Long.class.isAssignableFrom(value.getClass())
+                || long.class.isAssignableFrom(value.getClass())
+                || Integer.class.isAssignableFrom(value.getClass())
+                || int.class.isAssignableFrom(value.getClass())
+                || String.class.isAssignableFrom(value.getClass()))) {
+            super.saveValueInternal(key, encrypt(String.valueOf(value)));
+        }
+        else {
+            super.saveValueInternal(key, value);
+        }
     }
     
-    @Nullable
-    private String serialise(@NonNull Object value) {
-        Class<?> targetClass = value.getClass();
-        try {
-            if (customSerialiser != null && customSerialiser.canHandleType(targetClass)) {
-                return customSerialiser.serialise(value);
-            }
-            else if (base64Serialiser.canHandleType(targetClass)) {
-                return base64Serialiser.serialise(value);
-            }
-        }
-        catch (Serialiser.SerialisationException e) {
-            logger.e(this, e, "Could not serialise " + value);
-        }
-        
-        return null;
-    }
-    
-    @Nullable
-    private <O> O deserialise(String value,
-                              Class<O> objectClass) {
+    @Override
+    @SuppressWarnings("unchecked")
+    synchronized <O> O getValueInternal(@NonNull String key,
+                                        @NonNull Class<O> objectClass,
+                                        @Nullable O defaultValue) {
+        O valueInternal = null;
         if (Boolean.class.isAssignableFrom(objectClass)
-            || boolean.class.isAssignableFrom(objectClass)) {
-            return (O) Boolean.valueOf(value);
+            || boolean.class.isAssignableFrom(objectClass)
+            || Float.class.isAssignableFrom(objectClass)
+            || float.class.isAssignableFrom(objectClass)
+            || Long.class.isAssignableFrom(objectClass)
+            || long.class.isAssignableFrom(objectClass)
+            || Integer.class.isAssignableFrom(objectClass)
+            || int.class.isAssignableFrom(objectClass)
+            || String.class.isAssignableFrom(objectClass)) {
+            String serialised = super.getValueInternal(key, String.class, null);
+            
+            if (serialised == null) {
+                return null;
+            }
+            
+            String decrypted = decrypt(serialised);
+            
+            if (decrypted == null) {
+                return null;
+            }
+            
+            if (Boolean.class.isAssignableFrom(objectClass)
+                || boolean.class.isAssignableFrom(objectClass)) {
+                valueInternal = (O) Boolean.valueOf(decrypted);
+            }
+            else if (Float.class.isAssignableFrom(objectClass)
+                     || float.class.isAssignableFrom(objectClass)) {
+                valueInternal = (O) Float.valueOf(decrypted);
+            }
+            else if (Long.class.isAssignableFrom(objectClass)
+                     || long.class.isAssignableFrom(objectClass)) {
+                valueInternal = (O) Long.valueOf(decrypted);
+            }
+            else if (Integer.class.isAssignableFrom(objectClass)
+                     || int.class.isAssignableFrom(objectClass)) {
+                valueInternal = (O) Integer.valueOf(decrypted);
+            }
+            else if (String.class.isAssignableFrom(objectClass)) {
+                valueInternal = (O) decrypted;
+            }
         }
-        else if (Float.class.isAssignableFrom(objectClass)
-                 || float.class.isAssignableFrom(objectClass)) {
-            return (O) Float.valueOf(value);
-        }
-        else if (Long.class.isAssignableFrom(objectClass)
-                 || long.class.isAssignableFrom(objectClass)) {
-            return (O) Long.valueOf(value);
-        }
-        else if (Integer.class.isAssignableFrom(objectClass)
-                 || int.class.isAssignableFrom(objectClass)) {
-            return (O) Integer.valueOf(value);
-        }
-        else if (String.class.isAssignableFrom(objectClass)) {
-            return (O) value;
+        else {
+            valueInternal = super.getValueInternal(key, objectClass, defaultValue);
         }
         
-        try {
-            if (base64Serialiser.canHandleSerialisedFormat(value)) {
-                return base64Serialiser.deserialise(value, objectClass);
-            }
-            else if (customSerialiser != null && customSerialiser.canHandleSerialisedFormat(value)) {
-                return customSerialiser.deserialise(value, objectClass);
-            }
-        }
-        catch (Serialiser.SerialisationException e) {
-            logger.e(this, e, "Could not deserialise " + value);
-        }
-        return null;
+        saveToCache(key, valueInternal);
+        return valueInternal;
     }
     
     @Nullable
     @Override
-    @SuppressLint("RestrictedApi")
-    public synchronized final <O> O getValue(@NonNull String key,
-                                             @NonNull Class<O> objectClass,
-                                             @Nullable O defaultValue) {
-        return getValueInternal(key, objectClass, defaultValue);
+    String serialise(@NonNull Object value) {
+        String serialised = super.serialise(value);
+        
+        if (serialised == null) {
+            return null;
+        }
+        
+        return encrypt(serialised);
     }
     
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    @SuppressWarnings("unchecked")
-    <O> O getValueInternal(@NonNull String key,
-                           @NonNull Class<O> objectClass,
-                           @Nullable O defaultValue) {
-        String value = super.getValue(key, String.class, null);
+    @Override
+    <O> O deserialise(String serialised,
+                      Class<O> objectClass) throws Serialiser.SerialisationException {
+        if (serialised == null) {
+            return null;
+        }
         
-        return value == null
-               ? defaultValue
-               : decrypt(value, key, objectClass);
+        return super.deserialise(decrypt(serialised), key, objectClass);
     }
     
     @Nullable

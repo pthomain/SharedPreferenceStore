@@ -39,6 +39,9 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.L
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
+import static android.os.Build.VERSION_CODES.M;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.BASE_64;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.CUSTOM;
 import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
