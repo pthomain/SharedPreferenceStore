@@ -61,7 +61,7 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                 || Integer.class.isAssignableFrom(value.getClass())
                 || int.class.isAssignableFrom(value.getClass())
                 || String.class.isAssignableFrom(value.getClass()))) {
-            super.saveValueInternal(key, encrypt(String.valueOf(value)));
+            super.saveValueInternal(key, encrypt(String.valueOf(value), key));
         }
         else {
             super.saveValueInternal(key, value);
@@ -89,7 +89,7 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                 return null;
             }
             
-            String decrypted = decrypt(serialised);
+            String decrypted = decrypt(serialised, key);
             
             if (decrypted == null) {
                 return null;
@@ -125,24 +125,27 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     
     @Nullable
     @Override
-    String serialise(@NonNull Object value) {
-        String serialised = super.serialise(value);
+    String serialise(String key,
+                     @NonNull Object value) {
+        String serialised = super.serialise(key, value);
         
         if (serialised == null) {
             return null;
         }
         
-        return encrypt(serialised);
+        return encrypt(serialised, key);
     }
     
     @Override
-    <O> O deserialise(String serialised,
+    @Nullable
+    <O> O deserialise(String key,
+                      String serialised,
                       Class<O> objectClass) throws Serialiser.SerialisationException {
         if (serialised == null) {
             return null;
         }
         
-        return super.deserialise(decrypt(serialised), key, objectClass);
+        return super.deserialise(key, decrypt(serialised, key), objectClass);
     }
     
     @Nullable
@@ -153,20 +156,10 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     }
     
     @Nullable
-    private <O> O decrypt(@Nullable String encrypted,
-                          String key,
-                          Class<O> targetClass) {
+    private String decrypt(@Nullable String encrypted,
+                           String key) {
         checkEncryptionAvailable();
-        if (encrypted == null) {
-            return null;
-        }
-        else {
-            String decrypted = encryptionManager.decrypt(encrypted, key);
-            if(decrypted == null){
-                return null;
-            }
-            return deserialise(decrypted, targetClass);
-        }
+        return encrypted == null ? null : encryptionManager.decrypt(encrypted, key);
     }
     
     private void checkEncryptionAvailable() {
