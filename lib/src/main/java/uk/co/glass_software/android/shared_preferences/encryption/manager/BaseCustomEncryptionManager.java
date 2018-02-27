@@ -20,8 +20,6 @@ public abstract class BaseCustomEncryptionManager extends BaseEncryptionManager 
             return null;
         }
         
-        createNewKeyPairIfNeeded();
-        
         try {
             Cipher cipher = getCipher(true);
             return cipher.doFinal(toEncrypt);
@@ -48,8 +46,6 @@ public abstract class BaseCustomEncryptionManager extends BaseEncryptionManager 
             return null;
         }
     }
-    
-    protected abstract void createNewKeyPairIfNeeded();
     
     protected abstract Cipher getCipher(boolean isEncrypt) throws Exception;
 }

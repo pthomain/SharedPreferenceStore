@@ -17,7 +17,7 @@ public class LenientEncryptedSharedPreferenceStore implements KeyValueStore {
         logger.d(
                 this,
                 "Encryption is"
-                        + (encryptedStore.isEncryptionSupported() ? "" : " not")
+                        + (encryptedStore.isEncryptionSupported() ? "" : " NOT")
                         + " supported"
         );
     }

@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.PreMSecureKeyProvider;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyPairProvider;
 

@@ -24,15 +24,30 @@ public class CustomModule {
     
     @Provides
     @Singleton
-    PreMSecureKeyProvider providePreMSecureKeyProvider(KeyPairProvider keyPairProvider) {
-        return new PreMSecureKeyProvider(keyPairProvider);
+    PreMSecureKeyProvider providePreMSecureKeyProvider(KeyPairProvider keyPairProvider,
+                                                       Context context,
+                                                       @Nullable KeyStore keyStore,
+                                                       Logger logger,
+                                                       @Named(KEY_ALIAS) String keyAlias) {
+        return new PreMSecureKeyProvider(
+                keyPairProvider,
+                context,
+                logger,
+                keyStore,
+                keyAlias
+        );
     }
     
     @Provides
     @Singleton
     PostMSecureKeyProvider providePostMSecureKeyProvider(@Nullable KeyStore keyStore,
+                                                         Logger logger,
                                                          @Named(KEY_ALIAS) String keyAlias) {
-        return new PostMSecureKeyProvider(keyStore, keyAlias);
+        return new PostMSecureKeyProvider(
+                keyStore,
+                logger,
+                keyAlias
+        );
     }
     
     @Provides
@@ -40,17 +55,12 @@ public class CustomModule {
     @Nullable
     PreMEncryptionManager providePreMEncryptionManager(Logger logger,
                                                        PreMSecureKeyProvider secureKeyProvider,
-                                                       @Named(KEY_ALIAS) String keyAlias,
-                                                       @Nullable KeyStore keyStore,
-                                                       Context applicationContext) {
+                                                       @Nullable KeyStore keyStore) {
         if (SDK_INT >= JELLY_BEAN_MR2
             && keyStore != null) {
             return new PreMEncryptionManager(
                     logger,
-                    keyStore,
-                    keyAlias,
-                    secureKeyProvider,
-                    applicationContext
+                    secureKeyProvider
             );
         }
         return null;
@@ -61,15 +71,12 @@ public class CustomModule {
     @Nullable
     PostMEncryptionManager providePostMEncryptionManager(Logger logger,
                                                          PostMSecureKeyProvider secureKeyProvider,
-                                                         @Named(KEY_ALIAS) String keyAlias,
                                                          @Nullable KeyStore keyStore) {
         if (SDK_INT >= M
             && keyStore != null) {
             return new PostMEncryptionManager(
                     logger,
-                    secureKeyProvider,
-                    keyStore,
-                    keyAlias
+                    secureKeyProvider
             );
         }
         return null;

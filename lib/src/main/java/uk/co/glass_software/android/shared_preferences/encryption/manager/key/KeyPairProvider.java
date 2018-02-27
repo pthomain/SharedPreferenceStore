@@ -31,10 +31,9 @@ public class KeyPairProvider {
         this.keyPair = keyPair;
         this.cryptoConfig = cryptoConfig;
         this.isKeyPairEncrypted = isKeyPairEncrypted;
-        initialise();
     }
     
-    void initialise() {
+    public void initialise() {
         try {
             getOrGenerate();
         }
@@ -95,7 +94,7 @@ public class KeyPairProvider {
                 }
             }
         }
-    
+        
         return pair;
     }
     
@@ -148,4 +147,5 @@ public class KeyPairProvider {
             this.encryptedMacKey = encryptedMacKey;
         }
     }
+    
 }

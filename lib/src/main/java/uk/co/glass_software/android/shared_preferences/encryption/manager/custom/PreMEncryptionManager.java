@@ -21,49 +21,27 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.security.KeyPairGeneratorSpec;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import java.math.BigInteger;
 import java.security.Key;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.util.Calendar;
 
 import javax.crypto.Cipher;
-import javax.security.auth.x500.X500Principal;
 
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseCustomEncryptionManager;
 
-import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.ANDROID_KEY_STORE;
-
 //see https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.qcgaaeaso
 public class PreMEncryptionManager extends BaseCustomEncryptionManager {
-    
-    private static final String ASYMMETRIC_ENCRYPTION = "RSA";
+
     private static final String ENCRYPTION_PROVIDER = "BC";
     private static final String AES_MODE = "AES/ECB/PKCS7Padding";
     
-    private final KeyStore keyStore;
-    private final String keyAlias;
     private final SecureKeyProvider secureKeyProvider;
-    private final Context applicationContext;
     
     PreMEncryptionManager(Logger logger,
-                          @Nullable KeyStore keyStore,
-                          String keyAlias,
-                          SecureKeyProvider secureKeyProvider,
-                          Context applicationContext) {
+                          SecureKeyProvider secureKeyProvider){
         super(logger);
-        this.keyStore = keyStore;
-        this.keyAlias = keyAlias;
         this.secureKeyProvider = secureKeyProvider;
-        this.applicationContext = applicationContext;
     }
     
     @NonNull
@@ -82,34 +60,4 @@ public class PreMEncryptionManager extends BaseCustomEncryptionManager {
         }
     }
     
-    @Override
-    @TargetApi(JELLY_BEAN_MR2)
-    protected synchronized void createNewKeyPairIfNeeded() {
-        try {
-            if (keyStore != null && !keyStore.containsAlias(keyAlias)) {
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                end.add(Calendar.YEAR, 30);
-                
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(applicationContext)
-                        .setAlias(keyAlias)
-                        .setSubject(new X500Principal("CN=" + keyAlias))
-                        .setSerialNumber(BigInteger.TEN)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
-                
-                KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-                        ASYMMETRIC_ENCRYPTION,
-                        ANDROID_KEY_STORE
-                );
-                
-                keyPairGenerator.initialize(spec);
-                keyPairGenerator.generateKeyPair();
-            }
-        }
-        catch (Exception e) {
-            logger.e(this, e, "Could not create a new key");
-        }
-    }
 }

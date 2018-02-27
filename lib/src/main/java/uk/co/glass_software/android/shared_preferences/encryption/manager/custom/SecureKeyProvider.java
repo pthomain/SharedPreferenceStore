@@ -9,4 +9,6 @@ public interface SecureKeyProvider {
     @Nullable
     Key getKey() throws Exception;
     
+    void createNewKeyPairIfNeeded();
+    
 }

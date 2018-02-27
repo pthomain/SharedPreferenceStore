@@ -30,13 +30,13 @@ public class KeyModule {
     private final String keyAlias;
     
     public KeyModule(Context context) {
-        keyAlias = context.getApplicationContext().getPackageName() + "$$StoreKey";
+        keyAlias = context.getApplicationContext().getPackageName() + "==StoreKey";
     }
     
     @Provides
     @Singleton
     @Nullable
-    KeyStore provideKeyStore() {
+    KeyStore provideKeyStore(Logger logger) {
         if (SDK_INT < JELLY_BEAN_MR2) {
             return null;
         }
@@ -47,6 +47,7 @@ public class KeyModule {
                 return keyStore;
             }
             catch (Exception e) {
+                logger.e(this, e, "KeyStore could not be loaded");
                 return null;
             }
         }
@@ -86,10 +87,10 @@ public class KeyModule {
     @Provides
     @Singleton
     KeyPairProvider provideKeyPairProvider(RsaEncrypter rsaEncrypter,
-                                           Logger logger,
-                                           KeyPair keyPair,
-                                           CryptoConfig cryptoConfig,
-                                           IsKeyPairEncrypted isKeyPairEncrypted) {
+                                                   Logger logger,
+                                                   KeyPair keyPair,
+                                                   CryptoConfig cryptoConfig,
+                                                   IsKeyPairEncrypted isKeyPairEncrypted) {
         return new KeyPairProvider(
                 rsaEncrypter,
                 logger,
