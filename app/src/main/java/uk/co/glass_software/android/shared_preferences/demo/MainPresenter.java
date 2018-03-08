@@ -96,7 +96,6 @@ class MainPresenter {
     }
     
     public String getKey(Map.Entry<String, ?> entry) {
-        String decrypted = encryptedStore.decrypt(entry.getKey(), entry.getKey());
-        return decrypted == null ? entry.getKey() : decrypted;
+        return entry.getKey();
     }
 }

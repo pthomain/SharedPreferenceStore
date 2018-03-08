@@ -32,23 +32,23 @@ public class EncryptionManagerModule {
                                                       @Nullable PostMEncryptionManager postMEncryptionManager,
                                                       ConcealEncryptionManager concealEncryptionManager,
                                                       Logger logger) {
-//        if (concealEncryptionManager.isAvailable() || !fallbackToCustomEncryption) {
-//            if (concealEncryptionManager.isAvailable()) {
-//                logger.d(this, "Using Conceal encryption manager");
-//            }
-//            else {
-//                logger.e(this, "Encryption is NOT supported: Conceal is not available and there is no fallback to custom encryption as per config");
-//            }
-//            return concealEncryptionManager;
-//        }
-//        else if (postMEncryptionManager != null) {
-//            logger.d(this, "Using post-M encryption manager");
-//            return postMEncryptionManager;
-//        }
-//        else {
-//            logger.d(this, "Using pre-M encryption manager");
+        if (concealEncryptionManager.isAvailable() || !fallbackToCustomEncryption) {
+            if (concealEncryptionManager.isAvailable()) {
+                logger.d(this, "Using Conceal encryption manager");
+            }
+            else {
+                logger.e(this, "Encryption is NOT supported: Conceal is not available and there is no fallback to custom encryption as per config");
+            }
+            return concealEncryptionManager;
+        }
+        else if (postMEncryptionManager != null) {
+            logger.d(this, "Using post-M encryption manager");
+            return postMEncryptionManager;
+        }
+        else {
+            logger.d(this, "Using pre-M encryption manager");
             return preMEncryptionManager;
-//        }
+        }
     }
     
 }

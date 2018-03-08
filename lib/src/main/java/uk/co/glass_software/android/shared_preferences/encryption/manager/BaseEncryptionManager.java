@@ -41,8 +41,14 @@ public abstract class BaseEncryptionManager implements EncryptionManager {
         if (toEncrypt == null) {
             return null;
         }
-        byte[] input = encryptBytes(toEncrypt.getBytes(), dataTag);
-        return input == null ? null : Base64.encodeToString(input, Base64.DEFAULT);
+        try {
+            byte[] input = encryptBytes(toEncrypt.getBytes(), dataTag);
+            return input == null ? null : Base64.encodeToString(input, Base64.DEFAULT);
+        }
+        catch (Exception e) {
+            logger.e(this, "Could not encrypt data for tag: " + dataTag);
+            return null;
+        }
     }
     
     @Nullable
@@ -52,9 +58,15 @@ public abstract class BaseEncryptionManager implements EncryptionManager {
         if (toDecrypt == null) {
             return null;
         }
-        byte[] decode = Base64.decode(toDecrypt.getBytes(), Base64.DEFAULT);
-        byte[] bytes = decryptBytes(decode, dataTag);
-        return bytes == null ? null : new String(bytes);
+        try {
+            byte[] decode = Base64.decode(toDecrypt.getBytes(), Base64.DEFAULT);
+            byte[] bytes = decryptBytes(decode, dataTag);
+            return bytes == null ? null : new String(bytes);
+        }
+        catch (Exception e) {
+            logger.e(this, "Could not decrypt data for tag: " + dataTag);
+            return null;
+        }
     }
     
 }

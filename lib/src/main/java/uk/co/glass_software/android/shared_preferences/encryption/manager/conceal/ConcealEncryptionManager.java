@@ -47,7 +47,7 @@ public class ConcealEncryptionManager extends BaseEncryptionManager {
         }
         
         try {
-            return crypto.encrypt(toEncrypt, Entity.create(dataTag));
+            return crypto.encrypt(toEncrypt, Entity.create(""));
         }
         catch (Exception e) {
             logger.e(this, e, "Could not encrypt the given bytes");
@@ -63,10 +63,10 @@ public class ConcealEncryptionManager extends BaseEncryptionManager {
         }
         
         try {
-            return crypto.decrypt(toDecrypt, Entity.create(dataTag));
+            return crypto.decrypt(toDecrypt, Entity.create(""));
         }
         catch (Exception e) {
-            logger.e(this, "Could not decrypt the given bytes");
+            logger.e(this, e, "Could not decrypt the given bytes");
             return null;
         }
     }

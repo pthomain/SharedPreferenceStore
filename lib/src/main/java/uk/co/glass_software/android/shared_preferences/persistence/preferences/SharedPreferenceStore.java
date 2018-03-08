@@ -133,6 +133,12 @@ public class SharedPreferenceStore implements KeyValueStore {
     public final synchronized <O> O getValue(@NonNull String key,
                                              @NonNull Class<O> objectClass,
                                              @Nullable O defaultValue) {
+        Object fromCache = cacheMap.get(key);
+
+        if (fromCache != null) {
+            return (O) fromCache;
+        }
+        
         O valueInternal = getValueInternal(key, objectClass, defaultValue);
         saveToCache(key, valueInternal);
         return valueInternal;
@@ -141,12 +147,6 @@ public class SharedPreferenceStore implements KeyValueStore {
     synchronized <O> O getValueInternal(@NonNull String key,
                                         @NonNull Class<O> objectClass,
                                         @Nullable O defaultValue) {
-        Object fromCache = cacheMap.get(key);
-        
-        if (fromCache != null) {
-            return (O) fromCache;
-        }
-        
         try {
             if (sharedPreferences.contains(key)) {
                 O value;
@@ -232,8 +232,8 @@ public class SharedPreferenceStore implements KeyValueStore {
         return null;
     }
     
-    final synchronized void saveToCache(@NonNull String key,
-                                        @Nullable Object value) {
+    private synchronized void saveToCache(@NonNull String key,
+                                          @Nullable Object value) {
         if (value == null) {
             cacheMap.remove(key);
         }

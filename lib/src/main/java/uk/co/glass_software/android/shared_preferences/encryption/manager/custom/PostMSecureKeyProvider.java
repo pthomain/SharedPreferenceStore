@@ -32,7 +32,7 @@ public class PostMSecureKeyProvider implements SecureKeyProvider {
                            String keyAlias) {
         this.keyStore = keyStore;
         this.logger = logger;
-        this.keyAlias = keyAlias;
+        this.keyAlias = keyAlias + "-postM";
         createNewKeyPairIfNeeded();
     }
     

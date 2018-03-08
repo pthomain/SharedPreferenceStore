@@ -42,7 +42,7 @@ public abstract class BaseCustomEncryptionManager extends BaseEncryptionManager 
             return cipher.doFinal(toDecrypt);
         }
         catch (Exception e) {
-            logger.e(this, "Could not decrypt the given bytes");
+            logger.e(this, e, "Could not decrypt the given bytes");
             return null;
         }
     }

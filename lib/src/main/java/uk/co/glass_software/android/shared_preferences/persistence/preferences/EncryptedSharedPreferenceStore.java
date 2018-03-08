@@ -117,7 +117,6 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
             valueInternal = super.getValueInternal(key, objectClass, defaultValue);
         }
         
-        saveToCache(key, valueInternal);
         return valueInternal;
     }
     
