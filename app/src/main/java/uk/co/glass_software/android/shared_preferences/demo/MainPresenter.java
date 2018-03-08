@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
@@ -20,7 +19,6 @@ import static uk.co.glass_software.android.shared_preferences.persistence.Persis
 
 class MainPresenter {
     
-    private final SimpleDateFormat simpleDateFormat;
     private final SharedPreferences encryptedPreferences;
     private final SharedPreferenceStore store;
     private final EncryptedSharedPreferenceStore encryptedStore;
@@ -30,8 +28,6 @@ class MainPresenter {
     private final PersonEntry personEntry;
     
     MainPresenter(Context context) {
-        simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
-        
         encryptedPreferences = context.getSharedPreferences(
                 context.getPackageName() + "$" + ENCRYPTED_STORE_NAME,
                 Context.MODE_PRIVATE
@@ -50,12 +46,9 @@ class MainPresenter {
     
     private void createOrUpdatePerson() {
         Date lastSeenDate = new Date();
-        Person person;
+        Person person = personEntry.get();
         
-        if (personEntry.exists()) {
-            person = personEntry.get();
-        }
-        else {
+        if (person == null) {
             person = new Person();
             person.setAge(30);
             person.setFirstName("John");
@@ -68,7 +61,7 @@ class MainPresenter {
     
     void onPause() {
         counter.save(counter.get(1) + 1);
-        lastOpenDate.save(simpleDateFormat.format(new Date()));
+        lastOpenDate.save(new Date());
         createOrUpdatePerson();
     }
     

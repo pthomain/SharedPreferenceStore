@@ -22,7 +22,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.pthomain'
+group = 'com.github.pthomain'
 
 retrolambda {
     jvmArgs '-noverify'
@@ -67,6 +67,7 @@ dependencies {
 
     compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile 'com.facebook.conceal:conceal:2.0.2'
 
     testCompile "junit:junit:$jUnitVersion"
     testCompile "org.mockito:mockito-core:$mockitoVersion"

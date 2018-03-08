@@ -19,32 +19,37 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
-import java.util.Date;
+import android.support.annotation.Nullable;
 
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
-public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
-
-    COUNTER(Integer.class),
-    LAST_OPEN_DATE(Date.class),
-    PERSON(Person.class);
-
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
+class KeyPair extends StoreEntry<String> {
+    
+    KeyPair(KeyValueStore store) {
+        super(store, () -> "KeyPair", () -> String.class, null);
     }
-
+    
     @Override
-    public String getUniqueKey() {
-        return prefix + "." + this;
+    @Nullable
+    public synchronized final String get() {
+        return get(null);
     }
-
+    
     @Override
-    public Class getValueClass() {
-        return valueClass;
+    @Nullable
+    public synchronized final String get(String defaultValue) {
+        return super.get(defaultValue);
+    }
+    
+    @Override
+    public synchronized final void save(String value) {
+        throw new IllegalStateException("This value should not be saved externally");
+    }
+    
+    void saveInternal(String value){
+        super.save(value);
     }
 }

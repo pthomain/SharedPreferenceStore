@@ -19,18 +19,16 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.base;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
-import android.support.annotation.NonNull;
-
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
-
-
-public class EncryptedStoreEntry extends StoreEntry<String> {
+public interface EncryptionManager {
     
-    protected EncryptedStoreEntry(@NonNull EncryptedSharedPreferenceStore store,
-                                  @NonNull StoreEntry.UniqueKeyProvider storeKey) {
-        super(store, storeKey, () -> String.class);
-    }
+    String encrypt(String toEncrypt, String dataTag);
+    
+    byte[] encryptBytes(byte[] toEncrypt, String dataTag);
+    
+    String decrypt(String toDecrypt, String dataTag);
+    
+    byte[] decryptBytes(byte[] toDecrypt, String dataTag);
     
 }

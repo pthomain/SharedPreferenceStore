@@ -43,19 +43,27 @@ public class PersistenceModule {
     
     private final static int MAX_FILE_NAME_LENGTH = 127;
     public final static String STORE_NAME = "plain_text";
+    public final static String CONFIG_STORE_NAME = "store_config";
     public final static String ENCRYPTED_STORE_NAME = "encrypted";
+    public final static String LENIENT_ENCRYPTED_STORE_NAME = "lenient";
     public final static String IS_ENCRYPTION_SUPPORTED = "IS_ENCRYPTION_SUPPORTED";
+    public final static String IS_ENCRYPTION_KEY_SECURE = "IS_ENCRYPTION_KEY_SECURE";
     public final static String BASE_64 = "base_64";
     public final static String CUSTOM = "custom";
     
     private final Context context;
     
     @Nullable
+    private final Logger logger;
+    
+    @Nullable
     private final Serialiser customSerialiser;
     
     public PersistenceModule(Context context,
+                             @Nullable Logger logger,
                              @Nullable Serialiser customSerialiser) {
         this.context = context;
+        this.logger = logger;
         this.customSerialiser = customSerialiser;
     }
     
@@ -92,6 +100,13 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
+    @Named(CONFIG_STORE_NAME)
+    SharedPreferences provideConfigSharedPreferences(Function<String, SharedPreferences> storeFactory) {
+        return storeFactory.get(CONFIG_STORE_NAME);
+    }
+    
+    @Provides
+    @Singleton
     @Named(ENCRYPTED_STORE_NAME)
     SharedPreferences provideEncryptedSharedPreferences(Function<String, SharedPreferences> storeFactory) {
         return storeFactory.get(ENCRYPTED_STORE_NAME);
@@ -121,6 +136,13 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
+    @Named(CONFIG_STORE_NAME)
+    BehaviorSubject<String> provideConfigBehaviorSubject() {
+        return BehaviorSubject.create();
+    }
+    
+    @Provides
+    @Singleton
     @Named(ENCRYPTED_STORE_NAME)
     BehaviorSubject<String> provideEncryptedBehaviorSubject() {
         return BehaviorSubject.create();
@@ -145,8 +167,25 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
+    @Named(CONFIG_STORE_NAME)
+    SharedPreferenceStore provideConfigSharedPreferenceStore(@Named(CONFIG_STORE_NAME) SharedPreferences sharedPreferences,
+                                                             @Named(BASE_64) Serialiser base64Serialiser,
+                                                             @Nullable @Named(CUSTOM) Serialiser customSerialiser,
+                                                             @Named(CONFIG_STORE_NAME) BehaviorSubject<String> changeSubject,
+                                                             Logger logger) {
+        return new SharedPreferenceStore(
+                sharedPreferences,
+                base64Serialiser,
+                customSerialiser,
+                changeSubject,
+                logger
+        );
+    }
+    
+    @Provides
+    @Singleton
     Logger provideLogger() {
-        return new SimpleLogger();
+        return logger == null ? new SimpleLogger() : logger;
     }
     
 }
