@@ -36,6 +36,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
     private final String encryptedValue = "encryptedValue";
     
     private EncryptedSharedPreferenceStore target;
+    private String dataTag = "dataTag";
     
     @Before
     public void setUp() throws Exception {
@@ -58,26 +59,16 @@ public class EncryptedSharedPreferenceStoreUnitTest {
                 mockEncryptionManager
         );
         
-        when(mockEncryptionManager.decrypt(eq(encryptedValue))).thenReturn(value);
-        when(mockEncryptionManager.encrypt(eq(value))).thenReturn(encryptedValue);
+        when(mockEncryptionManager.decrypt(eq(encryptedValue), eq(dataTag))).thenReturn(value);
+        when(mockEncryptionManager.encrypt(eq(value), eq(dataTag))).thenReturn(encryptedValue);
         
-    }
-    
-    @Test
-    public void cache() {
-        assertFalse(target.cache());
-    }
-    
-    @Test
-    public void testReadStoredValue() {
-        assertEquals(value, target.readStoredValue(encryptedValue));
     }
     
     @Test
     public void testSaveValue() {
         Map<String, Object> cachedValues = target.getCachedValues();
         assertFalse("Cached values should not contain the key", cachedValues.containsKey(key));
-    
+        
         when(mockSharedPreferences.contains(eq(key))).thenReturn(false);
         when(mockEditor.putString(eq(key), eq(encryptedValue))).thenReturn(mockEditor);
         

@@ -60,11 +60,6 @@ public class SharedPreferenceStoreUnitTest {
         );
     }
 
-    @Test
-    public void cache() {
-        assertTrue(target.cache());
-    }
-
     @SuppressWarnings("unchecked")
     private void addValue() {
         Map map = new HashMap<>();
