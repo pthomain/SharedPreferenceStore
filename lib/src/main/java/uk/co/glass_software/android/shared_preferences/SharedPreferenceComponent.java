@@ -21,6 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import javax.inject.Named;
@@ -65,5 +66,6 @@ public interface SharedPreferenceComponent {
     @Nullable
     EncryptionManager keyStoreManager();
     
+    @NonNull
     Logger logger();
 }

@@ -66,7 +66,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     private void addEntries(String header,
                             Map<String, ?> entries) {
         Observable.fromIterable(entries.entrySet())
-                  .map(entry -> entry.getKey() + " => " + entry.getValue())
+                  .map(entry -> presenter.getKey(entry) + " => " + entry.getValue())
                   .toList()
                   .map(list -> list.toArray(new String[list.size()]))
                   .subscribe(list -> addEntries(header, list));

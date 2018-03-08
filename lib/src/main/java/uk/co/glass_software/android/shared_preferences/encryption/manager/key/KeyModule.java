@@ -62,8 +62,13 @@ public class KeyModule {
     
     @Provides
     @Singleton
-    RsaEncrypter provideRsaEncrypter(@Nullable KeyStore keyStore) {
-        return new RsaEncrypter(keyStore, keyAlias);
+    RsaEncrypter provideRsaEncrypter(@Nullable KeyStore keyStore,
+                                     Logger logger) {
+        return new RsaEncrypter(
+                keyStore,
+                logger,
+                keyAlias
+        );
     }
     
     @Provides

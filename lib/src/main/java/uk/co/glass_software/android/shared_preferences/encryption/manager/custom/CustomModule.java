@@ -54,10 +54,8 @@ public class CustomModule {
     @Singleton
     @Nullable
     PreMEncryptionManager providePreMEncryptionManager(Logger logger,
-                                                       PreMSecureKeyProvider secureKeyProvider,
-                                                       @Nullable KeyStore keyStore) {
-        if (SDK_INT >= JELLY_BEAN_MR2
-            && keyStore != null) {
+                                                       PreMSecureKeyProvider secureKeyProvider) {
+        if (SDK_INT >= JELLY_BEAN_MR2) {
             return new PreMEncryptionManager(
                     logger,
                     secureKeyProvider
@@ -70,10 +68,8 @@ public class CustomModule {
     @Singleton
     @Nullable
     PostMEncryptionManager providePostMEncryptionManager(Logger logger,
-                                                         PostMSecureKeyProvider secureKeyProvider,
-                                                         @Nullable KeyStore keyStore) {
-        if (SDK_INT >= M
-            && keyStore != null) {
+                                                         PostMSecureKeyProvider secureKeyProvider) {
+        if (SDK_INT >= M) {
             return new PostMEncryptionManager(
                     logger,
                     secureKeyProvider

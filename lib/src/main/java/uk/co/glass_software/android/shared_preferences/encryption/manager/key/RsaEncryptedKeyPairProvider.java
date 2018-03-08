@@ -66,7 +66,7 @@ public class RsaEncryptedKeyPairProvider {
                 byte[] cipherKey = isEncrypted ? pair.encryptedCipherKey : pair.cipherKey;
                 byte[] macKey = isEncrypted ? pair.encryptedMacKey : pair.macKey;
                 
-                keyPair.saveInternal(toBase64(cipherKey) + DELIMITER + toBase64(macKey));
+                keyPair.save(toBase64(cipherKey) + DELIMITER + toBase64(macKey));
                 isKeyPairEncrypted.save(isEncrypted);
                 
                 return pair;

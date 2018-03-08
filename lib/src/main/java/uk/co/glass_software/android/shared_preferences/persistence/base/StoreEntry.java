@@ -25,42 +25,42 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class StoreEntry<C> {
-
+    
     private final KeyValueStore store;
-    private final String keyString;
     private final Class<C> valueClass;
     private final C defaultValue;
-
+    final String keyString;
+    
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull String key,
                       @NonNull Class<C> valueClass) {
         this(store, key, valueClass, null);
     }
-
+    
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull String key,
                       @NonNull Class<C> valueClass,
                       @Nullable C defaultValue) {
         this(store, () -> key, () -> valueClass, defaultValue);
     }
-
+    
     public <K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry(@NonNull KeyValueStore store,
                                                                                                @NonNull K keyProvider) {
         this(store, keyProvider, keyProvider);
     }
-
+    
     public <K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry(@NonNull KeyValueStore store,
                                                                                                @NonNull K keyProvider,
                                                                                                @Nullable C defaultValue) {
         this(store, keyProvider, keyProvider, defaultValue);
     }
-
+    
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull StoreEntry.UniqueKeyProvider keyProvider,
                       @NonNull StoreEntry.ValueClassProvider valueClassProvider) {
         this(store, keyProvider, valueClassProvider, null);
     }
-
+    
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull StoreEntry.UniqueKeyProvider keyProvider,
                       @NonNull StoreEntry.ValueClassProvider valueClassProvider,
@@ -70,38 +70,38 @@ public class StoreEntry<C> {
         this.valueClass = valueClassProvider.getValueClass();
         this.defaultValue = defaultValue;
     }
-
-    public synchronized void save(@Nullable C value) {
-        store.saveValue(keyString, value);
+    
+    public final synchronized void save(@Nullable C value) {
+        store.saveValue(getKey(), value);
     }
-
+    
     @Nullable
-    public synchronized C get() {
+    public final synchronized C get() {
         return get(defaultValue);
     }
-
+    
     @Nullable
-    public synchronized C get(@Nullable C defaultValue) {
-        return store.getValue(keyString, valueClass, defaultValue);
+    public final synchronized C get(@Nullable C defaultValue) {
+        return store.getValue(getKey(), valueClass, defaultValue);
     }
-
-    public synchronized void drop() {
-        store.deleteValue(keyString);
+    
+    public final synchronized void drop() {
+        store.deleteValue(getKey());
     }
-
+    
     @NonNull
-    public String getKey() {
+    String getKey() {
         return keyString;
     }
-
-    public boolean exists() {
-        return store.hasValue(keyString);
+    
+    public final boolean exists() {
+        return store.hasValue(getKey());
     }
-
+    
     public interface UniqueKeyProvider {
         String getUniqueKey();
     }
-
+    
     public interface ValueClassProvider {
         Class getValueClass();
     }

@@ -49,8 +49,6 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     @Override
     synchronized void saveValueInternal(@NonNull String key,
                                         @Nullable Object value) {
-        saveToCache(key, value);
-        
         if (value != null
             && (Boolean.class.isAssignableFrom(value.getClass())
                 || boolean.class.isAssignableFrom(value.getClass())
@@ -149,15 +147,15 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     }
     
     @Nullable
-    private String encrypt(@Nullable String clearText,
-                           String key) {
+    public final String encrypt(@Nullable String clearText,
+                                String key) {
         checkEncryptionAvailable();
         return clearText == null ? null : encryptionManager.encrypt(clearText, key);
     }
     
     @Nullable
-    private String decrypt(@Nullable String encrypted,
-                           String key) {
+    public final String decrypt(@Nullable String encrypted,
+                                String key) {
         checkEncryptionAvailable();
         return encrypted == null ? null : encryptionManager.decrypt(encrypted, key);
     }

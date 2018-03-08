@@ -21,8 +21,6 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
-import android.support.annotation.Nullable;
-
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 
@@ -32,24 +30,4 @@ class KeyPair extends StoreEntry<String> {
         super(store, () -> "KeyPair", () -> String.class, null);
     }
     
-    @Override
-    @Nullable
-    public synchronized final String get() {
-        return get(null);
-    }
-    
-    @Override
-    @Nullable
-    public synchronized final String get(String defaultValue) {
-        return super.get(defaultValue);
-    }
-    
-    @Override
-    public synchronized final void save(String value) {
-        throw new IllegalStateException("This value should not be saved externally");
-    }
-    
-    void saveInternal(String value){
-        super.save(value);
-    }
 }

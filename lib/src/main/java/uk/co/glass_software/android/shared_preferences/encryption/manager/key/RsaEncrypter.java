@@ -38,6 +38,8 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 
+import uk.co.glass_software.android.shared_preferences.Logger;
+
 class RsaEncrypter {
     
     private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
@@ -46,11 +48,14 @@ class RsaEncrypter {
     @Nullable
     private final KeyStore keyStore;
     
+    private final Logger logger;
     private final String alias;
     
     RsaEncrypter(@Nullable KeyStore keyStore,
+                 Logger logger,
                  String alias) {
         this.keyStore = keyStore;
+        this.logger = logger;
         this.alias = alias;
     }
     
@@ -110,12 +115,17 @@ class RsaEncrypter {
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry() throws NoSuchAlgorithmException,
                                                                  UnrecoverableEntryException,
                                                                  KeyStoreException {
-        return keyStore == null
-               ? null
-               : (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-                       alias,
-                       null
-               );
+        if (keyStore == null) {
+            logger.e(this, "KeyStore is null, no encryption on device");
+            return null;
+        }
+        else {
+            logger.d(this, "Found a key pair in the KeyStore");
+            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(
+                    alias,
+                    null
+            );
+        }
     }
     
 }

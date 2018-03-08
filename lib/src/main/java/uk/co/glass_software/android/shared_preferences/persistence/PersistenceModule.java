@@ -23,6 +23,7 @@ package uk.co.glass_software.android.shared_preferences.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import javax.inject.Named;
@@ -184,6 +185,7 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
+    @NonNull
     Logger provideLogger() {
         return logger == null ? new SimpleLogger() : logger;
     }

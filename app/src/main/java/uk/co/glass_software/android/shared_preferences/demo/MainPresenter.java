@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 
 import java.util.Date;
+import java.util.Map;
 
+import uk.co.glass_software.android.shared_preferences.SimpleLogger;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;
@@ -34,7 +36,11 @@ class MainPresenter {
         ); //used only to display encrypted values as stored on disk, should not be used directly in practice
         
         Gson gson = new Gson();
-        storeEntryFactory = new StoreEntryFactory(context, new GsonSerialiser(gson));
+        storeEntryFactory = new StoreEntryFactory(
+                context,
+                new SimpleLogger(),
+                new GsonSerialiser(gson)
+        );
         store = storeEntryFactory.getStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
         
@@ -87,5 +93,10 @@ class MainPresenter {
     
     SharedPreferences encryptedPreferences() {
         return encryptedPreferences;
+    }
+    
+    public String getKey(Map.Entry<String, ?> entry) {
+        String decrypted = encryptedStore.decrypt(entry.getKey(), entry.getKey());
+        return decrypted == null ? entry.getKey() : decrypted;
     }
 }
