@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +25,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     private final LinkedHashMap<String, List<String>> children;
     private final LayoutInflater inflater;
     private final MainPresenter presenter;
+    private final SimpleDateFormat simpleDateFormat;
     
     ExpandableListAdapter(Context context,
                           MainPresenter presenter) {
@@ -30,15 +33,19 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         headers = new LinkedList<>();
         children = new LinkedHashMap<>();
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
     }
     
     void showEntries() {
         headers.clear();
         children.clear();
         
+        Date lastOpenDate = presenter.lastOpenDate().get();
+        String formattedDate = lastOpenDate == null ? null : simpleDateFormat.format(lastOpenDate);
+        
         addEntries("App opened",
                    "Count: " + presenter.counter().get(1) + " time(s)",
-                   "Last open date: " + presenter.lastOpenDate().get("N/A")
+                   "Last open date: " + (formattedDate == null ? "N/A" : formattedDate)
         );
         
         addEntries("Plain text entries",
@@ -59,7 +66,7 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     private void addEntries(String header,
                             Map<String, ?> entries) {
         Observable.fromIterable(entries.entrySet())
-                  .map(entry -> entry.getKey() + " => " + entry.getValue())
+                  .map(entry -> presenter.getKey(entry) + " => " + entry.getValue())
                   .toList()
                   .map(list -> list.toArray(new String[list.size()]))
                   .subscribe(list -> addEntries(header, list));

@@ -19,32 +19,16 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.encryption.manager;
 
-import java.util.Date;
-
-import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
-
-public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
-
-    COUNTER(Integer.class),
-    LAST_OPEN_DATE(Date.class),
-    PERSON(Person.class);
-
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
-    }
-
-    @Override
-    public String getUniqueKey() {
-        return prefix + "." + this;
-    }
-
-    @Override
-    public Class getValueClass() {
-        return valueClass;
-    }
+public interface EncryptionManager {
+    
+    String encrypt(String toEncrypt, String dataTag);
+    
+    byte[] encryptBytes(byte[] toEncrypt, String dataTag);
+    
+    String decrypt(String toDecrypt, String dataTag);
+    
+    byte[] decryptBytes(byte[] toDecrypt, String dataTag);
+    
 }

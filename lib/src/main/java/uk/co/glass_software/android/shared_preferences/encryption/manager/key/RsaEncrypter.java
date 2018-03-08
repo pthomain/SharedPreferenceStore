@@ -19,7 +19,9 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
+
+import android.support.annotation.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,29 +30,43 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 
-public class RsaEncrypter {
+import uk.co.glass_software.android.shared_preferences.Logger;
+
+class RsaEncrypter {
     
     private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
     private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
     
+    @Nullable
     private final KeyStore keyStore;
+    
+    private final Logger logger;
     private final String alias;
     
-    public RsaEncrypter(KeyStore keyStore,
-                        String alias) {
+    RsaEncrypter(@Nullable KeyStore keyStore,
+                 Logger logger,
+                 String alias) {
         this.keyStore = keyStore;
+        this.logger = logger;
         this.alias = alias;
     }
     
+    @Nullable
     byte[] encrypt(byte[] secret) throws Exception {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
+        
+        if (privateKeyEntry == null) {
+            return null;
+        }
+        
         Cipher inputCipher = getCipherInstance();
         inputCipher.init(Cipher.ENCRYPT_MODE, privateKeyEntry.getCertificate().getPublicKey());
         
@@ -62,14 +78,20 @@ public class RsaEncrypter {
         return outputStream.toByteArray();
     }
     
+    @Nullable
     byte[] decrypt(byte[] encrypted) throws Exception {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
+        
+        if (privateKeyEntry == null) {
+            return null;
+        }
+        
         Cipher outputCipher = getCipherInstance();
         outputCipher.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
         
         ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
         CipherInputStream cipherInputStream = new CipherInputStream(inputStream, outputCipher);
-        ArrayList<Byte> values = new ArrayList<>();
+        List<Byte> values = new LinkedList<>();
         
         int nextByte;
         while ((nextByte = cipherInputStream.read()) != -1) {
@@ -89,13 +111,21 @@ public class RsaEncrypter {
         return Cipher.getInstance(RSA_MODE, CIPHER_PROVIDER);
     }
     
+    @Nullable
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry() throws NoSuchAlgorithmException,
                                                                  UnrecoverableEntryException,
                                                                  KeyStoreException {
-        return (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-                alias,
-                null
-        );
+        if (keyStore == null) {
+            logger.e(this, "KeyStore is null, no encryption on device");
+            return null;
+        }
+        else {
+            logger.d(this, "Found a key pair in the KeyStore");
+            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(
+                    alias,
+                    null
+            );
+        }
     }
     
 }

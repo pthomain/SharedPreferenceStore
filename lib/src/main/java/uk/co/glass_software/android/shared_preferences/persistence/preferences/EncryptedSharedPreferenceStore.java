@@ -6,12 +6,12 @@ import android.support.annotation.Nullable;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 
 public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
-    private final KeyStoreManager keyStoreManager;
+    private final EncryptionManager encryptionManager;
     
     public EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                                           @NonNull Serialiser base64Serialiser,
@@ -32,21 +32,23 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                                           @Nullable Serialiser customSerialiser,
                                           @NonNull BehaviorSubject<String> changeSubject,
                                           @NonNull Logger logger,
-                                          @Nullable KeyStoreManager keyStoreManager) {
+                                          @Nullable EncryptionManager encryptionManager) {
         super(sharedPreferences,
               base64Serialiser,
               customSerialiser,
               changeSubject,
               logger
         );
-        this.keyStoreManager = keyStoreManager;
+        this.encryptionManager = encryptionManager;
+    }
+    
+    boolean isEncryptionSupported() {
+        return encryptionManager != null;
     }
     
     @Override
     synchronized void saveValueInternal(@NonNull String key,
                                         @Nullable Object value) {
-        saveToCache(key, value);
-        
         if (value != null
             && (Boolean.class.isAssignableFrom(value.getClass())
                 || boolean.class.isAssignableFrom(value.getClass())
@@ -57,7 +59,7 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                 || Integer.class.isAssignableFrom(value.getClass())
                 || int.class.isAssignableFrom(value.getClass())
                 || String.class.isAssignableFrom(value.getClass()))) {
-            super.saveValueInternal(key, encrypt(String.valueOf(value)));
+            super.saveValueInternal(key, encrypt(String.valueOf(value), key));
         }
         else {
             super.saveValueInternal(key, value);
@@ -85,7 +87,7 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                 return null;
             }
             
-            String decrypted = decrypt(serialised);
+            String decrypted = decrypt(serialised, key);
             
             if (decrypted == null) {
                 return null;
@@ -115,46 +117,50 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
             valueInternal = super.getValueInternal(key, objectClass, defaultValue);
         }
         
-        saveToCache(key, valueInternal);
         return valueInternal;
     }
     
     @Nullable
     @Override
-    String serialise(@NonNull Object value) {
-        String serialised = super.serialise(value);
+    String serialise(String key,
+                     @NonNull Object value) {
+        String serialised = super.serialise(key, value);
         
         if (serialised == null) {
             return null;
         }
         
-        return encrypt(serialised);
+        return encrypt(serialised, key);
     }
     
     @Override
-    <O> O deserialise(String serialised,
+    @Nullable
+    <O> O deserialise(String key,
+                      String serialised,
                       Class<O> objectClass) throws Serialiser.SerialisationException {
         if (serialised == null) {
             return null;
         }
         
-        return super.deserialise(decrypt(serialised), objectClass);
+        return super.deserialise(key, decrypt(serialised, key), objectClass);
     }
     
     @Nullable
-    private String encrypt(@Nullable String clearText) {
+    public final String encrypt(@Nullable String clearText,
+                                String key) {
         checkEncryptionAvailable();
-        return clearText == null ? null : keyStoreManager.encrypt(clearText);
+        return clearText == null ? null : encryptionManager.encrypt(clearText, key);
     }
     
     @Nullable
-    private String decrypt(@Nullable String encrypted) {
+    public final String decrypt(@Nullable String encrypted,
+                                String key) {
         checkEncryptionAvailable();
-        return encrypted == null ? null : keyStoreManager.decrypt(encrypted);
+        return encrypted == null ? null : encryptionManager.decrypt(encrypted, key);
     }
     
     private void checkEncryptionAvailable() {
-        if (keyStoreManager == null) {
+        if (!isEncryptionSupported()) {
             throw new IllegalStateException("Encryption is not supported on this device");
         }
     }

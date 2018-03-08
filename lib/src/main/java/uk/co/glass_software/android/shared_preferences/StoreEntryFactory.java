@@ -25,9 +25,12 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import io.reactivex.Observable;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.CustomModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
 import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
@@ -37,10 +40,12 @@ public class StoreEntryFactory {
     
     private final SharedPreferenceStore store;
     private final EncryptedSharedPreferenceStore encryptedStore;
+    private final KeyValueStore lenientEncryptedStore;
     private final boolean isEncryptionSupported;
+    private final boolean isEncryptionKeySecure;
     
     @Nullable
-    private final KeyStoreManager keyStoreManager;
+    private final EncryptionManager encryptionManager;
     
     public StoreEntryFactory(Context context) {
         this(context, null);
@@ -48,16 +53,28 @@ public class StoreEntryFactory {
     
     public StoreEntryFactory(Context context,
                              @Nullable Serialiser customSerialiser) {
+        this(context, null, customSerialiser);
+    }
+    
+    public StoreEntryFactory(Context context,
+                             @Nullable Logger logger,
+                             @Nullable Serialiser customSerialiser) {
         Context applicationContext = context.getApplicationContext();
-        SharedPreferenceComponent component = DaggerSharedPreferenceComponent.builder()
-                                                                             .keyStoreModule(new KeyStoreModule(applicationContext))
-                                                                             .persistenceModule(new PersistenceModule(applicationContext, customSerialiser))
-                                                                             .build();
+        SharedPreferenceComponent component = DaggerSharedPreferenceComponent
+                .builder()
+                .keyModule(new KeyModule(context.getApplicationContext()))
+                .encryptionManagerModule(new EncryptionManagerModule(true))
+                .persistenceModule(new PersistenceModule(applicationContext, logger, customSerialiser))
+                .build();
         
         encryptedStore = component.encryptedStore();
         store = component.store();
+        lenientEncryptedStore = component.lenientEncryptedStore();
+        encryptionManager = component.keyStoreManager();
         isEncryptionSupported = component.isEncryptionSupported();
-        keyStoreManager = component.keyStoreManager();
+        isEncryptionKeySecure = component.isEncryptionKeySecure();
+        component.logger().d(this, "Encryption supported: " + (isEncryptionSupported ? "TRUE" : "FALSE"));
+        component.logger().d(this, "Encryption key secure: " + (isEncryptionKeySecure ? "TRUE" : "FALSE"));
     }
     
     public <C> StoreEntry<C> open(String key,
@@ -70,26 +87,44 @@ public class StoreEntryFactory {
         return openEncrypted(() -> key, () -> valueClass);
     }
     
-    public <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
-                                  StoreEntry.ValueClassProvider<C> valueClassProvider) {
-        return new StoreEntry<>(store, keyProvider, valueClassProvider);
+    public <C> StoreEntry<C> openLenientEncrypted(String key,
+                                                  Class<C> valueClass) {
+        return openLenientEncrypted(() -> key, () -> valueClass);
     }
     
-    public <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
-                                           StoreEntry.ValueClassProvider<C> valueClassProvider) {
-        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
-    }
-    
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> open(K key) {
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> open(K key) {
         return open(key, key);
     }
     
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider<C>> StoreEntry<C> openEncrypted(K key) {
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openEncrypted(K key) {
         return openEncrypted(key, key);
+    }
+    
+    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openLenientEncrypted(K key) {
+        return openEncrypted(key, key);
+    }
+    
+    private <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
+                                   StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(store, keyProvider, valueClassProvider);
+    }
+    
+    private <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
+                                            StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
+    }
+    
+    private <C> StoreEntry<C> openLenientEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
+                                                   StoreEntry.ValueClassProvider valueClassProvider) {
+        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
     }
     
     public boolean isEncryptionSupported() {
         return isEncryptionSupported;
+    }
+    
+    public boolean isEncryptionKeySecure() {
+        return isEncryptionKeySecure;
     }
     
     public Observable<String> observeChanges() {
@@ -104,14 +139,16 @@ public class StoreEntryFactory {
         return encryptedStore;
     }
     
-    public byte[] encrypt(byte[] toEncrypt) {
+    public byte[] encrypt(byte[] toEncrypt,
+                          String tag) {
         checkEncryptionSupported();
-        return keyStoreManager.encryptBytes(toEncrypt);
+        return encryptionManager.encryptBytes(toEncrypt, tag);
     }
     
-    public byte[] decrypt(byte[] toDecrypt) {
+    public byte[] decrypt(byte[] toDecrypt,
+                          String tag) {
         checkEncryptionSupported();
-        return keyStoreManager.decryptBytes(toDecrypt);
+        return encryptionManager.decryptBytes(toDecrypt, tag);
     }
     
     private void checkEncryptionSupported() {

@@ -19,16 +19,15 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.keystore;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
-public interface KeyStoreManager {
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+
+class KeyPair extends StoreEntry<String> {
     
-    String encrypt(String toEncrypt);
-    
-    byte[] encryptBytes(byte[] toEncrypt);
-    
-    String decrypt(String toDecrypt);
-    
-    byte[] decryptBytes(byte[] toDecrypt);
+    KeyPair(KeyValueStore store) {
+        super(store, () -> "KeyPair", () -> String.class, null);
+    }
     
 }

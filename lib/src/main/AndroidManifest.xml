@@ -19,5 +19,4 @@
   ~ under the License.
   -->
 
-<manifest
-    package="shared_preferences.android.glass_software.co.uk.shared_preferences"/>
+<manifest package="uk.co.glass_software.android.shared_preferences"/>

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.keystore.KeyStoreManager;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -28,7 +28,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
     private Serialiser mockCustomSerialiser;
     private BehaviorSubject behaviorSubject;
     private SharedPreferences.Editor mockEditor;
-    private KeyStoreManager mockKeyStoreManager;
+    private EncryptionManager mockEncryptionManager;
     private Logger mockLogger;
     
     private final String key = "key";
@@ -44,7 +44,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
         mockCustomSerialiser = mock(Serialiser.class);
         behaviorSubject = BehaviorSubject.create();
         mockLogger = mock(Logger.class);
-        mockKeyStoreManager = mock(KeyStoreManager.class);
+        mockEncryptionManager = mock(EncryptionManager.class);
         
         mockEditor = mock(SharedPreferences.Editor.class);
         when(mockSharedPreferences.edit()).thenReturn(mockEditor);
@@ -55,11 +55,11 @@ public class EncryptedSharedPreferenceStoreUnitTest {
                 mockCustomSerialiser,
                 behaviorSubject,
                 mockLogger,
-                mockKeyStoreManager
+                mockEncryptionManager
         );
         
-        when(mockKeyStoreManager.decrypt(eq(encryptedValue))).thenReturn(value);
-        when(mockKeyStoreManager.encrypt(eq(value))).thenReturn(encryptedValue);
+        when(mockEncryptionManager.decrypt(eq(encryptedValue))).thenReturn(value);
+        when(mockEncryptionManager.encrypt(eq(value))).thenReturn(encryptedValue);
         
     }
     
