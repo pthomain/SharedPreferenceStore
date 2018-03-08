@@ -29,33 +29,30 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
-import uk.co.glass_software.android.shared_preferences.encryption.KeyStoreModule;
-import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_KEY_SECURE;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.LENIENT_ENCRYPTED_STORE_NAME;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.STORE_NAME;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.FORGETFUL;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.IS_ENCRYPTION_KEY_SECURE;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.IS_ENCRYPTION_SUPPORTED;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.LENIENT;
+
 
 @Singleton
-@Component(modules = {
-        PersistenceModule.class,
-        KeyStoreModule.class
-})
+@Component(modules = EncryptionManagerModule.class)
 public interface SharedPreferenceComponent {
     
-    @Named(STORE_NAME)
     SharedPreferenceStore store();
     
-    @Named(ENCRYPTED_STORE_NAME)
     EncryptedSharedPreferenceStore encryptedStore();
-
-    @Named(LENIENT_ENCRYPTED_STORE_NAME)
+    
+    @Named(LENIENT)
     KeyValueStore lenientEncryptedStore();
+    
+    @Named(FORGETFUL)
+    KeyValueStore forgetfulEncryptedStore();
     
     @Named(IS_ENCRYPTION_SUPPORTED)
     Boolean isEncryptionSupported();

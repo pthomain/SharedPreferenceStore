@@ -27,13 +27,11 @@ import android.support.annotation.Nullable;
 import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.custom.CustomModule;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
-import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 public class StoreEntryFactory {
@@ -139,21 +137,4 @@ public class StoreEntryFactory {
         return encryptedStore;
     }
     
-    public byte[] encrypt(byte[] toEncrypt,
-                          String tag) {
-        checkEncryptionSupported();
-        return encryptionManager.encryptBytes(toEncrypt, tag);
-    }
-    
-    public byte[] decrypt(byte[] toDecrypt,
-                          String tag) {
-        checkEncryptionSupported();
-        return encryptionManager.decryptBytes(toDecrypt, tag);
-    }
-    
-    private void checkEncryptionSupported() {
-        if (!isEncryptionSupported) {
-            throw new IllegalStateException("Encryption isn't supported on this device");
-        }
-    }
 }

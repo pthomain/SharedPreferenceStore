@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence;
+package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -35,37 +35,35 @@ import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Function;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.SimpleLogger;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.Base64Serialiser;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.Serialiser;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
-@Module
-public class PersistenceModule {
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.CONFIG;
+import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.BASE_64;
+import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.CUSTOM;
+
+@Module(includes = SerialisationModule.class)
+public class StoreModule {
     
     private final static int MAX_FILE_NAME_LENGTH = 127;
-    public final static String STORE_NAME = "plain_text";
-    public final static String CONFIG_STORE_NAME = "store_config";
-    public final static String ENCRYPTED_STORE_NAME = "encrypted";
-    public final static String LENIENT_ENCRYPTED_STORE_NAME = "lenient";
+    public final static String PLAIN_TEXT = "plain_text";
+    public final static String ENCRYPTED = "encrypted";
+    public final static String LENIENT = "lenient";
+    public final static String FORGETFUL = "forgetful";
     public final static String IS_ENCRYPTION_SUPPORTED = "IS_ENCRYPTION_SUPPORTED";
     public final static String IS_ENCRYPTION_KEY_SECURE = "IS_ENCRYPTION_KEY_SECURE";
-    public final static String BASE_64 = "base_64";
-    public final static String CUSTOM = "custom";
     
     private final Context context;
     
     @Nullable
     private final Logger logger;
     
-    @Nullable
-    private final Serialiser customSerialiser;
-    
-    public PersistenceModule(Context context,
-                             @Nullable Logger logger,
-                             @Nullable Serialiser customSerialiser) {
+    public StoreModule(Context context,
+                       @Nullable Logger logger) {
         this.context = context;
         this.logger = logger;
-        this.customSerialiser = customSerialiser;
     }
     
     @Provides
@@ -81,7 +79,7 @@ public class PersistenceModule {
     }
     
     private String getStoreName(String name) {
-        int nameLength = Math.max(STORE_NAME.length(), ENCRYPTED_STORE_NAME.length()) + 1;
+        int nameLength = Math.max(PLAIN_TEXT.length(), ENCRYPTED.length()) + 1;
         int availableLength = MAX_FILE_NAME_LENGTH - nameLength;
         String packageName = context.getPackageName();
         
@@ -94,68 +92,51 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
-    @Named(STORE_NAME)
+    @Named(PLAIN_TEXT)
     SharedPreferences provideSharedPreferences(Function<String, SharedPreferences> storeFactory) {
-        return storeFactory.get(STORE_NAME);
+        return storeFactory.get(PLAIN_TEXT);
     }
     
     @Provides
     @Singleton
-    @Named(CONFIG_STORE_NAME)
+    @Named(CONFIG)
     SharedPreferences provideConfigSharedPreferences(Function<String, SharedPreferences> storeFactory) {
-        return storeFactory.get(CONFIG_STORE_NAME);
+        return storeFactory.get(CONFIG);
     }
     
     @Provides
     @Singleton
-    @Named(ENCRYPTED_STORE_NAME)
+    @Named(ENCRYPTED)
     SharedPreferences provideEncryptedSharedPreferences(Function<String, SharedPreferences> storeFactory) {
-        return storeFactory.get(ENCRYPTED_STORE_NAME);
+        return storeFactory.get(ENCRYPTED);
     }
     
-    @Provides
     @Singleton
-    @Named(BASE_64)
-    Serialiser provideBase64Serialiser(Logger logger) {
-        return new Base64Serialiser(logger);
-    }
-    
-    @Provides
-    @Singleton
-    @Named(CUSTOM)
-    @Nullable
-    Serialiser provideCustomSerialiser() {
-        return customSerialiser;
-    }
-    
-    @Provides
-    @Singleton
-    @Named(STORE_NAME)
+    @Named(PLAIN_TEXT)
     BehaviorSubject<String> provideBehaviorSubject() {
         return BehaviorSubject.create();
     }
     
     @Provides
     @Singleton
-    @Named(CONFIG_STORE_NAME)
+    @Named(CONFIG)
     BehaviorSubject<String> provideConfigBehaviorSubject() {
         return BehaviorSubject.create();
     }
     
     @Provides
     @Singleton
-    @Named(ENCRYPTED_STORE_NAME)
+    @Named(ENCRYPTED)
     BehaviorSubject<String> provideEncryptedBehaviorSubject() {
         return BehaviorSubject.create();
     }
     
     @Provides
     @Singleton
-    @Named(STORE_NAME)
-    SharedPreferenceStore provideSharedPreferenceStore(@Named(STORE_NAME) SharedPreferences sharedPreferences,
+    SharedPreferenceStore provideSharedPreferenceStore(@Named(PLAIN_TEXT) SharedPreferences sharedPreferences,
                                                        @Named(BASE_64) Serialiser base64Serialiser,
                                                        @Nullable @Named(CUSTOM) Serialiser customSerialiser,
-                                                       @Named(STORE_NAME) BehaviorSubject<String> changeSubject,
+                                                       @Named(PLAIN_TEXT) BehaviorSubject<String> changeSubject,
                                                        Logger logger) {
         return new SharedPreferenceStore(
                 sharedPreferences,
@@ -168,11 +149,11 @@ public class PersistenceModule {
     
     @Provides
     @Singleton
-    @Named(CONFIG_STORE_NAME)
-    SharedPreferenceStore provideConfigSharedPreferenceStore(@Named(CONFIG_STORE_NAME) SharedPreferences sharedPreferences,
+    @Named(CONFIG)
+    SharedPreferenceStore provideConfigSharedPreferenceStore(@Named(CONFIG) SharedPreferences sharedPreferences,
                                                              @Named(BASE_64) Serialiser base64Serialiser,
                                                              @Nullable @Named(CUSTOM) Serialiser customSerialiser,
-                                                             @Named(CONFIG_STORE_NAME) BehaviorSubject<String> changeSubject,
+                                                             @Named(CONFIG) BehaviorSubject<String> changeSubject,
                                                              Logger logger) {
         return new SharedPreferenceStore(
                 sharedPreferences,
@@ -181,6 +162,59 @@ public class PersistenceModule {
                 changeSubject,
                 logger
         );
+    }
+    
+    @Provides
+    @Singleton
+    EncryptedSharedPreferenceStore provideEncryptedSharedPreferenceStore(@Named(ENCRYPTED) SharedPreferences sharedPreferences,
+                                                                         @Named(BASE_64) Serialiser base64Serialiser,
+                                                                         @Nullable @Named(CUSTOM) Serialiser customSerialiser,
+                                                                         @Named(ENCRYPTED) BehaviorSubject<String> changeSubject,
+                                                                         Logger logger,
+                                                                         @Nullable EncryptionManager encryptionManager) {
+        return new EncryptedSharedPreferenceStore(
+                sharedPreferences,
+                base64Serialiser,
+                customSerialiser,
+                changeSubject,
+                logger,
+                encryptionManager
+        );
+    }
+    
+    @Provides
+    @Singleton
+    @Named(IS_ENCRYPTION_SUPPORTED)
+    Boolean provideIsEncryptionSupported(@Nullable EncryptionManager encryptionManager) {
+        return encryptionManager != null;
+    }
+    
+    @Provides
+    @Singleton
+    @Named(PLAIN_TEXT)
+    KeyValueStore provideSharedPreferenceStore(SharedPreferenceStore store) {
+        return store;
+    }
+    
+    @Provides
+    @Singleton
+    @Named(ENCRYPTED)
+    KeyValueStore provideEncryptedSharedPreferenceStore(EncryptedSharedPreferenceStore store) {
+        return store;
+    }
+    
+    @Provides
+    @Singleton
+    @Named(LENIENT)
+    KeyValueStore provideLenientSharedPreferenceStore(LenientEncryptedStore store) {
+        return store;
+    }
+    
+    @Provides
+    @Singleton
+    @Named(FORGETFUL)
+    KeyValueStore provideForgetfulSharedPreferenceStore(ForgetfulEncryptedStore store) {
+        return store;
     }
     
     @Provides

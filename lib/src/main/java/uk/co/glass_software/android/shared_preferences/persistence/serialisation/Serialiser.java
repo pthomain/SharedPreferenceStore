@@ -19,17 +19,24 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
+package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
-import java.security.Key;
-
-public interface SecureKeyProvider {
+public interface Serialiser {
     
-    @Nullable
-    Key getKey() throws Exception;
+    boolean canHandleType(@NonNull Class<?> targetClass);
     
-    void createNewKeyPairIfNeeded();
+    boolean canHandleSerialisedFormat(@NonNull String serialised);
     
+    <O> String serialise(@NonNull O deserialised) throws SerialisationException;
+    
+    <O> O deserialise(@NonNull String serialised,
+                      Class<O> targetClass) throws SerialisationException;
+    
+    class SerialisationException extends Exception {
+        SerialisationException(Throwable cause) {
+            initCause(cause);
+        }
+    }
 }
