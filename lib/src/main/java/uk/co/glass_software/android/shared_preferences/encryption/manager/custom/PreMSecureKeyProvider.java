@@ -62,7 +62,7 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
         this.applicationContext = applicationContext;
         this.logger = logger;
         this.keyStore = keyStore;
-        this.keyAlias = keyAlias + "-preM";
+        this.keyAlias = keyAlias;
         createNewKeyPairIfNeeded();
         keyPairProvider.initialise();
     }

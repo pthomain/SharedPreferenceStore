@@ -43,7 +43,8 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 public class KeyModule {
     
     public final static String CONFIG = "store_config";
-    public static final String KEY_ALIAS = "KEY_ALIAS";
+    public static final String KEY_ALIAS_PRE_M = "KEY_ALIAS_PRE_M";
+    public static final String KEY_ALIAS_POST_M = "KEY_ALIAS_POST_M";
     public static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     
     private final String keyAlias;
@@ -74,15 +75,23 @@ public class KeyModule {
     
     @Provides
     @Singleton
-    @Named(KEY_ALIAS)
-    String provideKeyAlias() {
-        return keyAlias;
+    @Named(KEY_ALIAS_PRE_M)
+    String provideKeyAliasPreM() {
+        return keyAlias + "-preM";
+    }
+    
+    @Provides
+    @Singleton
+    @Named(KEY_ALIAS_POST_M)
+    String provideKeyAliasPostM() {
+        return keyAlias + "-postM";
     }
     
     @Provides
     @Singleton
     RsaEncrypter provideRsaEncrypter(@Nullable KeyStore keyStore,
-                                     Logger logger) {
+                                     Logger logger,
+                                     @Named(KEY_ALIAS_PRE_M) String keyAlias) {
         return new RsaEncrypter(
                 keyStore,
                 logger,
@@ -115,5 +124,5 @@ public class KeyModule {
                 cryptoConfig
         );
     }
-
+    
 }

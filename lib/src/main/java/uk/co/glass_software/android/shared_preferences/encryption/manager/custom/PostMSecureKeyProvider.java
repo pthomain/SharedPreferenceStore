@@ -53,7 +53,7 @@ public class PostMSecureKeyProvider implements SecureKeyProvider {
                            String keyAlias) {
         this.keyStore = keyStore;
         this.logger = logger;
-        this.keyAlias = keyAlias + "-postM";
+        this.keyAlias = keyAlias;
         createNewKeyPairIfNeeded();
     }
     
@@ -85,8 +85,8 @@ public class PostMSecureKeyProvider implements SecureKeyProvider {
                 keyGenerator.init(spec);
                 keyGenerator.generateKey();
             }
-    
-            if(!keyStore.containsAlias(keyAlias)){
+            
+            if (!keyStore.containsAlias(keyAlias)) {
                 throw new IllegalStateException("Key pair was not generated");
             }
         }

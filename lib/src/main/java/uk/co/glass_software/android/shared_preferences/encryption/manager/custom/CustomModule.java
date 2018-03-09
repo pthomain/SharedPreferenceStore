@@ -38,7 +38,8 @@ import uk.co.glass_software.android.shared_preferences.encryption.manager.key.Rs
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.M;
-import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.KEY_ALIAS;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.KEY_ALIAS_POST_M;
+import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.KEY_ALIAS_PRE_M;
 
 @Module(includes = KeyModule.class)
 public class CustomModule {
@@ -49,7 +50,7 @@ public class CustomModule {
                                                        Context context,
                                                        @Nullable KeyStore keyStore,
                                                        Logger logger,
-                                                       @Named(KEY_ALIAS) String keyAlias) {
+                                                       @Named(KEY_ALIAS_PRE_M) String keyAlias) {
         return new PreMSecureKeyProvider(
                 keyPairProvider,
                 context,
@@ -63,7 +64,7 @@ public class CustomModule {
     @Singleton
     PostMSecureKeyProvider providePostMSecureKeyProvider(@Nullable KeyStore keyStore,
                                                          Logger logger,
-                                                         @Named(KEY_ALIAS) String keyAlias) {
+                                                         @Named(KEY_ALIAS_POST_M) String keyAlias) {
         return new PostMSecureKeyProvider(
                 keyStore,
                 logger,
