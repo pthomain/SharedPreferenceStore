@@ -23,12 +23,12 @@ package uk.co.glass_software.android.shared_preferences.demo.model;
 
 import android.support.annotation.NonNull;
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.EncryptedStoreEntry;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
-public class PersonEntry extends EncryptedStoreEntry<Person> {
-  
-    public PersonEntry(@NonNull EncryptedSharedPreferenceStore store) {
+public class PersonEntry extends StoreEntry<Person> {
+    
+    public PersonEntry(@NonNull KeyValueStore store) {
         super(store, Keys.PERSON);
     }
     

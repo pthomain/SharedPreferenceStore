@@ -90,4 +90,14 @@ public class PostMSecureKeyProvider implements SecureKeyProvider {
             logger.e(this, e, "Could not create a new key");
         }
     }
+    
+    @Override
+    public boolean isEncryptionSupported() {
+        return keyStore != null;
+    }
+    
+    @Override
+    public boolean isEncryptionKeySecure() {
+        return isEncryptionSupported();
+    }
 }

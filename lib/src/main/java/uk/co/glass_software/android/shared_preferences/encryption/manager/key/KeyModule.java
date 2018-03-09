@@ -31,14 +31,15 @@ import java.security.KeyStore;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.IS_ENCRYPTION_KEY_SECURE;
 
+@Module
 public class KeyModule {
     
     public final static String CONFIG = "store_config";
@@ -122,11 +123,5 @@ public class KeyModule {
                 isKeyPairEncrypted
         );
     }
-    
-    @Provides
-    @Singleton
-    @Named(IS_ENCRYPTION_KEY_SECURE)
-    Boolean provideIsEncryptionKeySecure(IsKeyPairEncrypted isKeyPairEncrypted) {
-        return isKeyPairEncrypted.get(false);
-    }
+
 }

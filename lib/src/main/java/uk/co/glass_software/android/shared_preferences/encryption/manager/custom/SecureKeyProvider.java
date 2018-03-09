@@ -32,4 +32,7 @@ public interface SecureKeyProvider {
     
     void createNewKeyPairIfNeeded();
     
+    boolean isEncryptionSupported();
+    
+    boolean isEncryptionKeySecure();
 }

@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
 
 class ExpandableListAdapter extends BaseExpandableListAdapter {
     
@@ -70,11 +71,11 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         );
         
         addEntries("Plain text entries",
-                   presenter.store().getCachedValues()
+                   ((SharedPreferenceStore) presenter.store()).getCachedValues()
         );
         
         addEntries("Encrypted entries (as returned by the store)",
-                   presenter.encryptedStore().getCachedValues()
+                   ((SharedPreferenceStore) presenter.encryptedStore()).getCachedValues()
         );
         
         addEntries("Encrypted entries (as stored on disk)",

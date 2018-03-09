@@ -23,6 +23,7 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
 import android.support.annotation.NonNull;
 
+import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 
@@ -67,5 +68,10 @@ public class LenientEncryptedStore implements KeyValueStore {
     @Override
     public void deleteValue(@NonNull String key) {
         internalStore.deleteValue(key);
+    }
+    
+    @Override
+    public Observable<String> observeChanges() {
+        return internalStore.observeChanges();
     }
 }

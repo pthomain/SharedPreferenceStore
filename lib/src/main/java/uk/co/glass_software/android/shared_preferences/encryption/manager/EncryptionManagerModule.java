@@ -53,8 +53,10 @@ public class EncryptionManagerModule {
                                                       @Nullable PostMEncryptionManager postMEncryptionManager,
                                                       ConcealEncryptionManager concealEncryptionManager,
                                                       Logger logger) {
-        if (concealEncryptionManager.isAvailable() || !fallbackToCustomEncryption) {
-            if (concealEncryptionManager.isAvailable()) {
+        boolean isEncryptionSupported = concealEncryptionManager.isEncryptionSupported();
+        
+        if (isEncryptionSupported || !fallbackToCustomEncryption) {
+            if (isEncryptionSupported) {
                 logger.d(this, "Using Conceal encryption manager");
             }
             else {

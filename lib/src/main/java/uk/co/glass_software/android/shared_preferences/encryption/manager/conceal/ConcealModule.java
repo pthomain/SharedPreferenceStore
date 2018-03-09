@@ -25,7 +25,6 @@ import android.content.Context;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
 import com.facebook.crypto.CryptoConfig;
-import com.facebook.crypto.keychain.KeyChain;
 
 import javax.inject.Singleton;
 
@@ -40,8 +39,8 @@ public class ConcealModule {
     
     @Provides
     @Singleton
-    KeyChain provideKeyChain(CryptoConfig cryptoConfig,
-                             RsaEncryptedKeyPairProvider keyPairProvider) {
+    SecureKeyChain provideKeyChain(CryptoConfig cryptoConfig,
+                                   RsaEncryptedKeyPairProvider keyPairProvider) {
         return new SecureKeyChain(
                 cryptoConfig,
                 keyPairProvider
@@ -51,7 +50,7 @@ public class ConcealModule {
     @Provides
     @Singleton
     ConcealEncryptionManager provideConcealEncryptionManager(Logger logger,
-                                                             KeyChain keyChain,
+                                                             SecureKeyChain keyChain,
                                                              Context applicationContext) {
         return new ConcealEncryptionManager(
                 applicationContext,

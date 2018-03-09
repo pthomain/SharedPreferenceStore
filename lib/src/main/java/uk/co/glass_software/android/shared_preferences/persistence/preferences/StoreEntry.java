@@ -19,17 +19,20 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.base;
+package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class StoreEntry<C> {
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+
+public class StoreEntry<C> implements KeyValueEntry<C> {
     
     private final KeyValueStore store;
     private final Class<C> valueClass;
     private final C defaultValue;
-    final String keyString;
+    private final String keyString;
     
     public StoreEntry(@NonNull KeyValueStore store,
                       @NonNull String key,
@@ -71,29 +74,35 @@ public class StoreEntry<C> {
         this.defaultValue = defaultValue;
     }
     
+    @Override
     public final synchronized void save(@Nullable C value) {
         store.saveValue(getKey(), value);
     }
     
+    @Override
     @Nullable
     public final synchronized C get() {
         return get(defaultValue);
     }
     
+    @Override
     @Nullable
     public final synchronized C get(@Nullable C defaultValue) {
         return store.getValue(getKey(), valueClass, defaultValue);
     }
     
+    @Override
     public final synchronized void drop() {
         store.deleteValue(getKey());
     }
     
+    @Override
     @NonNull
-    String getKey() {
+    public final String getKey() {
         return keyString;
     }
     
+    @Override
     public final boolean exists() {
         return store.hasValue(getKey());
     }

@@ -66,4 +66,13 @@ public class PostMEncryptionManager extends BaseCustomEncryptionManager {
         }
     }
     
+    @Override
+    public boolean isEncryptionSupported() {
+        return secureKeyProvider.isEncryptionSupported();
+    }
+    
+    @Override
+    public boolean isEncryptionKeySecure() {
+        return secureKeyProvider.isEncryptionKeySecure();
+    }
 }

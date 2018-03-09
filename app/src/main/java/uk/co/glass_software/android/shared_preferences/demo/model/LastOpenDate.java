@@ -25,12 +25,12 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.EncryptedStoreEntry;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
-public class LastOpenDate extends EncryptedStoreEntry<Date> {
+public class LastOpenDate extends StoreEntry<Date> {
 
-    public LastOpenDate(@NonNull EncryptedSharedPreferenceStore store) {
+    public LastOpenDate(@NonNull KeyValueStore store) {
         super(store, Keys.LAST_OPEN_DATE);
     }
 

@@ -75,4 +75,7 @@ public class SecureKeyChain implements KeyChain {
         keyPairProvider.destroyKeys();
     }
     
+    public boolean isEncryptionKeySecure() {
+        return keyPairProvider.isEncryptionKeySecure();
+    }
 }

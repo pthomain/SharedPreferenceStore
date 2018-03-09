@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.co.glass_software.android.shared_preferences.StoreKey;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;

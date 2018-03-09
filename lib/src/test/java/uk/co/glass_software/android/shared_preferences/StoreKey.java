@@ -21,7 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences;
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 public enum StoreKey implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider{
     

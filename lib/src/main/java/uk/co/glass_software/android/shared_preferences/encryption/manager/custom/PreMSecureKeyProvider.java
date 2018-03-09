@@ -103,4 +103,14 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
         }
     }
     
+    @Override
+    public boolean isEncryptionSupported() {
+        return keyStore != null;
+    }
+    
+    @Override
+    public boolean isEncryptionKeySecure() {
+        return isEncryptionSupported();
+    }
+    
 }

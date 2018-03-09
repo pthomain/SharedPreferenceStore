@@ -19,32 +19,25 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.persistence.base;
 
-import java.util.Date;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
-public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
-
-    COUNTER(Integer.class),
-    LAST_OPEN_DATE(Date.class),
-    PERSON(Person.class);
-
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
-    }
-
-    @Override
-    public String getUniqueKey() {
-        return prefix + "." + this;
-    }
-
-    @Override
-    public Class getValueClass() {
-        return valueClass;
-    }
+public interface KeyValueEntry<C> {
+    
+    void save(@Nullable C value);
+    
+    @Nullable
+    C get();
+    
+    @Nullable
+    C get(@Nullable C defaultValue);
+    
+    void drop();
+    
+    @NonNull
+    String getKey();
+    
+    boolean exists();
 }

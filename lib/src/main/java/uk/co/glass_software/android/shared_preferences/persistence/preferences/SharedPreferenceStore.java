@@ -42,9 +42,11 @@ public class SharedPreferenceStore implements KeyValueStore {
     private final BehaviorSubject<String> changeSubject;
     private final Map<String, Object> cacheMap;
     
-    final Serialiser base64Serialiser;
-    @Nullable final Serialiser customSerialiser;
-    final Logger logger;
+    private final Serialiser base64Serialiser;
+    private final Logger logger;
+    
+    @Nullable
+    private final Serialiser customSerialiser;
     
     SharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                           @NonNull Serialiser base64Serialiser,
@@ -59,6 +61,7 @@ public class SharedPreferenceStore implements KeyValueStore {
         cacheMap = new HashMap<>();
     }
     
+    @Override
     public final Observable<String> observeChanges() {
         return changeSubject;
     }

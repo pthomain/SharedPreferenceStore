@@ -24,6 +24,7 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 
@@ -36,8 +37,7 @@ public class ForgetfulEncryptedStore implements KeyValueStore {
     @Nullable
     private final KeyValueStore internalStore;
     
-    ForgetfulEncryptedStore(@NonNull SharedPreferenceStore plainTextStore,
-                            @NonNull EncryptedSharedPreferenceStore encryptedStore,
+    ForgetfulEncryptedStore(@NonNull EncryptedSharedPreferenceStore encryptedStore,
                             Logger logger) {
         boolean isEncryptionSupported = encryptedStore.isEncryptionSupported();
         
@@ -73,5 +73,10 @@ public class ForgetfulEncryptedStore implements KeyValueStore {
         if (internalStore != null) {
             internalStore.deleteValue(key);
         }
+    }
+    
+    @Override
+    public Observable<String> observeChanges() {
+        return internalStore == null ? Observable.empty() : internalStore.observeChanges();
     }
 }

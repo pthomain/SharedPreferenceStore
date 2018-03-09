@@ -152,6 +152,10 @@ public class RsaEncryptedKeyPairProvider {
         return Base64.decode(string, Base64.DEFAULT);
     }
     
+    public boolean isEncryptionKeySecure() {
+        return isKeyPairEncrypted.get(false);
+    }
+    
     private class Pair {
         private final byte[] cipherKey;
         private final byte[] macKey;

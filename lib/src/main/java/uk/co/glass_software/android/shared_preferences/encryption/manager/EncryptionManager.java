@@ -31,4 +31,7 @@ public interface EncryptionManager {
     
     byte[] decryptBytes(byte[] toDecrypt, String dataTag);
     
+    boolean isEncryptionSupported();
+    
+    boolean isEncryptionKeySecure();
 }

@@ -39,20 +39,6 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                                    @NonNull Serialiser base64Serialiser,
                                    @Nullable Serialiser customSerialiser,
                                    @NonNull BehaviorSubject<String> changeSubject,
-                                   @NonNull Logger logger) {
-        this(sharedPreferences,
-             base64Serialiser,
-             customSerialiser,
-             changeSubject,
-             logger,
-             null
-        );
-    }
-    
-    EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                   @NonNull Serialiser base64Serialiser,
-                                   @Nullable Serialiser customSerialiser,
-                                   @NonNull BehaviorSubject<String> changeSubject,
                                    @NonNull Logger logger,
                                    @Nullable EncryptionManager encryptionManager) {
         super(sharedPreferences,
@@ -168,15 +154,15 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
     }
     
     @Nullable
-    public final String encrypt(@Nullable String clearText,
-                                String key) {
+    private String encrypt(@Nullable String clearText,
+                           String key) {
         checkEncryptionAvailable();
         return clearText == null ? null : encryptionManager.encrypt(clearText, key);
     }
     
     @Nullable
-    public final String decrypt(@Nullable String encrypted,
-                                String key) {
+    private String decrypt(@Nullable String encrypted,
+                           String key) {
         checkEncryptionAvailable();
         return encrypted == null ? null : encryptionManager.decrypt(encrypted, key);
     }
