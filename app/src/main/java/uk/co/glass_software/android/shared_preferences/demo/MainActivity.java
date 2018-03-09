@@ -37,7 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
-import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 public class MainActivity extends AppCompatActivity {
     static {
@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         listAdapter.showEntries();
-        subscription = presenter.storeEntryFactory().observeChanges()
+        subscription = presenter.store().observeChanges()
+                                .mergeWith(presenter.encryptedStore().observeChanges())
                                 .subscribe(ignore -> listAdapter.showEntries());
     }
     

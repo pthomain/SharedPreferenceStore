@@ -19,32 +19,24 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
 
-import java.util.Date;
+import android.support.annotation.NonNull;
 
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
-public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
-
-    COUNTER(Integer.class),
-    LAST_OPEN_DATE(Date.class),
-    PERSON(Person.class);
-
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
-    }
-
-    @Override
-    public String getUniqueKey() {
-        return prefix + "." + this;
-    }
-
-    @Override
-    public Class getValueClass() {
-        return valueClass;
+public interface Serialiser {
+    
+    boolean canHandleType(@NonNull Class<?> targetClass);
+    
+    boolean canHandleSerialisedFormat(@NonNull String serialised);
+    
+    <O> String serialise(@NonNull O deserialised) throws SerialisationException;
+    
+    <O> O deserialise(@NonNull String serialised,
+                      Class<O> targetClass) throws SerialisationException;
+    
+    class SerialisationException extends Exception {
+        SerialisationException(Throwable cause) {
+            initCause(cause);
+        }
     }
 }

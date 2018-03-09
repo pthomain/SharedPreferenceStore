@@ -19,20 +19,43 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager.custom;
+package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
 
 import android.support.annotation.Nullable;
 
-import java.security.Key;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public interface SecureKeyProvider {
+import dagger.Module;
+import dagger.Provides;
+import uk.co.glass_software.android.shared_preferences.Logger;
+
+@Module
+public class SerialisationModule {
+    
+    public final static String BASE_64 = "base_64";
+    public final static String CUSTOM = "custom";
     
     @Nullable
-    Key getKey() throws Exception;
+    private final Serialiser customSerialiser;
     
-    void createNewKeyPairIfNeeded();
+    public SerialisationModule(@Nullable Serialiser customSerialiser) {
+        this.customSerialiser = customSerialiser;
+    }
     
-    boolean isEncryptionSupported();
+    @Provides
+    @Singleton
+    @Named(BASE_64)
+    Serialiser provideBase64Serialiser(Logger logger) {
+        return new Base64Serialiser(logger);
+    }
     
-    boolean isEncryptionKeySecure();
+    @Provides
+    @Singleton
+    @Named(CUSTOM)
+    @Nullable
+    Serialiser provideCustomSerialiser() {
+        return customSerialiser;
+    }
+    
 }

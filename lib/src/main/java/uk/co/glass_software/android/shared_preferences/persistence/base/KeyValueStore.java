@@ -23,6 +23,8 @@ package uk.co.glass_software.android.shared_preferences.persistence.base;
 
 import android.support.annotation.NonNull;
 
+import io.reactivex.Observable;
+
 public interface KeyValueStore {
     
     <V> V getValue(@NonNull String key,
@@ -35,5 +37,7 @@ public interface KeyValueStore {
     boolean hasValue(@NonNull String key);
     
     void deleteValue(@NonNull String key);
+    
+    Observable<String> observeChanges();
     
 }

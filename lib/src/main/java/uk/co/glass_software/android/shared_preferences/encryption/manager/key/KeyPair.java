@@ -22,7 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.base.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 class KeyPair extends StoreEntry<String> {
     

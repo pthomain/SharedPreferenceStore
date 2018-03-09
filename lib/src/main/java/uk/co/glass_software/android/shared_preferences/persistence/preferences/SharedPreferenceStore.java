@@ -33,6 +33,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
 @SuppressWarnings("unchecked")
 public class SharedPreferenceStore implements KeyValueStore {
@@ -41,15 +42,17 @@ public class SharedPreferenceStore implements KeyValueStore {
     private final BehaviorSubject<String> changeSubject;
     private final Map<String, Object> cacheMap;
     
-    final Serialiser base64Serialiser;
-    @Nullable final Serialiser customSerialiser;
-    final Logger logger;
+    private final Serialiser base64Serialiser;
+    private final Logger logger;
     
-    public SharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
-                                 @NonNull Serialiser base64Serialiser,
-                                 @Nullable Serialiser customSerialiser,
-                                 @NonNull BehaviorSubject<String> changeSubject,
-                                 @NonNull Logger logger) {
+    @Nullable
+    private final Serialiser customSerialiser;
+    
+    SharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
+                          @NonNull Serialiser base64Serialiser,
+                          @Nullable Serialiser customSerialiser,
+                          @NonNull BehaviorSubject<String> changeSubject,
+                          @NonNull Logger logger) {
         this.sharedPreferences = sharedPreferences;
         this.base64Serialiser = base64Serialiser;
         this.customSerialiser = customSerialiser;
@@ -58,6 +61,7 @@ public class SharedPreferenceStore implements KeyValueStore {
         cacheMap = new HashMap<>();
     }
     
+    @Override
     public final Observable<String> observeChanges() {
         return changeSubject;
     }
@@ -134,7 +138,7 @@ public class SharedPreferenceStore implements KeyValueStore {
                                              @NonNull Class<O> objectClass,
                                              @Nullable O defaultValue) {
         Object fromCache = cacheMap.get(key);
-
+        
         if (fromCache != null) {
             return (O) fromCache;
         }

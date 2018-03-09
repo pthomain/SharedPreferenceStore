@@ -29,39 +29,34 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
-import uk.co.glass_software.android.shared_preferences.encryption.KeyStoreModule;
-import uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
 
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_KEY_SECURE;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.IS_ENCRYPTION_SUPPORTED;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.LENIENT_ENCRYPTED_STORE_NAME;
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.STORE_NAME;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.ENCRYPTED;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.FORGETFUL;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.LENIENT;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.PLAIN_TEXT;
+
 
 @Singleton
 @Component(modules = {
-        PersistenceModule.class,
-        KeyStoreModule.class
+        EncryptionManagerModule.class,
+        StoreModule.class
 })
 public interface SharedPreferenceComponent {
     
-    @Named(STORE_NAME)
-    SharedPreferenceStore store();
+    @Named(PLAIN_TEXT)
+    KeyValueStore store();
     
-    @Named(ENCRYPTED_STORE_NAME)
-    EncryptedSharedPreferenceStore encryptedStore();
-
-    @Named(LENIENT_ENCRYPTED_STORE_NAME)
-    KeyValueStore lenientEncryptedStore();
+    @Named(ENCRYPTED)
+    KeyValueStore encryptedStore();
     
-    @Named(IS_ENCRYPTION_SUPPORTED)
-    Boolean isEncryptionSupported();
+    @Named(LENIENT)
+    KeyValueStore lenientStore();
     
-    @Named(IS_ENCRYPTION_KEY_SECURE)
-    Boolean isEncryptionKeySecure();
+    @Named(FORGETFUL)
+    KeyValueStore forgetfulStore();
     
     @Nullable
     EncryptionManager keyStoreManager();

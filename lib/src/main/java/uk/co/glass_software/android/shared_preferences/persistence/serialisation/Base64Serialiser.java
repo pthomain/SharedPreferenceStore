@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.preferences;
+package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
 
 import android.support.annotation.NonNull;
 import android.util.Base64;
@@ -41,7 +41,7 @@ public class Base64Serialiser implements Serialiser {
     private final static String DELIMITER = "_START_DATA_";
     private final Logger logger;
     
-    public Base64Serialiser(Logger logger) {
+    Base64Serialiser(Logger logger) {
         this.logger = logger;
     }
     

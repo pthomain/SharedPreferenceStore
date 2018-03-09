@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2017 Glass Software Ltd
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package uk.co.glass_software.android.shared_preferences.demo;
 
 import android.content.Context;
@@ -14,37 +35,35 @@ import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;
 import uk.co.glass_software.android.shared_preferences.demo.model.Person;
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
 
-import static uk.co.glass_software.android.shared_preferences.persistence.PersistenceModule.ENCRYPTED_STORE_NAME;
+import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_ENCRYPTED_PREFERENCE_NAME;
+
 
 class MainPresenter {
     
     private final SharedPreferences encryptedPreferences;
-    private final SharedPreferenceStore store;
-    private final EncryptedSharedPreferenceStore encryptedStore;
+    private final KeyValueStore plainTextStore;
+    private final KeyValueStore encryptedStore;
     private final StoreEntryFactory storeEntryFactory;
     private final Counter counter;
     private final LastOpenDate lastOpenDate;
     private final PersonEntry personEntry;
     
     MainPresenter(Context context) {
-        encryptedPreferences = context.getSharedPreferences(
-                context.getPackageName() + "$" + ENCRYPTED_STORE_NAME,
-                Context.MODE_PRIVATE
-        ); //used only to display encrypted values as stored on disk, should not be used directly in practice
+        //used only to display encrypted values as stored on disk, should not be used directly in practice
+        encryptedPreferences = StoreModule.openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME);
         
-        Gson gson = new Gson();
-        storeEntryFactory = new StoreEntryFactory(
-                context,
-                new SimpleLogger(),
-                new GsonSerialiser(gson)
-        );
-        store = storeEntryFactory.getStore();
+        storeEntryFactory = StoreEntryFactory.builder(context)
+                                             .logger(new SimpleLogger())
+                                             .customSerialiser(new GsonSerialiser(new Gson()))
+                                             .build();
+       
+        plainTextStore = storeEntryFactory.getStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
         
-        counter = new Counter(store);
+        counter = new Counter(plainTextStore);
         lastOpenDate = new LastOpenDate(encryptedStore);
         personEntry = new PersonEntry(encryptedStore);
         createOrUpdatePerson();
@@ -83,11 +102,11 @@ class MainPresenter {
         return lastOpenDate;
     }
     
-    SharedPreferenceStore store() {
-        return store;
+    KeyValueStore store() {
+        return plainTextStore;
     }
     
-    SharedPreferenceStore encryptedStore() {
+    KeyValueStore encryptedStore() {
         return encryptedStore;
     }
     
