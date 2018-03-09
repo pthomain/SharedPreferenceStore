@@ -96,6 +96,10 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
                 
                 keyPairGenerator.initialize(spec);
                 keyPairGenerator.generateKeyPair();
+                
+                if(!keyStore.containsAlias(keyAlias)){
+                    throw new IllegalStateException("Key pair was not generated");
+                }
             }
         }
         catch (Exception e) {

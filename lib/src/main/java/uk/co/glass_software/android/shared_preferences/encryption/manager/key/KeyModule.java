@@ -98,12 +98,6 @@ public class KeyModule {
     
     @Provides
     @Singleton
-    IsKeyPairEncrypted provideIsKeyPairEncrypted(@Named(CONFIG) SharedPreferenceStore store) {
-        return new IsKeyPairEncrypted(store);
-    }
-    
-    @Provides
-    @Singleton
     CryptoConfig provideCryptoConfig() {
         return CryptoConfig.KEY_256;
     }
@@ -113,14 +107,12 @@ public class KeyModule {
     RsaEncryptedKeyPairProvider provideKeyPairProvider(RsaEncrypter rsaEncrypter,
                                                        Logger logger,
                                                        KeyPair keyPair,
-                                                       CryptoConfig cryptoConfig,
-                                                       IsKeyPairEncrypted isKeyPairEncrypted) {
+                                                       CryptoConfig cryptoConfig) {
         return new RsaEncryptedKeyPairProvider(
                 rsaEncrypter,
                 logger,
                 keyPair,
-                cryptoConfig,
-                isKeyPairEncrypted
+                cryptoConfig
         );
     }
 

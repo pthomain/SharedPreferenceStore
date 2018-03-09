@@ -21,6 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
 
+import android.support.annotation.NonNull;
 import android.util.Base64;
 
 import com.facebook.android.crypto.keychain.SecureRandomFix;
@@ -39,19 +40,16 @@ public class RsaEncryptedKeyPairProvider {
     private final Logger logger;
     private final KeyPair keyPair;
     private final CryptoConfig cryptoConfig;
-    private final IsKeyPairEncrypted isKeyPairEncrypted;
     private Pair pair;
     
     RsaEncryptedKeyPairProvider(RsaEncrypter rsaEncrypter,
                                 Logger logger,
                                 KeyPair keyPair,
-                                CryptoConfig cryptoConfig,
-                                IsKeyPairEncrypted isKeyPairEncrypted) {
+                                CryptoConfig cryptoConfig) {
         this.rsaEncrypter = rsaEncrypter;
         this.logger = logger;
         this.keyPair = keyPair;
         this.cryptoConfig = cryptoConfig;
-        this.isKeyPairEncrypted = isKeyPairEncrypted;
     }
     
     public void initialise() {
@@ -82,22 +80,27 @@ public class RsaEncryptedKeyPairProvider {
             
             if (string == null) {
                 pair = generateNewKeyPair();
-                boolean isEncrypted = pair.encryptedCipherKey != null && pair.encryptedMacKey != null;
+                boolean isEncrypted = isEncrypted(pair);
                 
                 byte[] cipherKey = isEncrypted ? pair.encryptedCipherKey : pair.cipherKey;
                 byte[] macKey = isEncrypted ? pair.encryptedMacKey : pair.macKey;
                 
-                keyPair.save(toBase64(cipherKey) + DELIMITER + toBase64(macKey));
-                isKeyPairEncrypted.save(isEncrypted);
+                keyPair.save((isEncrypted ? "1" : "0")
+                             + DELIMITER
+                             + toBase64(cipherKey)
+                             + DELIMITER
+                             + toBase64(macKey)
+                );
                 
                 return pair;
             }
             else {
                 String[] strings = string.split(DELIMITER);
-                byte[] storedCipherKey = fromBase64(strings[0]);
-                byte[] storedMacKey = fromBase64(strings[1]);
+                boolean isKeyPairEncrypted = "1".equals(strings[0]);
+                byte[] storedCipherKey = fromBase64(strings[1]);
+                byte[] storedMacKey = fromBase64(strings[2]);
                 
-                if (isKeyPairEncrypted.get(false)) {
+                if (isKeyPairEncrypted) {
                     pair = new Pair(
                             rsaEncrypter.decrypt(storedCipherKey),
                             rsaEncrypter.decrypt(storedMacKey),
@@ -117,6 +120,10 @@ public class RsaEncryptedKeyPairProvider {
         }
         
         return pair;
+    }
+    
+    private boolean isEncrypted(Pair pair) {
+        return pair.encryptedCipherKey != null && pair.encryptedMacKey != null;
     }
     
     private synchronized Pair generateNewKeyPair() throws Exception {
@@ -144,16 +151,22 @@ public class RsaEncryptedKeyPairProvider {
         );
     }
     
-    private String toBase64(byte[] bytes) {
+    private String toBase64(@NonNull byte[] bytes) {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
     
-    private byte[] fromBase64(String string) {
+    private byte[] fromBase64(@NonNull String string) {
         return Base64.decode(string, Base64.DEFAULT);
     }
     
     public boolean isEncryptionKeySecure() {
-        return isKeyPairEncrypted.get(false);
+        try {
+            return isEncrypted(getOrGenerate());
+        }
+        catch (Exception e) {
+            logger.e(this, e, "Could not check if the key pair was encrypted");
+            return false;
+        }
     }
     
     private class Pair {

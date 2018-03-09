@@ -85,6 +85,10 @@ public class PostMSecureKeyProvider implements SecureKeyProvider {
                 keyGenerator.init(spec);
                 keyGenerator.generateKey();
             }
+    
+            if(!keyStore.containsAlias(keyAlias)){
+                throw new IllegalStateException("Key pair was not generated");
+            }
         }
         catch (Exception e) {
             logger.e(this, e, "Could not create a new key");

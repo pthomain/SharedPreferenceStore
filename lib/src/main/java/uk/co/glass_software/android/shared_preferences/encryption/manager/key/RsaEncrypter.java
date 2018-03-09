@@ -64,6 +64,7 @@ class RsaEncrypter {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
         
         if (privateKeyEntry == null) {
+            logger.e(this, "Private key entry was null");
             return null;
         }
         
@@ -83,6 +84,7 @@ class RsaEncrypter {
         KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
         
         if (privateKeyEntry == null) {
+            logger.e(this, "Private key entry was null");
             return null;
         }
         
