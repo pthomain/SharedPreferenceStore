@@ -136,6 +136,7 @@ public class StoreModule {
         return new LenientEncryptedStore(
                 plainTextStore,
                 encryptedStore,
+                encryptedStore.isEncryptionSupported(),
                 logger
         );
     }
@@ -146,6 +147,7 @@ public class StoreModule {
                                                            Logger logger) {
         return new ForgetfulEncryptedStore(
                 encryptedStore,
+                encryptedStore.isEncryptionSupported(),
                 logger
         );
     }

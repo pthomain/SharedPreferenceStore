@@ -30,7 +30,7 @@ import uk.co.glass_software.android.shared_preferences.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
-public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
+public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
     @Nullable
     private final EncryptionManager encryptionManager;
@@ -41,11 +41,12 @@ public final class EncryptedSharedPreferenceStore extends SharedPreferenceStore 
                                    @NonNull BehaviorSubject<String> changeSubject,
                                    @NonNull Logger logger,
                                    @Nullable EncryptionManager encryptionManager) {
-        super(sharedPreferences,
-              base64Serialiser,
-              customSerialiser,
-              changeSubject,
-              logger
+        super(
+                sharedPreferences,
+                base64Serialiser,
+                customSerialiser,
+                changeSubject,
+                logger
         );
         this.encryptionManager = encryptionManager;
     }

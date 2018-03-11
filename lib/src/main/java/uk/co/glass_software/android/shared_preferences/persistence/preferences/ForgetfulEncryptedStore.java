@@ -37,10 +37,9 @@ public class ForgetfulEncryptedStore implements KeyValueStore {
     @Nullable
     private final KeyValueStore internalStore;
     
-    ForgetfulEncryptedStore(@NonNull EncryptedSharedPreferenceStore encryptedStore,
+    ForgetfulEncryptedStore(@NonNull KeyValueStore encryptedStore,
+                            boolean isEncryptionSupported,
                             Logger logger) {
-        boolean isEncryptionSupported = encryptedStore.isEncryptionSupported();
-        
         internalStore = isEncryptionSupported ? encryptedStore : null;
         logger.d(this,
                  "Encryption is"

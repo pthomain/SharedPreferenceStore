@@ -36,10 +36,10 @@ public class LenientEncryptedStore implements KeyValueStore {
     @NonNull
     private final KeyValueStore internalStore;
     
-    LenientEncryptedStore(@NonNull SharedPreferenceStore plainTextStore,
-                          @NonNull EncryptedSharedPreferenceStore encryptedStore,
+    LenientEncryptedStore(@NonNull KeyValueStore plainTextStore,
+                          @NonNull KeyValueStore encryptedStore,
+                          boolean isEncryptionSupported,
                           Logger logger) {
-        boolean isEncryptionSupported = encryptedStore.isEncryptionSupported();
         internalStore = isEncryptionSupported ? encryptedStore : plainTextStore;
         logger.d(this,
                  "Encryption is"

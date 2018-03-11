@@ -24,6 +24,7 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager.conce
 import android.content.Context;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
+import com.facebook.android.crypto.keychain.SecureRandomFix;
 import com.facebook.crypto.CryptoConfig;
 
 import javax.inject.Singleton;
@@ -43,7 +44,8 @@ public class ConcealModule {
                                    RsaEncryptedKeyPairProvider keyPairProvider) {
         return new SecureKeyChain(
                 cryptoConfig,
-                keyPairProvider
+                keyPairProvider,
+                SecureRandomFix::createLocalSecureRandom
         );
     }
     

@@ -28,7 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,25 +35,32 @@ import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.NoSuchPaddingException;
+import javax.inject.Provider;
 
+import uk.co.glass_software.android.shared_preferences.Function;
 import uk.co.glass_software.android.shared_preferences.Logger;
 
 class RsaEncrypter {
     
-    private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
-    private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
-    
     @Nullable
     private final KeyStore keyStore;
     
+    private final Provider<Cipher> cipherProvider;
+    private final Function<Cipher, OutputStreams> outputStreamsProvider;
+    private final Function<Pair, InputStreams> inputStreamsProvider;
     private final Logger logger;
     private final String alias;
     
     RsaEncrypter(@Nullable KeyStore keyStore,
+                 Provider<Cipher> cipherProvider,
+                 Function<Cipher, OutputStreams> outputStreamsProvider,
+                 Function<Pair, InputStreams> inputStreamsProvider,
                  Logger logger,
                  String alias) {
         this.keyStore = keyStore;
+        this.cipherProvider = cipherProvider;
+        this.outputStreamsProvider = outputStreamsProvider;
+        this.inputStreamsProvider = inputStreamsProvider;
         this.logger = logger;
         this.alias = alias;
     }
@@ -68,15 +74,18 @@ class RsaEncrypter {
             return null;
         }
         
-        Cipher inputCipher = getCipherInstance();
+        Cipher inputCipher = cipherProvider.get();
         inputCipher.init(Cipher.ENCRYPT_MODE, privateKeyEntry.getCertificate().getPublicKey());
         
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, inputCipher);
-        cipherOutputStream.write(secret);
-        cipherOutputStream.close();
-        
-        return outputStream.toByteArray();
+        OutputStreams streams = outputStreamsProvider.get(inputCipher);
+        try {
+            streams.cipherOutputStream.write(secret);
+            return streams.outputStream.toByteArray();
+        }
+        finally {
+            streams.outputStream.close();
+            streams.cipherOutputStream.close();
+        }
     }
     
     @Nullable
@@ -88,29 +97,27 @@ class RsaEncrypter {
             return null;
         }
         
-        Cipher outputCipher = getCipherInstance();
+        Cipher outputCipher = cipherProvider.get();
         outputCipher.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
         
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
-        CipherInputStream cipherInputStream = new CipherInputStream(inputStream, outputCipher);
+        InputStreams inputStreams = inputStreamsProvider.get(new Pair(outputCipher, encrypted));
         List<Byte> values = new LinkedList<>();
-        
-        int nextByte;
-        while ((nextByte = cipherInputStream.read()) != -1) {
-            values.add((byte) nextByte);
+        try {
+            int nextByte;
+            while ((nextByte = inputStreams.cipherInputStream.read()) != -1) {
+                values.add((byte) nextByte);
+            }
+            
+            byte[] bytes = new byte[values.size()];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = values.get(i);
+            }
+            return bytes;
         }
-        
-        byte[] bytes = new byte[values.size()];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = values.get(i);
+        finally {
+            inputStreams.inputStream.close();
+            inputStreams.cipherInputStream.close();
         }
-        return bytes;
-    }
-    
-    private Cipher getCipherInstance() throws NoSuchAlgorithmException,
-                                              NoSuchProviderException,
-                                              NoSuchPaddingException {
-        return Cipher.getInstance(RSA_MODE, CIPHER_PROVIDER);
     }
     
     @Nullable
@@ -130,4 +137,36 @@ class RsaEncrypter {
         }
     }
     
+    static class OutputStreams {
+        private final ByteArrayOutputStream outputStream;
+        private final CipherOutputStream cipherOutputStream;
+        
+        OutputStreams(ByteArrayOutputStream outputStream,
+                      CipherOutputStream cipherOutputStream) {
+            this.outputStream = outputStream;
+            this.cipherOutputStream = cipherOutputStream;
+        }
+    }
+    
+    static class InputStreams {
+        private final ByteArrayInputStream inputStream;
+        private final CipherInputStream cipherInputStream;
+        
+        InputStreams(ByteArrayInputStream inputStream,
+                     CipherInputStream cipherInputStream) {
+            this.inputStream = inputStream;
+            this.cipherInputStream = cipherInputStream;
+        }
+    }
+    
+    static class Pair {
+        final Cipher cipher;
+        final byte[] encrypted;
+        
+        Pair(Cipher cipher,
+             byte[] encrypted) {
+            this.cipher = cipher;
+            this.encrypted = encrypted;
+        }
+    }
 }

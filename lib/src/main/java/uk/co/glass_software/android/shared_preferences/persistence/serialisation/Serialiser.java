@@ -32,9 +32,13 @@ public interface Serialiser {
     <O> String serialise(@NonNull O deserialised) throws SerialisationException;
     
     <O> O deserialise(@NonNull String serialised,
-                      Class<O> targetClass) throws SerialisationException;
+                      @NonNull Class<O> targetClass) throws SerialisationException;
     
     class SerialisationException extends Exception {
+        SerialisationException(String message) {
+            super(message);
+        }
+        
         SerialisationException(Throwable cause) {
             initCause(cause);
         }

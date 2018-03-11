@@ -22,127 +22,127 @@
 package uk.co.glass_software.android.shared_preferences;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.EncryptedSharedPreferenceStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
-import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
-import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
-
-import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.openSharedPreferences;
 
 public class StoreEntryFactory {
     
     public final static String DEFAULT_PLAIN_TEXT_PREFERENCE_NAME = "plain_text_store";
     public final static String DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store";
     
+    @NonNull
     private final KeyValueStore store;
+    
+    @NonNull
     private final KeyValueStore encryptedStore;
+    
+    @NonNull
     private final KeyValueStore lenientStore;
+    
+    @NonNull
     private final KeyValueStore forgetfulStore;
     
     @Nullable
     private final EncryptionManager encryptionManager;
     
-    StoreEntryFactory(Context context,
-                      @Nullable SharedPreferences plainTextPreferences,
-                      @Nullable SharedPreferences encryptedPreferences,
-                      boolean fallbackToCustomEncryption,
-                      @Nullable Logger logger,
-                      @Nullable Serialiser customSerialiser) {
-        plainTextPreferences = plainTextPreferences == null ? openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME) : plainTextPreferences;
-        encryptedPreferences = encryptedPreferences == null ? openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME) : encryptedPreferences;
+    StoreEntryFactory(@NonNull Logger logger,
+                      @NonNull KeyValueStore store,
+                      @NonNull KeyValueStore encryptedStore,
+                      @NonNull KeyValueStore lenientStore,
+                      @NonNull KeyValueStore forgetfulStore,
+                      @Nullable EncryptionManager encryptionManager) {
+        this.store = store;
+        this.encryptedStore = encryptedStore;
+        this.lenientStore = lenientStore;
+        this.forgetfulStore = forgetfulStore;
+        this.encryptionManager = encryptionManager;
         
-        SharedPreferenceComponent component = DaggerSharedPreferenceComponent
-                .builder()
-                .keyModule(new KeyModule(context))
-                .encryptionManagerModule(new EncryptionManagerModule(fallbackToCustomEncryption))
-                .storeModule(new StoreModule(context, plainTextPreferences, encryptedPreferences, logger))
-                .serialisationModule(new SerialisationModule(customSerialiser))
-                .build();
-        
-        encryptedStore = component.encryptedStore();
-        store = component.store();
-        lenientStore = component.lenientStore();
-        forgetfulStore = component.forgetfulStore();
-        encryptionManager = component.keyStoreManager();
-        
-        component.logger().d(this, "Encryption supported: " + (encryptionManager != null && encryptionManager.isEncryptionSupported() ? "TRUE" : "FALSE"));
-        component.logger().d(this, "Encryption key secure: " + (encryptionManager != null && encryptionManager.isEncryptionKeySecure() ? "TRUE" : "FALSE"));
+        logger.d(this, "Encryption supported: " + (this.encryptionManager != null && this.encryptionManager.isEncryptionSupported() ? "TRUE" : "FALSE"));
+        logger.d(this, "Encryption key secure: " + (this.encryptionManager != null && this.encryptionManager.isEncryptionKeySecure() ? "TRUE" : "FALSE"));
     }
     
     public static StoreEntryFactoryBuilder builder(Context context) {
         return new StoreEntryFactoryBuilder(context.getApplicationContext());
     }
     
+    @NonNull
     public <C> StoreEntry<C> open(String key,
                                   Class<C> valueClass) {
         return open(() -> key, () -> valueClass);
     }
     
+    @NonNull
     public <C> StoreEntry<C> openEncrypted(String key,
                                            Class<C> valueClass) {
         return openEncrypted(() -> key, () -> valueClass);
     }
     
+    @NonNull
     public <C> StoreEntry<C> openLenient(String key,
                                          Class<C> valueClass) {
         return openLenient(() -> key, () -> valueClass);
     }
     
+    @NonNull
     public <C> StoreEntry<C> openForgetful(String key,
                                            Class<C> valueClass) {
         return openForgetful(() -> key, () -> valueClass);
     }
     
+    @NonNull
     public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> open(K key) {
         return open(key, key);
     }
     
+    @NonNull
     public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openEncrypted(K key) {
         return openEncrypted(key, key);
     }
     
+    @NonNull
     public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openLenient(K key) {
         return openEncrypted(key, key);
     }
     
+    @NonNull
     public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openForgetful(K key) {
         return openForgetful(key, key);
     }
     
+    @NonNull
     private <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
                                    StoreEntry.ValueClassProvider valueClassProvider) {
         return new StoreEntry<>(store, keyProvider, valueClassProvider);
     }
     
+    @NonNull
     private <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
                                             StoreEntry.ValueClassProvider valueClassProvider) {
         return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
     }
     
+    @NonNull
     private <C> StoreEntry<C> openLenient(StoreEntry.UniqueKeyProvider keyProvider,
                                           StoreEntry.ValueClassProvider valueClassProvider) {
         return new StoreEntry<>(lenientStore, keyProvider, valueClassProvider);
     }
     
+    @NonNull
     private <C> StoreEntry<C> openForgetful(StoreEntry.UniqueKeyProvider keyProvider,
                                             StoreEntry.ValueClassProvider valueClassProvider) {
         return new StoreEntry<>(forgetfulStore, keyProvider, valueClassProvider);
     }
     
+    @NonNull
     public KeyValueStore getStore() {
         return store;
     }
     
+    @NonNull
     public KeyValueStore getEncryptedStore() {
         return encryptedStore;
     }

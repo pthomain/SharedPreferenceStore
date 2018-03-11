@@ -23,8 +23,17 @@ package uk.co.glass_software.android.shared_preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
+import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
+import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
+
+import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_ENCRYPTED_PREFERENCE_NAME;
+import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME;
+import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.openSharedPreferences;
 
 public class StoreEntryFactoryBuilder {
     
@@ -39,39 +48,56 @@ public class StoreEntryFactoryBuilder {
         this.context = context;
     }
     
+    @NonNull
     public StoreEntryFactoryBuilder plainTextPreferences(SharedPreferences preferences) {
         this.plainTextPreferences = preferences;
         return this;
     }
     
+    @NonNull
     public StoreEntryFactoryBuilder encryptedPreferences(SharedPreferences preferences) {
         this.encryptedPreferences = preferences;
         return this;
     }
     
+    @NonNull
     public StoreEntryFactoryBuilder fallbackToCustomEncryption(boolean fallbackToCustomEncryption) {
         this.fallbackToCustomEncryption = fallbackToCustomEncryption;
         return this;
     }
     
+    @NonNull
     public StoreEntryFactoryBuilder logger(Logger logger) {
         this.logger = logger;
         return this;
     }
     
+    @NonNull
     public StoreEntryFactoryBuilder customSerialiser(Serialiser customSerialiser) {
         this.customSerialiser = customSerialiser;
         return this;
     }
     
+    @NonNull
     public StoreEntryFactory build() {
+        plainTextPreferences = plainTextPreferences == null ? openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME) : plainTextPreferences;
+        encryptedPreferences = encryptedPreferences == null ? openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME) : encryptedPreferences;
+        
+        SharedPreferenceComponent component = DaggerSharedPreferenceComponent
+                .builder()
+                .keyModule(new KeyModule(context))
+                .encryptionManagerModule(new EncryptionManagerModule(fallbackToCustomEncryption))
+                .storeModule(new StoreModule(context, plainTextPreferences, encryptedPreferences, logger))
+                .serialisationModule(new SerialisationModule(customSerialiser))
+                .build();
+        
         return new StoreEntryFactory(
-                context,
-                plainTextPreferences,
-                encryptedPreferences,
-                fallbackToCustomEncryption,
-                logger,
-                customSerialiser
+                component.logger(),
+                component.store(),
+                component.encryptedStore(),
+                component.lenientStore(),
+                component.forgetfulStore(),
+                component.keyStoreManager()
         );
     }
 }

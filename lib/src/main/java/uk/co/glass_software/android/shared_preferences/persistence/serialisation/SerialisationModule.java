@@ -22,6 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
 
 import android.support.annotation.Nullable;
+import android.util.Base64;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,6 +30,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Base64Serialiser.CustomBase64;
 
 @Module
 public class SerialisationModule {
@@ -47,7 +49,20 @@ public class SerialisationModule {
     @Singleton
     @Named(BASE_64)
     Serialiser provideBase64Serialiser(Logger logger) {
-        return new Base64Serialiser(logger);
+        return new Base64Serialiser(
+                logger,
+                new CustomBase64() {
+                    @Override
+                    public String encode(byte[] input, int flags) {
+                        return Base64.encodeToString(input, flags);
+                    }
+                    
+                    @Override
+                    public byte[] decode(String input, int flags) {
+                        return Base64.decode(input, flags);
+                    }
+                }
+        );
     }
     
     @Provides
