@@ -21,26 +21,28 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.manager.conceal;
 
-import com.facebook.android.crypto.keychain.SecureRandomFix;
 import com.facebook.crypto.CryptoConfig;
 import com.facebook.crypto.exception.KeyChainException;
 import com.facebook.crypto.keychain.KeyChain;
 
 import java.security.SecureRandom;
 
+import javax.inject.Provider;
+
 import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
 
 public class SecureKeyChain implements KeyChain {
     
-    private final CryptoConfig mCryptoConfig;
-    private final SecureRandom mSecureRandom;
+    private final CryptoConfig cryptoConfig;
+    private final SecureRandom secureRandom;
     private final RsaEncryptedKeyPairProvider keyPairProvider;
     
     SecureKeyChain(CryptoConfig config,
-                   RsaEncryptedKeyPairProvider keyPairProvider) {
+                   RsaEncryptedKeyPairProvider keyPairProvider,
+                   Provider<SecureRandom> secureRandomProvider) {
         this.keyPairProvider = keyPairProvider;
-        mSecureRandom = SecureRandomFix.createLocalSecureRandom();
-        mCryptoConfig = config;
+        secureRandom = secureRandomProvider.get();
+        cryptoConfig = config;
     }
     
     @Override
@@ -65,8 +67,8 @@ public class SecureKeyChain implements KeyChain {
     
     @Override
     public byte[] getNewIV() throws KeyChainException {
-        byte[] iv = new byte[mCryptoConfig.ivLength];
-        mSecureRandom.nextBytes(iv);
+        byte[] iv = new byte[cryptoConfig.ivLength];
+        secureRandom.nextBytes(iv);
         return iv;
     }
     

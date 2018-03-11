@@ -23,7 +23,6 @@ package uk.co.glass_software.android.shared_preferences.persistence.serialisatio
 
 import android.support.annotation.NonNull;
 import android.util.Base64;
-import android.util.Pair;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,9 +39,12 @@ public class Base64Serialiser implements Serialiser {
     private final static String PREFIX = "BASE_64_";
     private final static String DELIMITER = "_START_DATA_";
     private final Logger logger;
+    private final CustomBase64 base64;
     
-    Base64Serialiser(Logger logger) {
+    Base64Serialiser(Logger logger,
+                     CustomBase64 base64) {
         this.logger = logger;
+        this.base64 = base64;
     }
     
     @Override
@@ -67,7 +69,7 @@ public class Base64Serialiser implements Serialiser {
             out = new ObjectOutputStream(bos);
             out.writeObject(deserialised);
             byte[] valueBytes = bos.toByteArray();
-            String base64 = new String(Base64.encode(valueBytes, Base64.DEFAULT));
+            String base64 = this.base64.encode(valueBytes, Base64.DEFAULT);
             return format(base64, deserialised.getClass());
         }
         catch (IOException e) {
@@ -90,13 +92,23 @@ public class Base64Serialiser implements Serialiser {
     @Override
     @SuppressWarnings("unchecked")
     public <O> O deserialise(@NonNull String objectBase64,
-                             Class<O> targetClass) throws SerialisationException {
+                             @NonNull Class<O> targetClass) throws SerialisationException {
         ByteArrayInputStream bis = null;
         ObjectInput in = null;
         
         try {
-            Pair<Class<?>, String> read = read(objectBase64);
-            byte[] objectBytes = Base64.decode(read.second, Base64.DEFAULT);
+            Object[] read = read(objectBase64);
+            
+            if (!targetClass.equals(read[0])) {
+                throw new SerialisationException(
+                        "Serialised class didn't match: expected: "
+                        + targetClass
+                        + "; serialised: "
+                        + read[0]
+                );
+            }
+            
+            byte[] objectBytes = base64.decode((String) read[1], Base64.DEFAULT);
             bis = new ByteArrayInputStream(objectBytes);
             in = new ObjectInputStream(bis);
             return (O) in.readObject();
@@ -125,13 +137,21 @@ public class Base64Serialiser implements Serialiser {
         return PREFIX + objectClass.getCanonicalName() + DELIMITER + base64;
     }
     
-    private Pair<Class<?>, String> read(@NonNull String base64) throws ClassNotFoundException {
+    private Object[] read(@NonNull String base64) throws ClassNotFoundException {
         if (canHandleSerialisedFormat(base64)) {
             String payload = base64.substring(base64.indexOf(DELIMITER) + DELIMITER.length());
             String className = base64.substring(base64.indexOf(PREFIX) + PREFIX.length(), base64.indexOf(DELIMITER));
             Class<?> targetClass = Class.forName(className);
-            return new Pair<>(targetClass, className);
+            return new Object[]{targetClass, payload};
         }
         throw new IllegalArgumentException("Not a Base64 string: " + base64);
+    }
+    
+    interface CustomBase64 {
+        
+        String encode(byte[] input, int flags);
+        
+        byte[] decode(String str, int flags);
+        
     }
 }

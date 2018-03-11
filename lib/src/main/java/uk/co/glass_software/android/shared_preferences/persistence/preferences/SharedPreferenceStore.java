@@ -68,6 +68,10 @@ public class SharedPreferenceStore implements KeyValueStore {
     
     @Override
     public final synchronized void deleteValue(@NonNull String key) {
+        deleteValueInternal(key);
+    }
+    
+    synchronized void deleteValueInternal(@NonNull String key) {
         saveValue(key, null);
     }
     
@@ -248,9 +252,14 @@ public class SharedPreferenceStore implements KeyValueStore {
     
     @Override
     public final synchronized boolean hasValue(@NonNull String key) {
+        return hasValueInternal(key);
+    }
+    
+    synchronized boolean hasValueInternal(@NonNull String key) {
         return sharedPreferences.contains(key);
     }
     
+    @Deprecated
     public final synchronized Map<String, Object> getCachedValues() {
         return Collections.unmodifiableMap(cacheMap);
     }

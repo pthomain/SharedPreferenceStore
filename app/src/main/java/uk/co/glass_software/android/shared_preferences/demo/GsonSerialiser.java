@@ -51,7 +51,8 @@ class GsonSerialiser implements Serialiser {
     }
     
     @Override
-    public <O> O deserialise(@NonNull String serialised, Class<O> targetClass) throws SerialisationException {
+    public <O> O deserialise(@NonNull String serialised,
+                             @NonNull Class<O> targetClass) throws SerialisationException {
         return gson.fromJson(serialised, targetClass);
     }
 }
