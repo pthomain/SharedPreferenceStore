@@ -19,15 +19,22 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager.key;
+package uk.co.glass_software.android.shared_preferences.utils;
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
-class KeyPair extends StoreEntry<String> {
+public interface Logger {
+    void e(Object caller,
+           Throwable t,
+           String message);
     
-    KeyPair(KeyValueStore store) {
-        super(store, () -> "KeyPair", () -> String.class, null);
+    void e(Object caller,
+           String message);
+    
+    void d(Object caller,
+           String message);
+    
+    final class LogException extends Exception {
+        LogException(String detailMessage) {
+            super(detailMessage);
+        }
     }
-    
 }

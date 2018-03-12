@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
 import static junit.framework.Assert.assertEquals;

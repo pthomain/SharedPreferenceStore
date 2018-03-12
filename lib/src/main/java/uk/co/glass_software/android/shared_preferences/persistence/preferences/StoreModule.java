@@ -32,15 +32,14 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.shared_preferences.Function;
-import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.SimpleLogger;
+import uk.co.glass_software.android.shared_preferences.utils.Function;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
-import static uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule.CONFIG;
 import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.BASE_64;
 import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.CUSTOM;
 
@@ -148,21 +147,6 @@ public class StoreModule {
         return new ForgetfulEncryptedStore(
                 encryptedStore,
                 encryptedStore.isEncryptionSupported(),
-                logger
-        );
-    }
-    
-    @Provides
-    @Singleton
-    @Named(CONFIG)
-    SharedPreferenceStore provideConfigSharedPreferenceStore(@Named(BASE_64) Serialiser base64Serialiser,
-                                                             @Nullable @Named(CUSTOM) Serialiser customSerialiser,
-                                                             Logger logger) {
-        return new SharedPreferenceStore(
-                openSharedPreferences(context, CONFIG),
-                base64Serialiser,
-                customSerialiser,
-                BehaviorSubject.create(),
                 logger
         );
     }

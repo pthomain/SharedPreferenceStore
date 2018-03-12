@@ -25,11 +25,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_ENCRYPTED_PREFERENCE_NAME;
 import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME;
@@ -40,7 +39,6 @@ public class StoreEntryFactoryBuilder {
     private final Context context;
     private SharedPreferences plainTextPreferences;
     private SharedPreferences encryptedPreferences;
-    private boolean fallbackToCustomEncryption = true;
     private Logger logger;
     private Serialiser customSerialiser;
     
@@ -57,12 +55,6 @@ public class StoreEntryFactoryBuilder {
     @NonNull
     public StoreEntryFactoryBuilder encryptedPreferences(SharedPreferences preferences) {
         this.encryptedPreferences = preferences;
-        return this;
-    }
-    
-    @NonNull
-    public StoreEntryFactoryBuilder fallbackToCustomEncryption(boolean fallbackToCustomEncryption) {
-        this.fallbackToCustomEncryption = fallbackToCustomEncryption;
         return this;
     }
     
@@ -85,8 +77,6 @@ public class StoreEntryFactoryBuilder {
         
         SharedPreferenceComponent component = DaggerSharedPreferenceComponent
                 .builder()
-                .keyModule(new KeyModule(context))
-                .encryptionManagerModule(new EncryptionManagerModule(fallbackToCustomEncryption))
                 .storeModule(new StoreModule(context, plainTextPreferences, encryptedPreferences, logger))
                 .serialisationModule(new SerialisationModule(customSerialiser))
                 .build();
