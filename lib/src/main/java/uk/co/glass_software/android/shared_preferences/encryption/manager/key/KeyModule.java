@@ -26,13 +26,8 @@ import android.support.annotation.Nullable;
 
 import com.facebook.crypto.CryptoConfig;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.security.KeyStore;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -52,13 +47,10 @@ public class KeyModule {
     public static final String KEY_ALIAS_POST_M = "KEY_ALIAS_POST_M";
     public static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     
-    private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
-    private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
-    
     private final String keyAlias;
     
     public KeyModule(Context context) {
-        keyAlias = context.getApplicationContext().getPackageName() + "==StoreKey";
+        keyAlias = context.getApplicationContext().getPackageName() + ".StoreKey";
     }
     
     @Provides
@@ -85,14 +77,14 @@ public class KeyModule {
     @Singleton
     @Named(KEY_ALIAS_PRE_M)
     String provideKeyAliasPreM() {
-        return keyAlias + "-preM";
+        return keyAlias + ".preM";
     }
     
     @Provides
     @Singleton
     @Named(KEY_ALIAS_POST_M)
     String provideKeyAliasPostM() {
-        return keyAlias + "-postM";
+        return keyAlias + ".postM";
     }
     
     @Provides
@@ -102,26 +94,6 @@ public class KeyModule {
                                      @Named(KEY_ALIAS_PRE_M) String keyAlias) {
         return new RsaEncrypter(
                 keyStore,
-                () -> {
-                    try {
-                        return Cipher.getInstance(RSA_MODE, CIPHER_PROVIDER);
-                    }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                },
-                cipher -> {
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    return new RsaEncrypter.OutputStreams(
-                            outputStream,
-                            new CipherOutputStream(outputStream, cipher)
-                    );
-                },
-                pair -> {
-                    ByteArrayInputStream inputStream = new ByteArrayInputStream(pair.encrypted);
-                    CipherInputStream cipherInputStream = new CipherInputStream(inputStream, pair.cipher);
-                    return new RsaEncrypter.InputStreams(inputStream, cipherInputStream);
-                },
                 logger,
                 keyAlias
         );

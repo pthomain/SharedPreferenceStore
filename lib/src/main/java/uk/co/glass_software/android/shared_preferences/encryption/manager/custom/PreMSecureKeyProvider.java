@@ -45,6 +45,7 @@ public class PreMSecureKeyProvider implements SecureKeyProvider {
     
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
+    
     private final RsaEncryptedKeyPairProvider keyPairProvider;
     private final Context applicationContext;
     private final String keyAlias;

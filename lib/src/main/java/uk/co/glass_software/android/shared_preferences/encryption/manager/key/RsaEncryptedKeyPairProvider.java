@@ -41,6 +41,7 @@ public class RsaEncryptedKeyPairProvider {
     private final KeyPair keyPair;
     private final CryptoConfig cryptoConfig;
     private Pair pair;
+    private boolean isKeyEncryptionEnabled = false; //FIXME
     
     RsaEncryptedKeyPairProvider(RsaEncrypter rsaEncrypter,
                                 Logger logger,
@@ -80,12 +81,11 @@ public class RsaEncryptedKeyPairProvider {
             
             if (string == null) {
                 pair = generateNewKeyPair();
-                boolean isEncrypted = isEncrypted(pair);
                 
-                byte[] cipherKey = isEncrypted ? pair.encryptedCipherKey : pair.cipherKey;
-                byte[] macKey = isEncrypted ? pair.encryptedMacKey : pair.macKey;
+                byte[] cipherKey = pair.isEncrypted ? pair.encryptedCipherKey : pair.cipherKey;
+                byte[] macKey = pair.isEncrypted ? pair.encryptedMacKey : pair.macKey;
                 
-                keyPair.save((isEncrypted ? "1" : "0")
+                keyPair.save((pair.isEncrypted ? "1" : "0")
                              + DELIMITER
                              + toBase64(cipherKey)
                              + DELIMITER
@@ -105,7 +105,8 @@ public class RsaEncryptedKeyPairProvider {
                             rsaEncrypter.decrypt(storedCipherKey),
                             rsaEncrypter.decrypt(storedMacKey),
                             storedCipherKey,
-                            storedMacKey
+                            storedMacKey,
+                            true
                     );
                 }
                 else {
@@ -113,7 +114,8 @@ public class RsaEncryptedKeyPairProvider {
                             storedCipherKey,
                             storedMacKey,
                             null,
-                            null
+                            null,
+                            false
                     );
                 }
             }
@@ -122,11 +124,7 @@ public class RsaEncryptedKeyPairProvider {
         return pair;
     }
     
-    private boolean isEncrypted(Pair pair) {
-        return pair.encryptedCipherKey != null && pair.encryptedMacKey != null;
-    }
-    
-    private synchronized Pair generateNewKeyPair() throws Exception {
+    private synchronized Pair generateNewKeyPair() {
         byte[] cipherKey = new byte[cryptoConfig.keyLength];
         byte[] macKey = new byte[MacConfig.DEFAULT.keyLength];
         
@@ -134,20 +132,34 @@ public class RsaEncryptedKeyPairProvider {
         secureRandom.nextBytes(cipherKey);
         secureRandom.nextBytes(macKey);
         
-        byte[] encryptedCipherKey = rsaEncrypter.encrypt(cipherKey);
-        byte[] encryptedMacKey = rsaEncrypter.encrypt(macKey);
+        byte[] encryptedCipherKey;
+        byte[] encryptedMacKey;
+        try {
+            encryptedCipherKey = rsaEncrypter.encrypt(cipherKey);
+            encryptedMacKey = rsaEncrypter.encrypt(macKey);
+        }
+        catch (Exception e) {
+            encryptedCipherKey = null;
+            encryptedMacKey = null;
+        }
         
-        if (encryptedCipherKey == null || encryptedMacKey == null) {
+        boolean isEncrypted;
+        if (encryptedCipherKey == null || encryptedMacKey == null || !isKeyEncryptionEnabled) {
             logger.e(this, "RSA encrypter could not encrypt the keys");
             encryptedCipherKey = null;
             encryptedMacKey = null;
+            isEncrypted = false;
+        }
+        else {
+            isEncrypted = true;
         }
         
         return new Pair(
                 cipherKey,
                 macKey,
                 encryptedCipherKey,
-                encryptedMacKey
+                encryptedMacKey,
+                isEncrypted
         );
     }
     
@@ -161,7 +173,7 @@ public class RsaEncryptedKeyPairProvider {
     
     public boolean isEncryptionKeySecure() {
         try {
-            return isEncrypted(getOrGenerate());
+            return getOrGenerate().isEncrypted;
         }
         catch (Exception e) {
             logger.e(this, e, "Could not check if the key pair was encrypted");
@@ -174,15 +186,18 @@ public class RsaEncryptedKeyPairProvider {
         private final byte[] macKey;
         private final byte[] encryptedCipherKey;
         private final byte[] encryptedMacKey;
+        private final boolean isEncrypted;
         
         private Pair(byte[] cipherKey,
                      byte[] macKey,
                      byte[] encryptedCipherKey,
-                     byte[] encryptedMacKey) {
+                     byte[] encryptedMacKey,
+                     boolean isEncrypted) {
             this.cipherKey = cipherKey;
             this.macKey = macKey;
             this.encryptedCipherKey = encryptedCipherKey;
             this.encryptedMacKey = encryptedMacKey;
+            this.isEncrypted = isEncrypted;
         }
     }
     
