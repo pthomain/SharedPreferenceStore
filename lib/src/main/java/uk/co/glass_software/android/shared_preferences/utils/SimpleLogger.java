@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences;
+package uk.co.glass_software.android.shared_preferences.utils;
 
 
 import android.util.Log;

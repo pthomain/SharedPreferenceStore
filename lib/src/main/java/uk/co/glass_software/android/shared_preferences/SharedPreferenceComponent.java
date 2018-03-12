@@ -32,6 +32,7 @@ import uk.co.glass_software.android.shared_preferences.encryption.manager.Encryp
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.ENCRYPTED;
 import static uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.FORGETFUL;

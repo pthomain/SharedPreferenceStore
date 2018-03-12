@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
-import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 import static junit.framework.Assert.assertEquals;

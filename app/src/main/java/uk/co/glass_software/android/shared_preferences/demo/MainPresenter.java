@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 import java.util.Date;
 import java.util.Map;
 
-import uk.co.glass_software.android.shared_preferences.SimpleLogger;
+import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;

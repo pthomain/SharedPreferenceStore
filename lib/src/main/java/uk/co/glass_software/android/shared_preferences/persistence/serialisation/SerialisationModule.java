@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Base64Serialiser.CustomBase64;
 
 @Module

@@ -33,5 +33,4 @@ public interface EncryptionManager {
     
     boolean isEncryptionSupported();
     
-    boolean isEncryptionKeySecure();
 }

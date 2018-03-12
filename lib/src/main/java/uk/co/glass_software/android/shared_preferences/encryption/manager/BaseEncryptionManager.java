@@ -24,7 +24,7 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 
-import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 public abstract class BaseEncryptionManager implements EncryptionManager {
     

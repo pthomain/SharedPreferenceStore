@@ -19,22 +19,10 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences;
+package uk.co.glass_software.android.shared_preferences.utils;
 
-public interface Logger {
-    void e(Object caller,
-           Throwable t,
-           String message);
+public interface Function<T, R> {
     
-    void e(Object caller,
-           String message);
+    R get(T t);
     
-    void d(Object caller,
-           String message);
-    
-    final class LogException extends Exception {
-        LogException(String detailMessage) {
-            super(detailMessage);
-        }
-    }
 }

@@ -24,35 +24,38 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager.conce
 import android.content.Context;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
-import com.facebook.android.crypto.keychain.SecureRandomFix;
+import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
 import com.facebook.crypto.CryptoConfig;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import uk.co.glass_software.android.shared_preferences.Logger;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.KeyModule;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.key.RsaEncryptedKeyPairProvider;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
-@Module(includes = KeyModule.class)
+@Module
 public class ConcealModule {
     
     @Provides
     @Singleton
-    SecureKeyChain provideKeyChain(CryptoConfig cryptoConfig,
-                                   RsaEncryptedKeyPairProvider keyPairProvider) {
-        return new SecureKeyChain(
-                cryptoConfig,
-                keyPairProvider,
-                SecureRandomFix::createLocalSecureRandom
+    SharedPrefsBackedKeyChain provideKeyChain(CryptoConfig cryptoConfig,
+                                              Context context) {
+        return new SharedPrefsBackedKeyChain(
+                context,
+                cryptoConfig
         );
     }
     
     @Provides
     @Singleton
+    CryptoConfig provideCryptoConfig() {
+        return CryptoConfig.KEY_256;
+    }
+    
+    @Provides
+    @Singleton
     ConcealEncryptionManager provideConcealEncryptionManager(Logger logger,
-                                                             SecureKeyChain keyChain,
+                                                             SharedPrefsBackedKeyChain keyChain,
                                                              Context applicationContext) {
         return new ConcealEncryptionManager(
                 applicationContext,

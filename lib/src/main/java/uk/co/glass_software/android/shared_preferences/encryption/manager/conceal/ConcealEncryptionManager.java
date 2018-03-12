@@ -25,16 +25,16 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager.conce
 import android.content.Context;
 
 import com.facebook.android.crypto.keychain.AndroidConceal;
+import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
 import com.facebook.crypto.Crypto;
 import com.facebook.crypto.Entity;
 import com.facebook.soloader.SoLoader;
 
-import uk.co.glass_software.android.shared_preferences.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseEncryptionManager;
 
 public class ConcealEncryptionManager extends BaseEncryptionManager {
     
-    private final SecureKeyChain keyChain;
     private final Logger logger;
     
     private boolean isAvailable;
@@ -42,11 +42,10 @@ public class ConcealEncryptionManager extends BaseEncryptionManager {
     
     ConcealEncryptionManager(Context context,
                              Logger logger,
-                             SecureKeyChain keyChain,
+                             SharedPrefsBackedKeyChain keyChain,
                              AndroidConceal androidConceal) {
         super(logger);
         this.logger = logger;
-        this.keyChain = keyChain;
         try {
             SoLoader.init(context, false);
             
@@ -101,8 +100,4 @@ public class ConcealEncryptionManager extends BaseEncryptionManager {
         return isAvailable;
     }
     
-    @Override
-    public boolean isEncryptionKeySecure() {
-        return keyChain.isEncryptionKeySecure();
-    }
 }

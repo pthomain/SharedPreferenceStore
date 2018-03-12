@@ -28,6 +28,7 @@ import android.support.annotation.Nullable;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 public class StoreEntryFactory {
     
@@ -62,7 +63,6 @@ public class StoreEntryFactory {
         this.encryptionManager = encryptionManager;
         
         logger.d(this, "Encryption supported: " + (this.encryptionManager != null && this.encryptionManager.isEncryptionSupported() ? "TRUE" : "FALSE"));
-        logger.d(this, "Encryption key secure: " + (this.encryptionManager != null && this.encryptionManager.isEncryptionKeySecure() ? "TRUE" : "FALSE"));
     }
     
     public static StoreEntryFactoryBuilder builder(Context context) {
