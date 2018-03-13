@@ -30,16 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import io.reactivex.subjects.Subject;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 @SuppressWarnings("unchecked")
 public class SharedPreferenceStore implements KeyValueStore {
     
     private final SharedPreferences sharedPreferences;
-    private final BehaviorSubject<String> changeSubject;
+    private final Subject<String> changeSubject;
     private final Map<String, Object> cacheMap;
     
     private final Serialiser base64Serialiser;
@@ -51,7 +51,7 @@ public class SharedPreferenceStore implements KeyValueStore {
     SharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                           @NonNull Serialiser base64Serialiser,
                           @Nullable Serialiser customSerialiser,
-                          @NonNull BehaviorSubject<String> changeSubject,
+                          @NonNull Subject<String> changeSubject,
                           @NonNull Logger logger) {
         this.sharedPreferences = sharedPreferences;
         this.base64Serialiser = base64Serialiser;
