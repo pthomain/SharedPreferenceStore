@@ -25,10 +25,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import io.reactivex.subjects.Subject;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
 
 public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     
@@ -38,15 +38,14 @@ public class EncryptedSharedPreferenceStore extends SharedPreferenceStore {
     EncryptedSharedPreferenceStore(@NonNull SharedPreferences sharedPreferences,
                                    @NonNull Serialiser base64Serialiser,
                                    @Nullable Serialiser customSerialiser,
-                                   @NonNull BehaviorSubject<String> changeSubject,
+                                   @NonNull Subject<String> changeSubject,
                                    @NonNull Logger logger,
                                    @Nullable EncryptionManager encryptionManager) {
-        super(
-                sharedPreferences,
-                base64Serialiser,
-                customSerialiser,
-                changeSubject,
-                logger
+        super(sharedPreferences,
+              base64Serialiser,
+              customSerialiser,
+              changeSubject,
+              logger
         );
         this.encryptionManager = encryptionManager;
     }

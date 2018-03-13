@@ -31,14 +31,14 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.shared_preferences.utils.Function;
-import uk.co.glass_software.android.shared_preferences.utils.Logger;
-import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
+import io.reactivex.subjects.PublishSubject;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
+import uk.co.glass_software.android.shared_preferences.utils.Function;
+import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
 
 import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.BASE_64;
 import static uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.CUSTOM;
@@ -106,7 +106,7 @@ public class StoreModule {
                 plainTextSharedPreferences,
                 base64Serialiser,
                 customSerialiser,
-                BehaviorSubject.create(),
+                PublishSubject.create(),
                 logger
         );
     }
@@ -121,7 +121,7 @@ public class StoreModule {
                 encryptedSharedPreferences,
                 base64Serialiser,
                 customSerialiser,
-                BehaviorSubject.create(),
+                PublishSubject.create(),
                 logger,
                 encryptionManager
         );
