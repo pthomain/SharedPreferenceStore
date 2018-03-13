@@ -21,7 +21,6 @@
 
 package uk.co.glass_software.android.shared_preferences.utils;
 
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 public class StoreKey implements StoreEntry.UniqueKeyProvider,
@@ -52,10 +51,6 @@ public class StoreKey implements StoreEntry.UniqueKeyProvider,
     @Override
     public StoreMode getMode() {
         return mode;
-    }
-    
-    public final <C> StoreEntry<C> open(StoreEntryFactory factory) {
-        return getMode().open(this, factory);
     }
     
     @Override

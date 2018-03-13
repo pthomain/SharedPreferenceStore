@@ -22,45 +22,44 @@
 package uk.co.glass_software.android.shared_preferences.demo;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.widget.EditText;
+import android.widget.Switch;
 
 import com.google.gson.Gson;
 
 import java.util.Date;
 import java.util.Map;
 
-import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
+import io.reactivex.Observable;
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter;
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate;
 import uk.co.glass_software.android.shared_preferences.demo.model.Person;
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
-
-import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_ENCRYPTED_PREFERENCE_NAME;
+import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
 
 
 class MainPresenter {
     
-    private final SharedPreferences encryptedPreferences;
-    private final KeyValueStore plainTextStore;
-    private final KeyValueStore encryptedStore;
     private final StoreEntryFactory storeEntryFactory;
     private final Counter counter;
     private final LastOpenDate lastOpenDate;
     private final PersonEntry personEntry;
+    private final KeyValueStore plainTextStore;
+    private final KeyValueStore encryptedStore;
     
     MainPresenter(Context context) {
-        //used only to display encrypted values as stored on disk, should not be used directly in practice
-        encryptedPreferences = StoreModule.openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME);
-        
         storeEntryFactory = StoreEntryFactory.builder(context)
                                              .logger(new SimpleLogger())
                                              .customSerialiser(new GsonSerialiser(new Gson()))
                                              .build();
-       
-        plainTextStore = storeEntryFactory.getStore();
+        
+        plainTextStore = storeEntryFactory.getPlainTextStore();
         encryptedStore = storeEntryFactory.getEncryptedStore();
         
         counter = new Counter(plainTextStore);
@@ -90,10 +89,6 @@ class MainPresenter {
         createOrUpdatePerson();
     }
     
-    StoreEntryFactory storeEntryFactory() {
-        return storeEntryFactory;
-    }
-    
     Counter counter() {
         return counter;
     }
@@ -102,19 +97,64 @@ class MainPresenter {
         return lastOpenDate;
     }
     
-    KeyValueStore store() {
-        return plainTextStore;
-    }
-    
-    KeyValueStore encryptedStore() {
-        return encryptedStore;
-    }
-    
-    SharedPreferences encryptedPreferences() {
-        return encryptedPreferences;
-    }
-    
     public String getKey(Map.Entry<String, ?> entry) {
         return entry.getKey();
+    }
+    
+    @NonNull
+    KeyValueEntry<String> getStoreEntry(EditText editText,
+                                        Switch encryptedSwitch) {
+        String key = editText.getText().toString();
+        
+        if (key.isEmpty()) {
+            return new VoidEntry();
+        }
+        
+        return storeEntryFactory
+                .open(key,
+                      encryptedSwitch.isChecked() ? StoreMode.ENCRYPTED : StoreMode.PLAIN_TEXT,
+                      String.class
+                );
+    }
+    
+    public StoreEntryFactory getStoreEntryFactory() {
+        return storeEntryFactory;
+    }
+    
+    public Observable<String> observeChanges() {
+        return plainTextStore.observeChanges().mergeWith(encryptedStore.observeChanges());
+    }
+    
+    private class VoidEntry implements KeyValueEntry<String> {
+        @Override
+        public void save(@Nullable String value) {
+        }
+        
+        @Nullable
+        @Override
+        public String get() {
+            return null;
+        }
+        
+        @Nullable
+        @Override
+        public String get(@Nullable String defaultValue) {
+            return defaultValue;
+        }
+        
+        @Override
+        public void drop() {
+        }
+        
+        @NonNull
+        @Override
+        public String getKey() {
+            return "";
+        }
+        
+        @Override
+        public boolean exists() {
+            return false;
+        }
     }
 }

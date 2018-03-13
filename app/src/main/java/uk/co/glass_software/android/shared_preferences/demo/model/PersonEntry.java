@@ -29,7 +29,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 public class PersonEntry extends StoreEntry<Person> {
     
     public PersonEntry(@NonNull KeyValueStore store) {
-        super(store, Keys.PERSON);
+        super(store, Keys.PERSON.key);
     }
     
 }

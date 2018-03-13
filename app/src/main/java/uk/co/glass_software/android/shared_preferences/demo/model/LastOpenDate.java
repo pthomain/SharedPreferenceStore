@@ -31,7 +31,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 public class LastOpenDate extends StoreEntry<Date> {
 
     public LastOpenDate(@NonNull KeyValueStore store) {
-        super(store, Keys.LAST_OPEN_DATE);
+        super(store, Keys.LAST_OPEN_DATE.key);
     }
 
 }

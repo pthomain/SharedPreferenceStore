@@ -24,20 +24,18 @@ package uk.co.glass_software.android.shared_preferences.demo;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 
 public class MainActivity extends AppCompatActivity {
     static {
@@ -56,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     
     @BindView(R.id.encrypted_switch)
     Switch encryptedSwitch;
+    
     @BindView(R.id.result)
     ExpandableListView listView;
     
@@ -83,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         listAdapter.showEntries();
-        subscription = presenter.store().observeChanges()
-                                .mergeWith(presenter.encryptedStore().observeChanges())
+        subscription = presenter.observeChanges()
                                 .subscribe(ignore -> listAdapter.showEntries());
     }
     
@@ -97,44 +95,17 @@ public class MainActivity extends AppCompatActivity {
         presenter.onPause();
     }
     
-    @Nullable
-    private StoreEntry<String> getStoreEntry() {
-        String key = keyEditText.getText().toString();
-        
-        if (key.isEmpty()) {
-            return null;
-        }
-        
-        return encryptedSwitch.isChecked()
-               ? presenter.storeEntryFactory().openEncrypted(key, String.class)
-               : presenter.storeEntryFactory().open(key, String.class);
-    }
-    
-    @OnClick(R.id.button_get)
-    void onGetClicked() {
-        StoreEntry<String> storeEntry = getStoreEntry();
-        
-        if (storeEntry != null) {
-            String message = storeEntry.get("Entry doesn't exist");
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        }
-    }
-    
     @OnClick(R.id.button_save)
     void onSaveClicked() {
-        StoreEntry<String> storeEntry = getStoreEntry();
+        KeyValueEntry<String> storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch);
         String value = valueEditText.getText().toString();
-        if (storeEntry != null) {
-            storeEntry.save(value.isEmpty() ? null : value);
-        }
+        storeEntry.save(value.isEmpty() ? null : value);
     }
     
     @OnClick(R.id.button_delete)
     void onDeleteClicked() {
-        StoreEntry<String> storeEntry = getStoreEntry();
-        if (storeEntry != null) {
-            storeEntry.drop();
-        }
+        KeyValueEntry<String> storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch);
+        storeEntry.drop();
     }
     
     @OnClick(R.id.github)

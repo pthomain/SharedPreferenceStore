@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 public class StoreEntryUnitTest {
     
-    private StoreEntry<String> target;
+    private KeyValueEntry<String> target;
     private KeyValueStore mockStore;
     private StoreKey storeKey = StoreKey.TEST;
     

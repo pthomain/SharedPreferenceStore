@@ -26,9 +26,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import uk.co.glass_software.android.shared_preferences.utils.StoreKey;
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
 
 public class StoreEntryFactory {
     
@@ -36,7 +39,7 @@ public class StoreEntryFactory {
     public final static String DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store";
     
     @NonNull
-    private final KeyValueStore store;
+    private final KeyValueStore plainTextStore;
     
     @NonNull
     private final KeyValueStore encryptedStore;
@@ -56,7 +59,7 @@ public class StoreEntryFactory {
                       @NonNull KeyValueStore lenientStore,
                       @NonNull KeyValueStore forgetfulStore,
                       @Nullable EncryptionManager encryptionManager) {
-        this.store = store;
+        this.plainTextStore = store;
         this.encryptedStore = encryptedStore;
         this.lenientStore = lenientStore;
         this.forgetfulStore = forgetfulStore;
@@ -65,86 +68,78 @@ public class StoreEntryFactory {
         logger.d(this, "Encryption supported: " + (this.encryptionManager != null && this.encryptionManager.isEncryptionSupported() ? "TRUE" : "FALSE"));
     }
     
+    public static StoreEntryFactory buildDefault(Context context) {
+        return builder(context).build();
+    }
+    
     public static StoreEntryFactoryBuilder builder(Context context) {
         return new StoreEntryFactoryBuilder(context.getApplicationContext());
     }
     
     @NonNull
-    public <C> StoreEntry<C> open(String key,
-                                  Class<C> valueClass) {
-        return open(() -> key, () -> valueClass);
+    public <C> KeyValueEntry<C> open(StoreKey key) {
+        return open(
+                key.getUniqueKey(),
+                key.getMode(),
+                key.getValueClass()
+        );
     }
     
     @NonNull
-    public <C> StoreEntry<C> openEncrypted(String key,
-                                           Class<C> valueClass) {
-        return openEncrypted(() -> key, () -> valueClass);
+    public <C> KeyValueEntry<C> open(String key,
+                                     StoreMode mode,
+                                     Class<C> valueClass) {
+        KeyValueStore store;
+        
+        switch (mode) {
+            case PLAIN_TEXT:
+                store = plainTextStore;
+                break;
+            
+            case ENCRYPTED:
+                store = encryptedStore;
+                break;
+            
+            case LENIENT:
+                store = lenientStore;
+                break;
+            
+            case FORGETFUL:
+                store = forgetfulStore;
+                break;
+            
+            default:
+                throw new IllegalArgumentException("Unknown mode: " + mode);
+        }
+        
+        return open(store, () -> key, () -> valueClass);
     }
     
     @NonNull
-    public <C> StoreEntry<C> openLenient(String key,
-                                         Class<C> valueClass) {
-        return openLenient(() -> key, () -> valueClass);
-    }
-    
-    @NonNull
-    public <C> StoreEntry<C> openForgetful(String key,
-                                           Class<C> valueClass) {
-        return openForgetful(() -> key, () -> valueClass);
-    }
-    
-    @NonNull
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> open(K key) {
-        return open(key, key);
-    }
-    
-    @NonNull
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openEncrypted(K key) {
-        return openEncrypted(key, key);
-    }
-    
-    @NonNull
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openLenient(K key) {
-        return openEncrypted(key, key);
-    }
-    
-    @NonNull
-    public <C, K extends StoreEntry.UniqueKeyProvider & StoreEntry.ValueClassProvider> StoreEntry<C> openForgetful(K key) {
-        return openForgetful(key, key);
-    }
-    
-    @NonNull
-    private <C> StoreEntry<C> open(StoreEntry.UniqueKeyProvider keyProvider,
-                                   StoreEntry.ValueClassProvider valueClassProvider) {
+    private <C> KeyValueEntry<C> open(KeyValueStore store,
+                                      StoreEntry.UniqueKeyProvider keyProvider,
+                                      StoreEntry.ValueClassProvider valueClassProvider) {
         return new StoreEntry<>(store, keyProvider, valueClassProvider);
     }
     
     @NonNull
-    private <C> StoreEntry<C> openEncrypted(StoreEntry.UniqueKeyProvider keyProvider,
-                                            StoreEntry.ValueClassProvider valueClassProvider) {
-        return new StoreEntry<>(encryptedStore, keyProvider, valueClassProvider);
-    }
-    
-    @NonNull
-    private <C> StoreEntry<C> openLenient(StoreEntry.UniqueKeyProvider keyProvider,
-                                          StoreEntry.ValueClassProvider valueClassProvider) {
-        return new StoreEntry<>(lenientStore, keyProvider, valueClassProvider);
-    }
-    
-    @NonNull
-    private <C> StoreEntry<C> openForgetful(StoreEntry.UniqueKeyProvider keyProvider,
-                                            StoreEntry.ValueClassProvider valueClassProvider) {
-        return new StoreEntry<>(forgetfulStore, keyProvider, valueClassProvider);
-    }
-    
-    @NonNull
-    public KeyValueStore getStore() {
-        return store;
+    public KeyValueStore getPlainTextStore() {
+        return plainTextStore;
     }
     
     @NonNull
     public KeyValueStore getEncryptedStore() {
         return encryptedStore;
+    }
+    
+    @NonNull
+    public KeyValueStore getLenientStore() {
+        return lenientStore;
+    }
+    
+    @NonNull
+    public KeyValueStore getForgetfulStore() {
+        return forgetfulStore;
     }
     
     @Nullable
