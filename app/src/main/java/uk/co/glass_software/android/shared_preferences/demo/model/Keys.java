@@ -23,28 +23,20 @@ package uk.co.glass_software.android.shared_preferences.demo.model;
 
 import java.util.Date;
 
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.utils.StoreKey;
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
 
-public enum Keys implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider {
-
-    COUNTER(Integer.class),
-    LAST_OPEN_DATE(Date.class),
-    PERSON(Person.class);
-
-    private final String prefix = getClass().getSimpleName();
-    private final Class<?> valueClass;
-
-    Keys(Class valueClass) {
-        this.valueClass = valueClass;
+public enum Keys {
+    
+    COUNTER(StoreMode.PLAIN_TEXT, Integer.class),
+    LAST_OPEN_DATE(StoreMode.ENCRYPTED, Date.class),
+    PERSON(StoreMode.ENCRYPTED, Person.class);
+    
+    public final StoreKey key;
+    
+    Keys(StoreMode mode,
+         Class valueClass) {
+        key = new StoreKey(this, mode, valueClass);
     }
-
-    @Override
-    public String getUniqueKey() {
-        return prefix + "." + this;
-    }
-
-    @Override
-    public Class getValueClass() {
-        return valueClass;
-    }
+    
 }

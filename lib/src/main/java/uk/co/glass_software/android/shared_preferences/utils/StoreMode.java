@@ -21,33 +21,11 @@
 
 package uk.co.glass_software.android.shared_preferences.utils;
 
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
 public enum StoreMode {
     PLAIN_TEXT,
     ENCRYPTED,
     LENIENT,  //will try to encrypt but falls back to plain-text if encryption isn't supported, see LenientEncryptedStore
     FORGETFUL;//will try to encrypt but won't save anything if encryption isn't supported, see ForgetfulEncryptedStore
-    
-    public final <C> StoreEntry<C> open(StoreKey key,
-                                        StoreEntryFactory factory) {
-        switch (this) {
-            case PLAIN_TEXT:
-                return factory.open(key);
-            
-            case ENCRYPTED:
-                return factory.openEncrypted(key);
-            
-            case LENIENT:
-                return factory.openLenient(key);
-            
-            case FORGETFUL:
-                return factory.openForgetful(key);
-        }
-        
-        throw new IllegalStateException("Unexpected mode: " + this);
-    }
     
     public interface Provider {
         StoreMode getMode();

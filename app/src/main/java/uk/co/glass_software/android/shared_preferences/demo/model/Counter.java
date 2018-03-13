@@ -27,7 +27,9 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValue
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
 
 public class Counter extends StoreEntry<Integer> {
+ 
     public Counter(@NonNull KeyValueStore store) {
-        super(store, Keys.COUNTER);
+        super(store, Keys.COUNTER.key);
     }
+    
 }

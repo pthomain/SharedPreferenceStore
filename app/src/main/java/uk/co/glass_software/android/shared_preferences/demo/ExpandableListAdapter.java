@@ -22,7 +22,10 @@
 package uk.co.glass_software.android.shared_preferences.demo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +41,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore;
+import ix.Ix;
+import uk.co.glass_software.android.shared_preferences.demo.model.Keys;
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule;
+import uk.co.glass_software.android.shared_preferences.utils.StoreKey;
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
+
+import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_ENCRYPTED_PREFERENCE_NAME;
+import static uk.co.glass_software.android.shared_preferences.StoreEntryFactory.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME;
 
 class ExpandableListAdapter extends BaseExpandableListAdapter {
     
@@ -48,6 +57,8 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     private final LayoutInflater inflater;
     private final MainPresenter presenter;
     private final SimpleDateFormat simpleDateFormat;
+    private final SharedPreferences plainTextPreferences;
+    private final SharedPreferences encryptedPreferences;
     
     ExpandableListAdapter(Context context,
                           MainPresenter presenter) {
@@ -56,6 +67,10 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         children = new LinkedHashMap<>();
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+        
+        //used only to display values as stored on disk, should not be used directly in practice
+        plainTextPreferences = StoreModule.openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME);
+        encryptedPreferences = StoreModule.openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME);
     }
     
     void showEntries() {
@@ -70,28 +85,37 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
                    "Last open date: " + (formattedDate == null ? "N/A" : formattedDate)
         );
         
-        addEntries("Plain text entries",
-                   ((SharedPreferenceStore) presenter.store()).getCachedValues()
-        );
+        addEntries("Plain text entries", plainTextPreferences.getAll());
         
         addEntries("Encrypted entries (as returned by the store)",
-                   ((SharedPreferenceStore) presenter.encryptedStore()).getCachedValues()
+                   Ix.from(encryptedPreferences.getAll().keySet())
+                     .map(key -> Pair.create(key, presenter.getStoreEntryFactory().open(key, StoreMode.ENCRYPTED, getValueClass(key))))
+                     .toMap(pair -> pair.first, pair -> pair.second.get("[error]").toString())
         );
         
-        addEntries("Encrypted entries (as stored on disk)",
-                   presenter.encryptedPreferences().getAll()
-        );
+        addEntries("Encrypted entries (as stored on disk)", encryptedPreferences.getAll());
         
         notifyDataSetChanged();
     }
     
+    @NonNull
+    @SuppressWarnings("unchecked")
+    private <C> Class<C> getValueClass(String key) {
+        return Ix.from(Arrays.asList(Keys.values()))
+                 .map(keys -> keys.key)
+                 .filter(storeKey -> key.equals(storeKey.getUniqueKey()))
+                 .map(StoreKey::getValueClass)
+                 .defaultIfEmpty(String.class)
+                 .first();
+    }
+    
     private void addEntries(String header,
                             Map<String, ?> entries) {
-        Observable.fromIterable(entries.entrySet())
-                  .map(entry -> presenter.getKey(entry) + " => " + entry.getValue())
-                  .toList()
-                  .map(list -> list.toArray(new String[list.size()]))
-                  .subscribe(list -> addEntries(header, list));
+        List<String> list = Ix.from(entries.entrySet())
+                              .map(entry -> presenter.getKey(entry) + " => " + entry.getValue())
+                              .toList();
+        
+        addEntries(header, list.toArray(new String[list.size()]));
     }
     
     private void addEntries(String header,
@@ -99,12 +123,9 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
         List<String> info = new ArrayList<>();
         headers.add(header);
         
-        Observable.just(subSections)
-                  .map(Arrays::asList)
-                  .flatMap(Observable::fromIterable)
-                  .map(string -> string.replaceAll("\\n", ""))
-                  .toList()
-                  .subscribe(list -> info.addAll(list));
+        Ix.from(Arrays.asList(subSections))
+          .map(string -> string.replaceAll("\\n", ""))
+          .subscribe(info::add);
         
         children.put(header, info);
     }
