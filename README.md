@@ -96,7 +96,7 @@ Values returned by ``StoreEntryFactory`` are cached in memory to improve perform
 
 All the values handled by ``SharedPreferences`` are supported by default along with objects implementing the ``Serializable`` interface which are serialised to Base64 using the default Java mechanism.
 
-The builder takes an optional ``CustomSerialiser`` object to handle serialisation of custom types. For instance, one can provide a custom serialiser using ``Gson`` to serialise to JSON. See ``GsonSerialiser`` in the app module for an example implementation. The provided custom serialiser takes precedence over the default provided serialisation mechanism.
+The builder takes an optional ``CustomSerialiser`` object to handle serialisation of custom types. For instance, one can provide a custom serialiser using ``Gson`` to serialise to JSON. See ``GsonSerialiser`` in the app module for an example implementation. The provided custom serialiser takes precedence over the default serialisation mechanism.
 
 Value udpates are logged in the console in debug mode by default, the output is disabled in production (checking ``BuildConfig.DEBUG``).
 
