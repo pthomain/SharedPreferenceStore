@@ -64,17 +64,17 @@ To add the library to your project, add the following block to your root gradle 
 
 ```
 allprojects {
- repositories {
-    jcenter()
-    maven { url "https://jitpack.io" }
- }
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
+    }
 }
  ```
  
  Then add the following dependency to your module:
  
  ```
- dependencies {
+dependencies {
     compile 'com.github.pthomain:SharedPreferenceStore:1.0.9'
 }
 ```
@@ -208,11 +208,11 @@ Using this library with existing SharedPreferences
 This library can be used on top of an existing implementation of `SharedPreferences`, simply provide your existing `SharedPreferences` file to the builder as such:
 
 ```java
-    StoreEntryFactory factory = StoreEntryFactory.builder(context)
-                                                 .plainTextPreferences(yourExistingPreferenceFile)
-                                                 .build();
-                                                 
-    KeyValueEntry<Integer> oldEntry = factory.open("old_entry_key", StoreMode.PLAIN_TEXT, Integer.class);                                             
+StoreEntryFactory factory = StoreEntryFactory.builder(context)
+                                             .plainTextPreferences(yourExistingPreferenceFile)
+                                             .build();
+
+KeyValueEntry<Integer> oldEntry = factory.open("old_entry_key", StoreMode.PLAIN_TEXT, Integer.class);                                             
 ```
 
 If you prefer using `StoreKey`:
@@ -251,7 +251,7 @@ public class OldStoreKey extends StoreKey {
 Then:
 
 ```java
-    KeyValueEntry<Integer> oldEntry = factory.open(OLD_ENTRY.key);
+KeyValueEntry<Integer> oldEntry = factory.open(OLD_ENTRY.key);
 ```
 
 Using this library with a different persistence model
