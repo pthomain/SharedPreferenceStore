@@ -148,7 +148,7 @@ Rather than injecting a `KeyValueEntry` as:
 
 ```java
 @Inject 
-@Name("addressEntry") 
+@Named("addressEntry") 
 KeyValueEntry<Address> addressEntry
 ```
 you might want to create an `AddressEntry` object extending from `StoreEntry` and thus inject it as
