@@ -45,7 +45,9 @@ If you don't use dependency injection:
 
 ```java
 KeyValueEntry<Address> address = StoreEntryFactory.buildDefault(context)
-                                                  .open("address_key", Address.class, StoreMode.PLAIN_TEXT);
+                                                  .open("address_key", 
+                                                        Address.class, 
+                                                        StoreMode.PLAIN_TEXT);
 ```
 
 Injecting `KeyValueEntry<T>` dependencies this way is faster but means that you will have to use the `@Named` annotation to differentiate them. A better solution is to use a specific type for your entry. See the [Unique entry types](#unique-entry-types) section for how to do this.
