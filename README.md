@@ -3,30 +3,6 @@ SharedPreferenceStore
 
 DAO object mapping of the Android SharedPreferences with support for encryption when available on device (API level 16+).
 
-<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="250"/></a>
-
-Adding the dependency [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
----------------------
-
-To add the library to your project, add the following block to your root gradle file:
-
-```
-allprojects {
- repositories {
-    jcenter()
-    maven { url "https://jitpack.io" }
- }
-}
- ```
- 
- Then add the following dependency to your module:
- 
- ```
- dependencies {
-    compile 'com.github.pthomain:SharedPreferenceStore:1.0.9'
-}
-```
-
 TL;DR
 -----
 
@@ -78,6 +54,32 @@ Encryption is available using Facebook's Conceal API (https://github.com/faceboo
 **Make sure to call ``StoreEntryFactory.isEncryptionSupported()`` first to check otherwise a runtime exception will be thrown.** 
 
 See [Supported modes](#supported-modes) for storage options. 
+
+Adding the dependency [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
+---------------------
+
+To add the library to your project, add the following block to your root gradle file:
+
+```
+allprojects {
+ repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+ }
+}
+ ```
+ 
+ Then add the following dependency to your module:
+ 
+ ```
+ dependencies {
+    compile 'com.github.pthomain:SharedPreferenceStore:1.0.9'
+}
+```
+
+To see the library in action, download the app.
+
+<a href="https://play.google.com/store/apps/details?id=uk.co.glass_software.android.shared_preferences.demo"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="200"/></a>
 
 Overview
 --------
