@@ -19,10 +19,18 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.utils;
+package uk.co.glass_software.android.shared_preferences.utils
 
-public interface Function<T, R> {
-    
-    R get(T t);
-    
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
+
+data class StoreKey(private val parent: Enum<*>,
+                    override val mode: StoreMode,
+                    override val valueClass: Class<*>)
+    : StoreEntry.UniqueKeyProvider,
+        StoreEntry.ValueClassProvider,
+        StoreMode.Provider {
+
+    override val uniqueKey = parent.javaClass.simpleName + "." + parent.name
+
 }
+

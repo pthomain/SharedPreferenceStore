@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         subscription = presenter.observeChanges()
                                 .subscribe(ignore -> listAdapter.showEntries());
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();

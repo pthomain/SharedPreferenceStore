@@ -20,7 +20,7 @@
  */
 
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android'
 
 buildscript {
     repositories {
@@ -28,21 +28,15 @@ buildscript {
     }
 }
 
-retrolambda {
-    jvmArgs '-noverify'
-    defaultMethods true
-    incremental false
-}
-
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "uk.co.glass_software.android.shared_preferences.demo"
 
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
         versionName "1.2"
 
@@ -51,6 +45,12 @@ android {
 
         aaptOptions {
             additionalParameters "--no-version-vectors"
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
         }
     }
 
@@ -65,18 +65,38 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/eclipse.inf'
+        exclude 'about_files/LICENSE-2.0.txt'
+        exclude 'plugin.xml'
+        exclude 'plugin.properties'
+    }
 }
 
 dependencies {
-    compile project(":lib")
+    implementation project(":lib")
 
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.google.code.gson:gson:2.8.1'
-    compile 'com.github.akarnokd:ixjava:1.0.0'
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
+    implementation "com.github.akarnokd:ixjava:$ixJavaVersion"
 
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support:customtabs:$supportLibVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.android.support:customtabs:$supportLibVersion"
 
-    compile "com.jakewharton:butterknife:8.5.1"
-    annotationProcessor "com.jakewharton:butterknife-compiler:8.5.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+    implementation "com.jakewharton:butterknife:$butterknifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 }

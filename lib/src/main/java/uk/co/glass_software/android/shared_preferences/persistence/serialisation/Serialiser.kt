@@ -19,22 +19,26 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.utils;
+package uk.co.glass_software.android.shared_preferences.persistence.serialisation
 
-public interface Logger {
-    void e(Object caller,
-           Throwable t,
-           String message);
-    
-    void e(Object caller,
-           String message);
-    
-    void d(Object caller,
-           String message);
-    
-    final class LogException extends Exception {
-        LogException(String detailMessage) {
-            super(detailMessage);
+interface Serialiser {
+
+    fun canHandleType(targetClass: Class<*>): Boolean
+
+    fun canHandleSerialisedFormat(serialised: String): Boolean
+
+    @Throws(Serialiser.SerialisationException::class)
+    fun <O : Any> serialise(deserialised: O): String
+
+    @Throws(Serialiser.SerialisationException::class)
+    fun <O> deserialise(serialised: String,
+                        targetClass: Class<O>): O
+
+    class SerialisationException : Exception {
+        internal constructor(message: String) : super(message)
+
+        internal constructor(cause: Throwable) {
+            initCause(cause)
         }
     }
 }

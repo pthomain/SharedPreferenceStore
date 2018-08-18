@@ -22,16 +22,23 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext.kotlinVersion = '1.2.60'
+
     repositories {
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        google()
     }
 
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.android.tools.build:gradle:3.3.0-alpha06'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 
@@ -39,13 +46,12 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
-        maven { url 'https://maven.google.com' }
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 task clean(type: Delete) {
@@ -53,16 +59,26 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 26
-    buildToolsVersion = '26.0.0'
+    compileSdkVersion = 28
     minSdkVersion = 16
-    targetSdkVersion = 26
+    targetSdkVersion = 28
+    buildToolsVersion = '28.0.0'
 
-    daggerVersion = '2.9'
+    daggerVersion = '2.17'
     jsr250Version = '1.0'
-    rxJavaVersion = '2.0.6'
-    rxAndroidVersion = '2.0.1'
+
+    boilerplateVersion = '0.1'
+
+    rxJavaVersion = '2.2.0'
+    rxKotlinVersion = '2.3.0'
+    rxAndroidVersion = '2.1.0'
+
+    ixJavaVersion = '1.0.0'
+    gsonVersion = '2.8.5'
+    concealVersion = '2.0.2'
+    butterknifeVersion = '8.5.1'
+
     jUnitVersion = '4.12'
     mockitoVersion = '2.1.0'
-    supportLibVersion = '26.1.0'
+    supportLibVersion = '27.1.1'
 }

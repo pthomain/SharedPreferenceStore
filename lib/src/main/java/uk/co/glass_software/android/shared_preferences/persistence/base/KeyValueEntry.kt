@@ -19,18 +19,17 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager;
+package uk.co.glass_software.android.shared_preferences.persistence.base
 
-public interface EncryptionManager {
-    
-    String encrypt(String toEncrypt, String dataTag);
-    
-    byte[] encryptBytes(byte[] toEncrypt, String dataTag);
-    
-    String decrypt(String toDecrypt, String dataTag);
-    
-    byte[] decryptBytes(byte[] toDecrypt, String dataTag);
-    
-    boolean isEncryptionSupported();
-    
+interface KeyValueEntry<C> {
+
+    fun getKey(): String
+
+    fun save(value: C?)
+
+    fun get(defaultValue: C? = null): C?
+
+    fun drop()
+
+    fun exists(): Boolean
 }

@@ -19,25 +19,15 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.base;
+package uk.co.glass_software.android.shared_preferences.utils
 
-import android.support.annotation.NonNull;
+enum class StoreMode {
+    PLAIN_TEXT,
+    ENCRYPTED,
+    LENIENT,    //will try to encrypt but falls back to plain-text if encryption isn't supported, see LenientEncryptedStore
+    FORGETFUL;  //will try to encrypt but won't save anything if encryption isn't supported, see ForgetfulEncryptedStore
 
-import io.reactivex.Observable;
-
-public interface KeyValueStore {
-    
-    <V> V getValue(@NonNull String key,
-                   @NonNull Class<V> valueClass,
-                   V defaultValue);
-    
-    <V> void saveValue(@NonNull String key,
-                       V value);
-    
-    boolean hasValue(@NonNull String key);
-    
-    void deleteValue(@NonNull String key);
-    
-    Observable<String> observeChanges();
-    
+    interface Provider {
+        val mode: StoreMode
+    }
 }

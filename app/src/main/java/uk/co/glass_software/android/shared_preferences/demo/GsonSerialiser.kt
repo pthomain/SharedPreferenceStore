@@ -19,25 +19,25 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.base;
+package uk.co.glass_software.android.shared_preferences.demo
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import com.google.gson.Gson
 
-public interface KeyValueEntry<C> {
-    
-    void save(@Nullable C value);
-    
-    @Nullable
-    C get();
-    
-    @Nullable
-    C get(@Nullable C defaultValue);
-    
-    void drop();
-    
-    @NonNull
-    String getKey();
-    
-    boolean exists();
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+
+internal class GsonSerialiser(private val gson: Gson) : Serialiser {
+
+    override fun canHandleType(targetClass: Class<*>) = true
+
+    override fun canHandleSerialisedFormat(serialised: String) = true
+
+    @Throws(Serialiser.SerialisationException::class)
+    override fun <O> serialise(deserialised: O) =
+            gson.toJson(deserialised)
+
+    @Throws(Serialiser.SerialisationException::class)
+    override fun <O> deserialise(serialised: String,
+                                 targetClass: Class<O>) =
+            gson.fromJson(serialised, targetClass)
+
 }

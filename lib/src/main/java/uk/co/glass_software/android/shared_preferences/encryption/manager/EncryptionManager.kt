@@ -19,15 +19,22 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.utils;
+package uk.co.glass_software.android.shared_preferences.encryption.manager
 
-public enum StoreMode {
-    PLAIN_TEXT,
-    ENCRYPTED,
-    LENIENT,  //will try to encrypt but falls back to plain-text if encryption isn't supported, see LenientEncryptedStore
-    FORGETFUL;//will try to encrypt but won't save anything if encryption isn't supported, see ForgetfulEncryptedStore
-    
-    public interface Provider {
-        StoreMode getMode();
-    }
+interface EncryptionManager {
+
+    val isEncryptionSupported: Boolean
+
+    fun encrypt(toEncrypt: String?,
+                dataTag: String): String?
+
+    fun encryptBytes(toEncrypt: ByteArray?,
+                     dataTag: String): ByteArray?
+
+    fun decrypt(toDecrypt: String?,
+                dataTag: String): String?
+
+    fun decryptBytes(toDecrypt: ByteArray?,
+                     dataTag: String): ByteArray?
+
 }

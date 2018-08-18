@@ -40,7 +40,6 @@ import uk.co.glass_software.android.shared_preferences.demo.model.Person;
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.utils.SimpleLogger;
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
 
 
@@ -54,7 +53,7 @@ class MainPresenter {
     private final KeyValueStore encryptedStore;
     
     MainPresenter(Context context) {
-        storeEntryFactory = StoreEntryFactory.builder(context)
+        storeEntryFactory = StoreEntryFactory.Companion.builder(context)
                                              .logger(new SimpleLogger())
                                              .customSerialiser(new GsonSerialiser(new Gson()))
                                              .build();

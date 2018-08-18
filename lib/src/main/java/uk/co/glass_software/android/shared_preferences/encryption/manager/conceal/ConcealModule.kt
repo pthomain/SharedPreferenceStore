@@ -19,50 +19,50 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager.conceal;
+package uk.co.glass_software.android.shared_preferences.encryption.manager.conceal
 
-import android.content.Context;
+import android.content.Context
 
-import com.facebook.android.crypto.keychain.AndroidConceal;
-import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
-import com.facebook.crypto.CryptoConfig;
+import com.facebook.android.crypto.keychain.AndroidConceal
+import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain
+import com.facebook.crypto.CryptoConfig
 
-import javax.inject.Singleton;
+import javax.inject.Singleton
 
-import dagger.Module;
-import dagger.Provides;
-import uk.co.glass_software.android.shared_preferences.utils.Logger;
+import dagger.Module
+import dagger.Provides
+import uk.co.glass_software.android.boilerplate.log.Logger
 
 @Module
-public class ConcealModule {
-    
+internal class ConcealModule {
+
     @Provides
     @Singleton
-    SharedPrefsBackedKeyChain provideKeyChain(CryptoConfig cryptoConfig,
-                                              Context context) {
-        return new SharedPrefsBackedKeyChain(
+    fun provideKeyChain(cryptoConfig: CryptoConfig,
+                        context: Context): SharedPrefsBackedKeyChain {
+        return SharedPrefsBackedKeyChain(
                 context,
                 cryptoConfig
-        );
+        )
     }
-    
+
     @Provides
     @Singleton
-    CryptoConfig provideCryptoConfig() {
-        return CryptoConfig.KEY_256;
+    fun provideCryptoConfig(): CryptoConfig {
+        return CryptoConfig.KEY_256
     }
-    
+
     @Provides
     @Singleton
-    ConcealEncryptionManager provideConcealEncryptionManager(Logger logger,
-                                                             SharedPrefsBackedKeyChain keyChain,
-                                                             Context applicationContext) {
-        return new ConcealEncryptionManager(
+    fun provideConcealEncryptionManager(logger: Logger,
+                                        keyChain: SharedPrefsBackedKeyChain,
+                                        applicationContext: Context): ConcealEncryptionManager {
+        return ConcealEncryptionManager(
                 applicationContext,
                 logger,
                 keyChain,
                 AndroidConceal.get()
-        );
+        )
     }
-    
+
 }

@@ -19,28 +19,23 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.serialisation;
+package uk.co.glass_software.android.shared_preferences.persistence.base
 
-import android.support.annotation.NonNull;
+import io.reactivex.Observable
 
-public interface Serialiser {
-    
-    boolean canHandleType(@NonNull Class<?> targetClass);
-    
-    boolean canHandleSerialisedFormat(@NonNull String serialised);
-    
-    <O> String serialise(@NonNull O deserialised) throws SerialisationException;
-    
-    <O> O deserialise(@NonNull String serialised,
-                      @NonNull Class<O> targetClass) throws SerialisationException;
-    
-    class SerialisationException extends Exception {
-        SerialisationException(String message) {
-            super(message);
-        }
-        
-        SerialisationException(Throwable cause) {
-            initCause(cause);
-        }
-    }
+interface KeyValueStore {
+
+    fun <V> getValue(key: String,
+                     valueClass: Class<V>,
+                     defaultValue: V? = null): V?
+
+    fun <V> saveValue(key: String,
+                      value: V?)
+
+    fun hasValue(key: String): Boolean
+
+    fun deleteValue(key: String)
+
+    fun observeChanges(): Observable<String>
+
 }

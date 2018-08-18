@@ -20,25 +20,27 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.pthomain'
 
-retrolambda {
-    jvmArgs '-noverify'
-    defaultMethods true
-    incremental false
-}
-
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        consumerProguardFiles 'proguard-rules-lib.pro'
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -46,6 +48,26 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/eclipse.inf'
+        exclude 'META-INF/index.list'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'about_files/LICENSE-2.0.txt'
+        exclude 'plugin.xml'
+        exclude 'plugin.properties'
     }
 
     lintOptions {
@@ -59,6 +81,16 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    publishNonDefault true
 }
 
 task sourcesJar(type: Jar) {
@@ -71,17 +103,25 @@ artifacts {
 }
 
 dependencies {
-    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    implementation "com.google.dagger:dagger-android:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+
     testAnnotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
-    compile "com.google.dagger:dagger:$daggerVersion"
 
-    provided "javax.annotation:jsr250-api:$jsr250Version"
-    compile "com.android.support:support-annotations:$supportLibVersion"
+    compileOnly "javax.annotation:jsr250-api:$jsr250Version"
+    implementation "com.android.support:support-annotations:$supportLibVersion"
 
-    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    compile 'com.facebook.conceal:conceal:2.0.2'
+    api "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    api "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
+    api "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
 
-    testCompile "junit:junit:$jUnitVersion"
-    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    api "com.github.pthomain:boilerplate:$boilerplateVersion"
+
+    implementation "com.facebook.conceal:conceal:$concealVersion"
+
+    testImplementation "junit:junit:$jUnitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 }
