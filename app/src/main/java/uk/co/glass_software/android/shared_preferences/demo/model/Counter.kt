@@ -19,24 +19,9 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.demo.model
 
-import java.util.Date;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-import uk.co.glass_software.android.shared_preferences.utils.StoreKey;
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode;
-
-public enum Keys {
-    
-    COUNTER(StoreMode.PLAIN_TEXT, Integer.class),
-    LAST_OPEN_DATE(StoreMode.ENCRYPTED, Date.class),
-    PERSON(StoreMode.ENCRYPTED, Person.class);
-    
-    public final StoreKey key;
-    
-    Keys(StoreMode mode,
-         Class valueClass) {
-        key = new StoreKey(this, mode, valueClass);
-    }
-    
-}
+class Counter(store: KeyValueStore) : StoreEntry<Int>(store, Keys.COUNTER.key)

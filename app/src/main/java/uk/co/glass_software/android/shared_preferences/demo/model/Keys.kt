@@ -19,17 +19,20 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.demo.model
 
-import android.support.annotation.NonNull;
+import java.util.Date
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.utils.StoreKey
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 
-public class Counter extends StoreEntry<Integer> {
- 
-    public Counter(@NonNull KeyValueStore store) {
-        super(store, Keys.COUNTER.key);
-    }
-    
+enum class Keys constructor(mode: StoreMode,
+                            valueClass: Class<*>) {
+
+    COUNTER(StoreMode.PLAIN_TEXT, Int::class.java),
+    LAST_OPEN_DATE(StoreMode.ENCRYPTED, Date::class.java),
+    PERSON(StoreMode.ENCRYPTED, Person::class.java);
+
+    val key = StoreKey(this, mode, valueClass)
+
 }

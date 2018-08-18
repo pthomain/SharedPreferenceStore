@@ -19,25 +19,11 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo
+package uk.co.glass_software.android.shared_preferences.demo.model
 
-import com.google.gson.Gson
+import java.util.Date
 
-import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-internal class GsonSerialiser(private val gson: Gson) : Serialiser {
-
-    override fun canHandleType(targetClass: Class<*>) = true
-
-    override fun canHandleSerialisedFormat(serialised: String) = true
-
-    @Throws(Serialiser.SerialisationException::class)
-    override fun <O : Any> serialise(deserialised: O) =
-            gson.toJson(deserialised)
-
-    @Throws(Serialiser.SerialisationException::class)
-    override fun <O> deserialise(serialised: String,
-                                 targetClass: Class<O>) =
-            gson.fromJson(serialised, targetClass)
-
-}
+class LastOpenDate(store: KeyValueStore) : StoreEntry<Date>(store, Keys.LAST_OPEN_DATE.key)

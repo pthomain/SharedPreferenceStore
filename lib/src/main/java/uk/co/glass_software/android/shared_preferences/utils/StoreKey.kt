@@ -26,8 +26,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 data class StoreKey(private val parent: Enum<*>,
                     override val mode: StoreMode,
                     override val valueClass: Class<*>)
-    : StoreEntry.UniqueKeyProvider,
-        StoreEntry.ValueClassProvider,
+    : StoreEntry.KeyClassProvider,
         StoreMode.Provider {
 
     override val uniqueKey = parent.javaClass.simpleName + "." + parent.name

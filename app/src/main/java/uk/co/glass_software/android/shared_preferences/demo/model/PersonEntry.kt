@@ -19,19 +19,9 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.demo.model
 
-import android.support.annotation.NonNull;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-import java.util.Date;
-
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
-public class LastOpenDate extends StoreEntry<Date> {
-
-    public LastOpenDate(@NonNull KeyValueStore store) {
-        super(store, Keys.LAST_OPEN_DATE.key);
-    }
-
-}
+class PersonEntry(store: KeyValueStore) : StoreEntry<Person>(store, Keys.PERSON.key)

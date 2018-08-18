@@ -19,17 +19,11 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.demo.model;
+package uk.co.glass_software.android.shared_preferences.demo.model
 
-import android.support.annotation.NonNull;
+import java.util.Date
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
-
-public class PersonEntry extends StoreEntry<Person> {
-    
-    public PersonEntry(@NonNull KeyValueStore store) {
-        super(store, Keys.PERSON.key);
-    }
-    
-}
+data class Person(val age: Int = 0,
+                  val firstName: String? = null,
+                  val name: String? = null,
+                  val lastSeenDate: Date? = null)
