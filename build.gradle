@@ -76,7 +76,6 @@ ext {
     ixJavaVersion = '1.0.0'
     gsonVersion = '2.8.5'
     concealVersion = '2.0.2'
-    butterknifeVersion = '8.5.1'
 
     jUnitVersion = '4.12'
     mockitoVersion = '2.1.0'

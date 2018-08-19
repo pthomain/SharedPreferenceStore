@@ -25,12 +25,6 @@ import android.content.SharedPreferences
 import io.reactivex.subjects.Subject
 import uk.co.glass_software.android.boilerplate.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBooleanClass
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isFloatClass
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isHandled
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isIntClass
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isLongClass
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isStringClass
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 @Suppress("UNCHECKED_CAST")
@@ -53,47 +47,38 @@ internal class EncryptedSharedPreferenceStore(sharedPreferences: SharedPreferenc
     @Synchronized
     override fun saveValueInternal(key: String,
                                    value: Any?) {
-        if (value != null && isHandled(value.javaClass))
-            super.saveValueInternal(key, encrypt(value.toString(), key))
-        else
-            super.saveValueInternal(key, value)
+        super.saveValueInternal(
+                key,
+                value?.let { serialise(key, it) }
+        )
     }
 
     @Synchronized
     override fun <O> getValueInternal(key: String,
                                       objectClass: Class<O>,
                                       defaultValue: O?) =
-            if (isHandled(objectClass)) {
-                super.getValueInternal(
-                        key,
-                        String::class.java,
-                        null
-                )
-                        ?.let { decrypt(it, key) }
-                        ?.let {
-                            when {
-                                isBooleanClass(objectClass) -> it.toBoolean()
-                                isFloatClass(objectClass) -> it.toFloat()
-                                isLongClass(objectClass) -> it.toLong()
-                                isIntClass(objectClass) -> it.toInt()
-                                isStringClass(objectClass) -> it
-                                else -> null
-                            } as O?
-                        }
-            } else {
-                super.getValueInternal(key, objectClass, defaultValue)
-            }
+            super.getValueInternal(
+                    key,
+                    String::class.java,
+                    null
+            )?.let { deserialise(key, it, objectClass) }
 
     override fun serialise(key: String,
                            value: Any) =
-            super.serialise(key, value)
-                    ?.let { encrypt(it, key) }
+            encrypt(
+                    super.serialise(key, value),
+                    key
+            )
 
     @Throws(Serialiser.SerialisationException::class)
     override fun <O> deserialise(key: String,
                                  serialised: String?,
                                  objectClass: Class<O>) =
-            serialised?.let { super.deserialise(key, decrypt(it, key), objectClass) }
+            super.deserialise(
+                    key,
+                    decrypt(serialised, key),
+                    objectClass
+            )
 
     private fun encrypt(clearText: String?,
                         key: String) =
@@ -104,6 +89,7 @@ internal class EncryptedSharedPreferenceStore(sharedPreferences: SharedPreferenc
             checkEncryptionAvailable().decrypt(encrypted, key)
 
     private fun checkEncryptionAvailable() =
-            encryptionManager ?: throw IllegalStateException("Encryption is not supported on this device")
+            encryptionManager
+                    ?: throw IllegalStateException("Encryption is not supported on this device")
 
 }

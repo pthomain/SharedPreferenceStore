@@ -27,15 +27,11 @@ import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.app.AppCompatDelegate
+import android.view.View
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.Switch
-
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import io.reactivex.disposables.Disposable
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,31 +39,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var presenter: MainPresenter
     private var subscription: Disposable? = null
 
-    @BindView(R.id.input_key)
-    internal var keyEditText: EditText? = null
-
-    @BindView(R.id.input_value)
-    internal var valueEditText: EditText? = null
-
-    @BindView(R.id.encrypted_switch)
-    internal var encryptedSwitch: Switch? = null
-
-    @BindView(R.id.result)
-    internal var listView: ExpandableListView? = null
+    private val keyEditText by lazy { findViewById<EditText>(R.id.input_key) }
+    private val valueEditText by lazy { findViewById<EditText>(R.id.input_value) }
+    private val encryptedSwitch by lazy { findViewById<Switch>(R.id.encrypted_switch) }
+    private val listView by lazy { findViewById<ExpandableListView>(R.id.result) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        ButterKnife.bind(this)
+
+        findViewById<View>(R.id.button_save).setOnClickListener { onSaveClicked() }
+        findViewById<View>(R.id.button_delete).setOnClickListener { onDeleteClicked() }
+        findViewById<View>(R.id.github).setOnClickListener { openGithub() }
 
         presenter = MainPresenter(this)
         listAdapter = ExpandableListAdapter(this, presenter)
-        listView?.setAdapter(listAdapter)
+        listView.setAdapter(listAdapter)
 
         listAdapter.registerDataSetObserver(object : DataSetObserver() {
             override fun onChanged() {
                 for (i in 0 until listAdapter.groupCount) {
-                    listView?.expandGroup(i)
+                    listView.expandGroup(i)
                 }
             }
         })
@@ -82,27 +74,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (subscription != null) {
-            subscription!!.dispose()
-        }
+        subscription?.dispose()
         presenter.onPause()
     }
 
-    @OnClick(R.id.button_save)
-    internal fun onSaveClicked() {
+    private fun onSaveClicked() {
         val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
-        val value = valueEditText!!.text.toString()
+        val value = valueEditText.text.toString()
         storeEntry.save(if (value.isEmpty()) null else value)
     }
 
-    @OnClick(R.id.button_delete)
-    internal fun onDeleteClicked() {
+    private fun onDeleteClicked() {
         val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
         storeEntry.drop()
     }
 
-    @OnClick(R.id.github)
-    internal fun openGithub() {
+    private fun openGithub() {
         val builder = CustomTabsIntent.Builder()
         val customTabsIntent = builder.build()
         customTabsIntent.launchUrl(this, Uri.parse("https://github.com/pthomain/SharedPreferenceStore"))

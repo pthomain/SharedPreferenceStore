@@ -27,8 +27,9 @@ public class StoreEntryTest {
     @Before
     public void setUp() throws Exception {
         mockStore = mock(KeyValueStore.class);
-        target = new StoreEntry<>(
+        target = new StoreEntry(
                 mockStore,
+                key,
                 key
         );
     }

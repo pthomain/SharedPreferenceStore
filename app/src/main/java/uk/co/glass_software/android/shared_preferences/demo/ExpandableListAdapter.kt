@@ -59,10 +59,10 @@ internal class ExpandableListAdapter(context: Context,
         children.clear()
 
         val lastOpenDate = presenter.lastOpenDate().get()
-        val formattedDate = if (lastOpenDate == null) null else simpleDateFormat.format(lastOpenDate)
+        val formattedDate = lastOpenDate?.let { simpleDateFormat.format(it) }
 
         addEntries("App opened",
-                "Count: " + presenter.counter()[1] + " time(s)",
+                "Count: " + presenter.counter().get(1) + " time(s)",
                 "Last open date: " + (formattedDate ?: "N/A")
         )
 
@@ -80,7 +80,7 @@ internal class ExpandableListAdapter(context: Context,
                                     )
                             )
                         }
-                        .toMap<String, String>({ pair -> pair.first }) { pair -> pair.second.get("[error]")!!.toString() }
+                        .toMap<String, String>({ pair -> pair.first }) { pair -> pair.second.get("[error]")?.toString() }
         )
 
         addEntries("Encrypted entries (as stored on disk)", encryptedPreferences.all)
@@ -88,6 +88,7 @@ internal class ExpandableListAdapter(context: Context,
         notifyDataSetChanged()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <C> getValueClass(key: String) =
             Ix.from(Arrays.asList(*Keys.values()))
                     .map { keys -> keys.key }
@@ -112,7 +113,7 @@ internal class ExpandableListAdapter(context: Context,
 
         Ix.from(Arrays.asList(*subSections))
                 .map { string -> string.replace("\\n".toRegex(), "") }
-                .subscribe({ info.add(it) })
+                .subscribe { info.add(it) }
 
         children.put(header, info)
     }

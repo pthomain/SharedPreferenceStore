@@ -35,10 +35,10 @@ import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode.*
 
 class StoreEntryFactory internal constructor(logger: Logger,
-                                              val plainTextStore: KeyValueStore,
-                                              val encryptedStore: KeyValueStore,
-                                              val lenientStore: KeyValueStore,
-                                              val forgetfulStore: KeyValueStore,
+                                             val plainTextStore: KeyValueStore,
+                                             val encryptedStore: KeyValueStore,
+                                             val lenientStore: KeyValueStore,
+                                             val forgetfulStore: KeyValueStore,
                                              encryptionManager: EncryptionManager?) {
     init {
         logger.d(
@@ -65,8 +65,12 @@ class StoreEntryFactory internal constructor(logger: Logger,
             }.let {
                 open(
                         it,
-                        { key } as UniqueKeyProvider,
-                        { valueClass } as ValueClassProvider
+                        object : UniqueKeyProvider {
+                            override val uniqueKey = key
+                        },
+                        object : ValueClassProvider {
+                            override val valueClass = valueClass
+                        }
                 )
             }
 

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import uk.co.glass_software.android.boilerplate.log.Logger;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 
 import static org.mockito.ArgumentMatchers.any;

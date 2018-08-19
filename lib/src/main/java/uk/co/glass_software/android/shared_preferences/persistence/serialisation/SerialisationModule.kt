@@ -35,7 +35,7 @@ internal class SerialisationModule(private val customSerialiser: Serialiser?) {
     @Provides
     @Singleton
     @Named(BASE_64)
-    fun provideBase64Serialiser(logger: Logger) = Base64Serialiser(
+    fun provideBase64Serialiser(logger: Logger): Serialiser = Base64Serialiser(
             logger,
             object : CustomBase64 {
                 override fun encode(input: ByteArray, flags: Int) = Base64.encodeToString(input, flags)
@@ -46,7 +46,7 @@ internal class SerialisationModule(private val customSerialiser: Serialiser?) {
     @Provides
     @Singleton
     @Named(CUSTOM)
-    fun provideCustomSerialiser() = customSerialiser
+    fun provideCustomSerialiser(): Serialiser? = customSerialiser
 
     companion object {
         const val BASE_64 = "base_64"

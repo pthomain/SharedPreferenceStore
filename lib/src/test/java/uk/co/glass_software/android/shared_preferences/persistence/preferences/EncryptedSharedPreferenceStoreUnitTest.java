@@ -30,6 +30,7 @@ import org.mockito.InOrder;
 import java.util.Map;
 
 import io.reactivex.subjects.BehaviorSubject;
+import uk.co.glass_software.android.boilerplate.log.Logger;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
@@ -57,8 +58,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
     private final String encryptedValue = "encryptedValue";
     
     private EncryptedSharedPreferenceStore target;
-    private String dataTag = "dataTag";
-    
+
     @Before
     public void setUp() throws Exception {
         mockSharedPreferences = mock(SharedPreferences.class);
@@ -80,8 +80,8 @@ public class EncryptedSharedPreferenceStoreUnitTest {
                 mockEncryptionManager
         );
         
-        when(mockEncryptionManager.decrypt(eq(encryptedValue), eq(dataTag))).thenReturn(value);
-        when(mockEncryptionManager.encrypt(eq(value), eq(dataTag))).thenReturn(encryptedValue);
+        when(mockEncryptionManager.decrypt(eq(encryptedValue), eq(key))).thenReturn(value);
+        when(mockEncryptionManager.encrypt(eq(value), eq(key))).thenReturn(encryptedValue);
         
     }
     

@@ -22,41 +22,30 @@
 package uk.co.glass_software.android.shared_preferences.encryption.manager
 
 import android.util.Base64
-
 import uk.co.glass_software.android.boilerplate.log.Logger
 
-internal abstract class BaseEncryptionManager protected constructor(protected val logger: Logger)
+internal abstract class BaseEncryptionManager(protected val logger: Logger)
     : EncryptionManager {
 
     override fun encrypt(toEncrypt: String?,
-                         dataTag: String): String? {
-        if (toEncrypt == null) {
-            return null
-        }
-
-        return try {
-            val input = encryptBytes(toEncrypt.toByteArray(), dataTag)
-            if (input == null) null else Base64.encodeToString(input, Base64.DEFAULT)
-        } catch (e: Exception) {
-            logger.e(this, "Could not encrypt data for tag: " + dataTag)
-            null
-        }
-    }
+                         dataTag: String) =
+            try {
+                toEncrypt?.let { encryptBytes(it.toByteArray(), dataTag) }
+                        ?.let { Base64.encodeToString(it, Base64.DEFAULT) }
+            } catch (e: Exception) {
+                logger.e(this, "Could not encrypt data for tag: $dataTag")
+                null
+            }
 
     override fun decrypt(toDecrypt: String?,
-                         dataTag: String): String? {
-        if (toDecrypt == null) {
-            return null
-        }
-
-        return try {
-            val decode = Base64.decode(toDecrypt.toByteArray(), Base64.DEFAULT)
-            val bytes = decryptBytes(decode, dataTag)
-            if (bytes == null) null else String(bytes)
-        } catch (e: Exception) {
-            logger.e(this, "Could not decrypt data for tag: " + dataTag)
-            null
-        }
-    }
+                         dataTag: String) =
+            try {
+                toDecrypt?.let { Base64.decode(it.toByteArray(), Base64.DEFAULT) }
+                        ?.let { decryptBytes(it, dataTag) }
+                        ?.let { String(it) }
+            } catch (e: Exception) {
+                logger.e(this, "Could not decrypt data for tag: $dataTag")
+                null
+            }
 
 }

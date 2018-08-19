@@ -56,20 +56,21 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
         this.valueClass = valueClassProvider.valueClass as Class<C>
     }
 
-    @Synchronized override fun save(value: C?) {
+    @Synchronized
+    override fun save(value: C?) {
         store.saveValue(getKey(), value)
     }
 
     @Synchronized
-    fun get(): C? {
-        return get(defaultValue)
-    }
+    override fun get(): C? = get(defaultValue)
 
-    @Synchronized override operator fun get(defaultValue: C?): C? {
+    @Synchronized
+    override operator fun get(defaultValue: C?): C? {
         return store.getValue(getKey(), valueClass, defaultValue)
     }
 
-    @Synchronized override fun drop() {
+    @Synchronized
+    override fun drop() {
         store.deleteValue(getKey())
     }
 

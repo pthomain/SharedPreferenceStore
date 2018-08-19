@@ -24,12 +24,7 @@ package uk.co.glass_software.android.shared_preferences.demo
 import android.content.Context
 import android.widget.EditText
 import android.widget.Switch
-
 import com.google.gson.Gson
-
-import java.util.Date
-
-import io.reactivex.Observable
 import uk.co.glass_software.android.boilerplate.log.SimpleLogger
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
@@ -37,8 +32,8 @@ import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
+import java.util.*
 
 
 internal class MainPresenter(context: Context) {
@@ -61,21 +56,18 @@ internal class MainPresenter(context: Context) {
 
     private fun createOrUpdatePerson() {
         val lastSeenDate = Date()
-        var person = personEntry.get()
 
-        if (person == null) {
-            person = Person()
-            person.age = 30
-            person.firstName = "John"
-            person.name = "Smith"
-        }
+        val person = personEntry.get(Person(
+                age = 30,
+                firstName = "John",
+                name = "Smith"
+        ))!!.copy(lastSeenDate = lastSeenDate)
 
-        person.lastSeenDate = lastSeenDate
         personEntry.save(person)
     }
 
     fun onPause() {
-        counter.save(counter.get(1)!! + 1)
+        counter.save(counter.get(1)?.plus(1))
         lastOpenDate.save(Date())
         createOrUpdatePerson()
     }

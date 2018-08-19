@@ -27,6 +27,8 @@ interface KeyValueEntry<C> {
 
     fun save(value: C?)
 
+    fun get(): C? = get(null)
+
     fun get(defaultValue: C? = null): C?
 
     fun drop()

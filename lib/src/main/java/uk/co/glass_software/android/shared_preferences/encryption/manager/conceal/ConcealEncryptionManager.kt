@@ -33,10 +33,10 @@ import com.facebook.soloader.SoLoader
 import uk.co.glass_software.android.boilerplate.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseEncryptionManager
 
-internal class ConcealEncryptionManager internal constructor(context: Context,
-                                                             logger: Logger,
-                                                             keyChain: SharedPrefsBackedKeyChain,
-                                                             androidConceal: AndroidConceal)
+internal class ConcealEncryptionManager(context: Context,
+                                        logger: Logger,
+                                        keyChain: SharedPrefsBackedKeyChain,
+                                        androidConceal: AndroidConceal)
     : BaseEncryptionManager(logger) {
 
     override val isEncryptionSupported: Boolean by lazy { isAvailable }

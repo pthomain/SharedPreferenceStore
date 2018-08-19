@@ -14,8 +14,11 @@ internal object TypeUtils {
 
     fun isStringClass(valueClass: Class<*>) = String::class.java.isAssignableFrom(valueClass)
 
-    fun isIntClass(valueClass: Class<*>) = (Int::class.java.isAssignableFrom(valueClass)
-            || Int::class.javaPrimitiveType!!.isAssignableFrom(valueClass))
+    fun isIntClass(valueClass: Class<*>) = (
+            Int::class.java.isAssignableFrom(valueClass)
+                    || Integer::class.java.isAssignableFrom(valueClass)
+                    || Int::class.javaPrimitiveType!!.isAssignableFrom(valueClass)
+            )
 
     fun isLongClass(valueClass: Class<*>) = (Long::class.java.isAssignableFrom(valueClass)
             || Long::class.javaPrimitiveType!!.isAssignableFrom(valueClass))
@@ -26,9 +29,11 @@ internal object TypeUtils {
     fun isBooleanClass(valueClass: Class<*>) = (Boolean::class.java.isAssignableFrom(valueClass)
             || Boolean::class.javaPrimitiveType!!.isAssignableFrom(valueClass))
 
-    fun isHandled(it: Any) = isBoolean(it.javaClass)
-            || isFloat(it.javaClass)
-            || isLong(it.javaClass)
-            || isInt(it.javaClass)
-            || isString(it.javaClass)
+    fun isHandled(it: Any) = isHandledClass(it.javaClass)
+
+    fun isHandledClass(it: Class<*>) = isBooleanClass(it)
+            || isFloatClass(it)
+            || isLongClass(it)
+            || isIntClass(it)
+            || isStringClass(it)
 }
