@@ -97,18 +97,18 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     companion object {
 
         inline infix fun <reified T> StoreEntry<T>.delegatedDefault(defaultValue: T?) =
-                delegated(defaultValue)
+                StoreEntryDelegate(this, defaultValue, true)
 
-        inline fun <reified T> StoreEntry<T>.delegated(defaultValue: T? = null) =
-                StoreEntryDelegate(this, defaultValue)
+        inline fun <reified T> StoreEntry<T>.delegated() =
+                StoreEntryDelegate(this, null, false)
 
         class StoreEntryDelegate<T>(private val entry: KeyValueEntry<T>,
-                                    private val defaultValue: T? = null)
+                                    private val defaultValue: T? = null,
+                                    private val useDefaultValue: Boolean)
             : ReadWriteProperty<Any, T?> {
 
-            constructor(storeEntry: StoreEntry<T>) : this(storeEntry, storeEntry.defaultValue)
-
-            override operator fun getValue(thisRef: Any, property: KProperty<*>): T? = entry.get(defaultValue)
+            override operator fun getValue(thisRef: Any, property: KProperty<*>): T? =
+                    if (useDefaultValue) entry.get(defaultValue) else entry.get()
 
             override operator fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
                 entry.save(value)

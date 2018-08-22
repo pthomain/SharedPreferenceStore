@@ -81,8 +81,8 @@ class StoreEntryFactory internal constructor(logger: Logger,
 
     companion object {
 
-        val DEFAULT_PLAIN_TEXT_PREFERENCE_NAME = "plain_text_store"
-        val DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store"
+        const val DEFAULT_PLAIN_TEXT_PREFERENCE_NAME = "plain_text_store"
+        const val DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store"
 
         fun buildDefault(context: Context) = builder(context).build()
 

@@ -95,6 +95,8 @@ internal class MainPresenter(context: Context) {
     fun observeChanges() = plainTextStore.observeChanges().mergeWith(encryptedStore.observeChanges())!!
 
     private inner class VoidEntry : KeyValueEntry<String> {
+        override fun get(): String? = ""
+
         override fun save(value: String?) {}
 
         override operator fun get(defaultValue: String?) = defaultValue
