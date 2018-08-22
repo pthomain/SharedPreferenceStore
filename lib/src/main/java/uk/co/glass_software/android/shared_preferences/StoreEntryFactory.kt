@@ -22,10 +22,8 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-
 import uk.co.glass_software.android.boilerplate.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry.UniqueKeyProvider
@@ -47,7 +45,9 @@ class StoreEntryFactory internal constructor(logger: Logger,
         )
     }
 
-    fun <C> open(key: StoreKey): KeyValueEntry<C> =
+    fun <C> open(keyHolder: StoreKey.Holder): StoreEntry<C> = open(keyHolder.key)
+
+    fun <C> open(key: StoreKey): StoreEntry<C> =
             open(
                     key.uniqueKey,
                     key.mode,
@@ -56,7 +56,7 @@ class StoreEntryFactory internal constructor(logger: Logger,
 
     fun <C> open(key: String,
                  mode: StoreMode,
-                 valueClass: Class<C>): KeyValueEntry<C> =
+                 valueClass: Class<C>): StoreEntry<C> =
             when (mode) {
                 PLAIN_TEXT -> plainTextStore
                 ENCRYPTED -> encryptedStore
@@ -76,8 +76,8 @@ class StoreEntryFactory internal constructor(logger: Logger,
 
     private fun <C> open(store: KeyValueStore,
                          keyProvider: UniqueKeyProvider,
-                         valueClassProvider: ValueClassProvider): KeyValueEntry<C> =
-            StoreEntry(store, keyProvider, valueClassProvider)
+                         valueClassProvider: ValueClassProvider) =
+            StoreEntry<C>(store, keyProvider, valueClassProvider)
 
     companion object {
 

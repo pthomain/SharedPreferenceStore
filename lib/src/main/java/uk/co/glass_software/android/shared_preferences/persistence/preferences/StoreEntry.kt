@@ -23,6 +23,8 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueStore,
                                                    keyProvider: UniqueKeyProvider,
@@ -90,6 +92,28 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
 
     interface ValueClassProvider {
         val valueClass: Class<*>
+    }
+
+    companion object {
+
+        inline infix fun <reified T> StoreEntry<T>.delegatedDefault(defaultValue: T?) =
+                delegated(defaultValue)
+
+        inline fun <reified T> StoreEntry<T>.delegated(defaultValue: T? = null) =
+                StoreEntryDelegate(this, defaultValue)
+
+        class StoreEntryDelegate<T>(private val entry: KeyValueEntry<T>,
+                                    private val defaultValue: T? = null)
+            : ReadWriteProperty<Any, T?> {
+
+            constructor(storeEntry: StoreEntry<T>) : this(storeEntry, storeEntry.defaultValue)
+
+            override operator fun getValue(thisRef: Any, property: KProperty<*>): T? = entry.get(defaultValue)
+
+            override operator fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
+                entry.save(value)
+            }
+        }
     }
 }
 

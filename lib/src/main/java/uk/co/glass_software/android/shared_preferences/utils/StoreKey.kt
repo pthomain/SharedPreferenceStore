@@ -31,5 +31,8 @@ data class StoreKey(private val parent: Enum<*>,
 
     override val uniqueKey = parent.javaClass.simpleName + "." + parent.name
 
+    interface Holder {
+        val key: StoreKey
+    }
 }
 

@@ -21,18 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences.demo.model
 
-import java.util.Date
-
 import uk.co.glass_software.android.shared_preferences.utils.StoreKey
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
+import java.util.*
 
 enum class Keys constructor(mode: StoreMode,
-                            valueClass: Class<*>) {
+                            valueClass: Class<*>)
+    : StoreKey.Holder {
 
     COUNTER(StoreMode.PLAIN_TEXT, Int::class.java),
     LAST_OPEN_DATE(StoreMode.ENCRYPTED, Date::class.java),
     PERSON(StoreMode.ENCRYPTED, Person::class.java);
 
-    val key = StoreKey(this, mode, valueClass)
+    override val key = StoreKey(this, mode, valueClass)
 
 }
