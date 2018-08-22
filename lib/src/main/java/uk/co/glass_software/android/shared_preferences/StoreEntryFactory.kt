@@ -37,7 +37,7 @@ class StoreEntryFactory internal constructor(logger: Logger,
                                              val encryptedStore: KeyValueStore,
                                              val lenientStore: KeyValueStore,
                                              val forgetfulStore: KeyValueStore,
-                                             encryptionManager: EncryptionManager?) {
+                                             val encryptionManager: EncryptionManager?) {
     init {
         logger.d(
                 this,
