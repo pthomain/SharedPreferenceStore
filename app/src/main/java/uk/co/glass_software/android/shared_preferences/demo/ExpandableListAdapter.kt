@@ -40,6 +40,7 @@ import uk.co.glass_software.android.shared_preferences.utils.StoreKey
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 internal class ExpandableListAdapter(context: Context,
                                      private val presenter: MainPresenter)
@@ -49,10 +50,10 @@ internal class ExpandableListAdapter(context: Context,
     private val children: LinkedHashMap<String, List<String>> = LinkedHashMap()
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val simpleDateFormat = SimpleDateFormat("hh:mm:ss")
-    private val plainTextPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME)
+    private val plainTextPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME).file
 
     //used only to display values as stored on disk, should not be used directly in practice
-    private val encryptedPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME)
+    private val encryptedPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME).file
 
     fun showEntries() {
         headers.clear()
@@ -62,7 +63,7 @@ internal class ExpandableListAdapter(context: Context,
         val formattedDate = lastOpenDate?.let { simpleDateFormat.format(it) }
 
         addEntries("App opened",
-                "Count: " + presenter.counter().get(1) + " time(s)",
+                "Count: " + presenter.counter().get() + " time(s)",
                 "Last open date: " + (formattedDate ?: "N/A")
         )
 
@@ -80,7 +81,7 @@ internal class ExpandableListAdapter(context: Context,
                                     )
                             )
                         }
-                        .toMap<String, String>({ pair -> pair.first }) { pair -> pair.second.get("[error]")?.toString() }
+                        .toMap<String, String>({ pair -> pair.first }) { pair -> pair.second.get("[error]").toString() }
         )
 
         addEntries("Encrypted entries (as stored on disk)", encryptedPreferences.all)
@@ -111,11 +112,10 @@ internal class ExpandableListAdapter(context: Context,
         val info = ArrayList<String>()
         headers.add(header)
 
-        Ix.from(Arrays.asList(*subSections))
-                .map { string -> string.replace("\\n".toRegex(), "") }
-                .subscribe { info.add(it) }
+        subSections.map { string -> string.replace("\\n".toRegex(), "") }
+                .forEach { info.add(it) }
 
-        children.put(header, info)
+        children[header] = info
     }
 
     override fun getChild(groupPosition: Int,

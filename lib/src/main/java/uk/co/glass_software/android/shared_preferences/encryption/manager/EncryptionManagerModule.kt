@@ -21,13 +21,12 @@
 
 package uk.co.glass_software.android.shared_preferences.encryption.manager
 
-import javax.inject.Singleton
-
 import dagger.Module
 import dagger.Provides
 import uk.co.glass_software.android.boilerplate.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealEncryptionManager
 import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealModule
+import javax.inject.Singleton
 
 @Module(includes = [ConcealModule::class])
 internal class EncryptionManagerModule {
@@ -37,9 +36,9 @@ internal class EncryptionManagerModule {
     fun provideDefaultEncryptionManager(concealEncryptionManager: ConcealEncryptionManager,
                                         logger: Logger): EncryptionManager? {
         if (concealEncryptionManager.isEncryptionSupported) {
-            logger.d(this, "Using Conceal encryption manager")
+            logger.d("Using Conceal encryption manager")
         } else {
-            logger.e(this, "Encryption is NOT supported")
+            logger.e("Encryption is NOT supported")
         }
         return concealEncryptionManager
     }

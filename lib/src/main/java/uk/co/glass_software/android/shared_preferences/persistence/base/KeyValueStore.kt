@@ -26,8 +26,11 @@ import io.reactivex.Observable
 interface KeyValueStore {
 
     fun <V> getValue(key: String,
+                     valueClass: Class<V>): V?
+
+    fun <V> getValue(key: String,
                      valueClass: Class<V>,
-                     defaultValue: V? = null): V?
+                     defaultValue: V): V
 
     fun <V> saveValue(key: String,
                       value: V?)

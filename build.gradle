@@ -67,7 +67,7 @@ ext {
     daggerVersion = '2.17'
     jsr250Version = '1.0'
 
-    boilerplateVersion = '0.1'
+    boilerplateVersion = '0.8'
 
     rxJavaVersion = '2.2.0'
     rxKotlinVersion = '2.3.0'

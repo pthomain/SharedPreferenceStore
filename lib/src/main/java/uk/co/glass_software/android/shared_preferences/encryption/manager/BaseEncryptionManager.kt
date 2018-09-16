@@ -33,7 +33,7 @@ internal abstract class BaseEncryptionManager(protected val logger: Logger)
                 toEncrypt?.let { encryptBytes(it.toByteArray(), dataTag) }
                         ?.let { Base64.encodeToString(it, Base64.DEFAULT) }
             } catch (e: Exception) {
-                logger.e(this, "Could not encrypt data for tag: $dataTag")
+                logger.e("Could not encrypt data for tag: $dataTag")
                 null
             }
 
@@ -44,7 +44,7 @@ internal abstract class BaseEncryptionManager(protected val logger: Logger)
                         ?.let { decryptBytes(it, dataTag) }
                         ?.let { String(it) }
             } catch (e: Exception) {
-                logger.e(this, "Could not decrypt data for tag: $dataTag")
+                logger.e("Could not decrypt data for tag: $dataTag")
                 null
             }
 

@@ -90,10 +90,7 @@ dependencies {
 
     api "com.github.pthomain:boilerplate:$boilerplateVersion"
     api "com.facebook.conceal:conceal:$concealVersion"
-    //FIXME Gradle plugin broke external dependencies in AAR
-    // compare https://jitpack.io/com/github/pthomain/SharedPreferenceStore/1.1.1/SharedPreferenceStore-1.1.1.pom
-    // to https://jitpack.io/com/github/pthomain/SharedPreferenceStore/1.0.8/SharedPreferenceStore-1.0.8.pom
-    // see https://github.com/dcendents/android-maven-gradle-plugin/issues/61
+
     testImplementation "junit:junit:$jUnitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
 }

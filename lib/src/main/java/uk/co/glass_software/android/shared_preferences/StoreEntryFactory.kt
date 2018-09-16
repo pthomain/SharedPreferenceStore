@@ -39,10 +39,7 @@ class StoreEntryFactory internal constructor(logger: Logger,
                                              val forgetfulStore: KeyValueStore,
                                              val encryptionManager: EncryptionManager?) {
     init {
-        logger.d(
-                this,
-                "Encryption supported: ${if (encryptionManager?.isEncryptionSupported == true) "TRUE" else "FALSE"}"
-        )
+        logger.d("Encryption supported: ${if (encryptionManager?.isEncryptionSupported == true) "TRUE" else "FALSE"}")
     }
 
     fun <C> open(keyHolder: StoreKey.Holder): StoreEntry<C> = open(keyHolder.key)

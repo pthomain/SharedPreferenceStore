@@ -65,25 +65,21 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     }
 
     @Synchronized
-    override fun get(): C? = get(defaultValue)
+    override fun get() =
+            store.getValue(getKey(), valueClass)
 
     @Synchronized
-    override operator fun get(defaultValue: C?): C? {
-        return store.getValue(getKey(), valueClass, defaultValue)
-    }
+    override operator fun get(defaultValue: C): C =
+            store.getValue(getKey(), valueClass, defaultValue)
 
     @Synchronized
     override fun drop() {
         store.deleteValue(getKey())
     }
 
-    override fun getKey(): String {
-        return keyString
-    }
+    override fun getKey() = keyString
 
-    override fun exists(): Boolean {
-        return store.hasValue(getKey())
-    }
+    override fun exists() = store.hasValue(getKey())
 
     interface KeyClassProvider : UniqueKeyProvider, ValueClassProvider
 
@@ -108,10 +104,12 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
                                     private val useDefaultValue: Boolean)
             : ReadWriteProperty<Any, T?> {
 
-            override operator fun getValue(thisRef: Any, property: KProperty<*>): T? =
-                    if (useDefaultValue) entry.get(defaultValue) else entry.get()
+            override operator fun getValue(thisRef: Any,
+                                           property: KProperty<*>): T? =
+                    if (useDefaultValue && defaultValue != null) entry.get(defaultValue) else entry.get()
 
-            override operator fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
+            override operator fun setValue(thisRef: Any,
+                                           property: KProperty<*>, value: T?) {
                 entry.save(value)
             }
         }

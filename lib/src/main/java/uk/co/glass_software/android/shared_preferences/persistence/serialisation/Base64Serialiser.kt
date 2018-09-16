@@ -52,7 +52,7 @@ internal class Base64Serialiser(private val logger: Logger,
                 }
             }
         } catch (e: IOException) {
-            logger.e(this, e, e.message)
+            logger.e(e, e.message)
             throw Serialiser.SerialisationException(e)
         }
     }
@@ -80,7 +80,7 @@ internal class Base64Serialiser(private val logger: Logger,
                 }
             } as O
         } catch (e: Exception) {
-            logger.e(this, e, e.message)
+            logger.e(e, e.message)
             throw Serialiser.SerialisationException(e)
         }
     }

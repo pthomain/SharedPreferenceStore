@@ -25,7 +25,6 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.Switch
 import com.google.gson.Gson
-import uk.co.glass_software.android.boilerplate.log.SimpleLogger
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
@@ -39,7 +38,6 @@ import java.util.*
 internal class MainPresenter(context: Context) {
 
     val storeEntryFactory: StoreEntryFactory = StoreEntryFactory.builder(context)
-            .logger(SimpleLogger(BuildConfig.DEBUG))
             .customSerialiser(GsonSerialiser(Gson()))
             .build()
 
@@ -57,17 +55,17 @@ internal class MainPresenter(context: Context) {
     private fun createOrUpdatePerson() {
         val lastSeenDate = Date()
 
-        val person = personEntry.get(Person(
+        personEntry.get(Person(
                 age = 30,
                 firstName = "John",
                 name = "Smith"
-        ))!!.copy(lastSeenDate = lastSeenDate)
-
-        personEntry.save(person)
+        ))
+                .copy(lastSeenDate = lastSeenDate)
+                .let { personEntry.save(it) }
     }
 
     fun onPause() {
-        counter.save(counter.get(1)?.plus(1))
+        counter.save(counter.get(1).plus(1))
         lastOpenDate.save(Date())
         createOrUpdatePerson()
     }
@@ -82,29 +80,22 @@ internal class MainPresenter(context: Context) {
                       encryptedSwitch: Switch): KeyValueEntry<String> {
         val key = editText.text.toString()
 
-        return if (key.isEmpty()) {
-            VoidEntry()
-        } else storeEntryFactory
-                .open(key,
-                        if (encryptedSwitch.isChecked) StoreMode.ENCRYPTED else StoreMode.PLAIN_TEXT,
-                        String::class.java
-                )
+        return if (key.isEmpty()) VoidEntry()
+        else storeEntryFactory.open(key,
+                if (encryptedSwitch.isChecked) StoreMode.ENCRYPTED else StoreMode.PLAIN_TEXT,
+                String::class.java
+        )
 
     }
 
     fun observeChanges() = plainTextStore.observeChanges().mergeWith(encryptedStore.observeChanges())!!
 
     private inner class VoidEntry : KeyValueEntry<String> {
-        override fun get(): String? = ""
-
-        override fun save(value: String?) {}
-
-        override operator fun get(defaultValue: String?) = defaultValue
-
-        override fun drop() {}
-
+        override fun get(): String? = null
+        override fun get(defaultValue: String) = defaultValue
+        override fun save(value: String?) = Unit
+        override fun drop() = Unit
         override fun getKey() = ""
-
         override fun exists() = false
     }
 }

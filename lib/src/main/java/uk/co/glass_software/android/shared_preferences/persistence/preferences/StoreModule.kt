@@ -22,12 +22,11 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import io.reactivex.subjects.PublishSubject
 import uk.co.glass_software.android.boilerplate.log.Logger
-import uk.co.glass_software.android.boilerplate.log.SimpleLogger
+import uk.co.glass_software.android.boilerplate.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule
@@ -39,10 +38,9 @@ import javax.inject.Singleton
 
 @Module(includes = [SerialisationModule::class])
 internal class StoreModule(private val context: Context,
-                           private val isDebug: Boolean,
-                           private val plainTextSharedPreferences: SharedPreferences,
-                           private val encryptedSharedPreferences: SharedPreferences,
-                           private val logger: Logger?) {
+                           private val plainTextPrefs: Prefs,
+                           private val encryptedPrefs: Prefs,
+                           private val logger: Logger) {
 
     @Provides
     @Singleton
@@ -55,7 +53,7 @@ internal class StoreModule(private val context: Context,
                                      @Named(CUSTOM) customSerialiser: Serialiser?,
                                      logger: Logger): SharedPreferenceStore =
             SharedPreferenceStore(
-                    plainTextSharedPreferences,
+                    plainTextPrefs,
                     base64Serialiser,
                     customSerialiser,
                     PublishSubject.create(),
@@ -67,9 +65,9 @@ internal class StoreModule(private val context: Context,
     fun provideEncryptedSharedPreferenceStore(@Named(BASE_64) base64Serialiser: Serialiser,
                                               @Named(CUSTOM) customSerialiser: Serialiser?,
                                               encryptionManager: EncryptionManager?,
-                                              logger: Logger): EncryptedSharedPreferenceStore =
+                                              logger: Logger) =
             EncryptedSharedPreferenceStore(
-                    encryptedSharedPreferences,
+                    encryptedPrefs,
                     base64Serialiser,
                     customSerialiser,
                     PublishSubject.create(),
@@ -121,7 +119,7 @@ internal class StoreModule(private val context: Context,
 
     @Provides
     @Singleton
-    fun provideLogger() = logger ?: SimpleLogger(isDebug)
+    fun provideLogger() = logger
 
     companion object {
         internal const val MAX_FILE_NAME_LENGTH = 127

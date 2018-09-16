@@ -24,4 +24,4 @@ package uk.co.glass_software.android.shared_preferences.demo.model
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-class Counter(store: KeyValueStore) : StoreEntry<Int>(store, Keys.COUNTER.key)
+class Counter(store: KeyValueStore) : StoreEntry<Int>(store, Keys.COUNTER.key, 1)

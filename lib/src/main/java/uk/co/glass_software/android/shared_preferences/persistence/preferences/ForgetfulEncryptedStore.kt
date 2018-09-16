@@ -36,16 +36,17 @@ internal class ForgetfulEncryptedStore(encryptedStore: KeyValueStore,
     private val internalStore = if (isEncryptionSupported) encryptedStore else null
 
     init {
-        logger.d(
-                this,
-                "Encryption is${if (isEncryptionSupported) "" else " NOT"} supported"
-        )
+        logger.d("Encryption is${if (isEncryptionSupported) "" else " NOT"} supported")
     }
 
     override fun <V> getValue(key: String,
+                              valueClass: Class<V>) =
+            internalStore?.getValue(key, valueClass)
+
+    override fun <V> getValue(key: String,
                               valueClass: Class<V>,
-                              defaultValue: V?) =
-            internalStore?.getValue(key, valueClass, defaultValue)
+                              defaultValue: V) =
+            internalStore?.getValue(key, valueClass, defaultValue) ?: defaultValue
 
     override fun <V> saveValue(key: String,
                                value: V?) {

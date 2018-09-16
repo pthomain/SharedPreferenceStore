@@ -29,7 +29,7 @@ interface KeyValueEntry<C> {
 
     fun get(): C?
 
-    fun get(defaultValue: C? = null): C?
+    fun get(defaultValue: C): C
 
     fun drop()
 

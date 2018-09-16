@@ -58,7 +58,7 @@ internal class ConcealEncryptionManager(context: Context,
             isAvailable = false
         }
 
-        logger.d(this, "Conceal is" + (if (isAvailable) "" else " NOT") + " available")
+        logger.d("Conceal is" + (if (isAvailable) "" else " NOT") + " available")
     }
 
     override fun encryptBytes(toEncrypt: ByteArray?,
@@ -70,7 +70,7 @@ internal class ConcealEncryptionManager(context: Context,
         return try {
             crypto!!.encrypt(toEncrypt, Entity.create(dataTag))
         } catch (e: Exception) {
-            logger.e(this, e, "Could not encrypt the given bytes")
+            logger.e(e, "Could not encrypt the given bytes")
             null
         }
     }
@@ -84,7 +84,7 @@ internal class ConcealEncryptionManager(context: Context,
         return try {
             crypto!!.decrypt(toDecrypt, Entity.create(dataTag))
         } catch (e: Exception) {
-            logger.e(this, e, "Could not decrypt the given bytes")
+            logger.e(e, "Could not decrypt the given bytes")
             null
         }
     }

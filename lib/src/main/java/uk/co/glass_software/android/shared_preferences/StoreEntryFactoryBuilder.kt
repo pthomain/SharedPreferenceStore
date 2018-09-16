@@ -22,9 +22,9 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-import android.content.SharedPreferences
-
+import uk.co.glass_software.android.boilerplate.Boilerplate
 import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule
@@ -36,17 +36,17 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 class StoreEntryFactoryBuilder internal constructor(private val context: Context,
                                                     private val isDebug: Boolean) {
 
-    private var plainTextPreferences: SharedPreferences? = null
-    private var encryptedPreferences: SharedPreferences? = null
+    private var plainTextPreferences: Prefs? = null
+    private var encryptedPreferences: Prefs? = null
     private var logger: Logger? = null
     private var customSerialiser: Serialiser? = null
 
-    fun plainTextPreferences(preferences: SharedPreferences) = apply {
-        this.plainTextPreferences = preferences
+    fun plainTextPreferences(preferencesFileName: String) = apply {
+        this.plainTextPreferences = Prefs.with(preferencesFileName)
     }
 
-    fun encryptedPreferences(preferences: SharedPreferences) = apply {
-        this.encryptedPreferences = preferences
+    fun encryptedPreferences(preferencesFileName: String) = apply {
+        this.encryptedPreferences = Prefs.with(preferencesFileName)
     }
 
     fun logger(logger: Logger) = apply {
@@ -58,14 +58,15 @@ class StoreEntryFactoryBuilder internal constructor(private val context: Context
     }
 
     fun build(): StoreEntryFactory {
+        Boilerplate.init(context, isDebug, "PrefStoreLog")
+
         val component = DaggerSharedPreferenceComponent
                 .builder()
                 .storeModule(StoreModule(
                         context,
-                        isDebug,
                         plainTextPreferences ?: openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME),
                         encryptedPreferences ?: openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME),
-                        logger
+                        logger ?: Boilerplate.logger
                 ))
                 .serialisationModule(SerialisationModule(customSerialiser))
                 .build()

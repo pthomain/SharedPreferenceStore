@@ -22,9 +22,9 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import io.reactivex.subjects.Subject
 import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBoolean
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBooleanClass
@@ -40,12 +40,13 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-internal open class SharedPreferenceStore(private val sharedPreferences: SharedPreferences,
+internal open class SharedPreferenceStore(internal val prefs: Prefs,
                                           private val base64Serialiser: Serialiser,
                                           private val customSerialiser: Serialiser?,
                                           private val changeSubject: Subject<String>,
                                           private val logger: Logger) : KeyValueStore {
 
+    private val sharedPreferences = prefs.file
     private val cacheMap: MutableMap<String, Any> = HashMap()
 
     val cachedValues: Map<String, Any>
@@ -75,7 +76,7 @@ internal open class SharedPreferenceStore(private val sharedPreferences: SharedP
     protected open fun saveValueInternal(key: String,
                                          value: Any?) {
         if (value == null) {
-            logger.d(this, "Deleting entry $key")
+            logger.d("Deleting entry $key")
             sharedPreferences.apply {
                 if (contains(key)) {
                     edit().remove(key).apply()
@@ -103,17 +104,27 @@ internal open class SharedPreferenceStore(private val sharedPreferences: SharedP
                 apply()
             }
 
-            logger.d(this, "Saving entry $key -> $value")
+            logger.d("Saving entry $key -> $value")
             changeSubject.onNext(key)
         } catch (e: Exception) {
-            logger.e(this, e, e.message)
+            logger.e(e, e.message)
         }
     }
 
     @Synchronized
     override fun <O> getValue(key: String,
+                              valueClass: Class<O>) =
+            getNullableValue(key, valueClass, null)
+
+    @Synchronized
+    override fun <O> getValue(key: String,
                               valueClass: Class<O>,
-                              defaultValue: O?) =
+                              defaultValue: O) =
+            getNullableValue(key, valueClass, defaultValue)!!
+
+    private fun <O> getNullableValue(key: String,
+                             valueClass: Class<O>,
+                             defaultValue: O?): O? =
             cacheMap[key]
                     ?.let { return it as O }
                     ?: getValueInternal(
@@ -137,15 +148,16 @@ internal open class SharedPreferenceStore(private val sharedPreferences: SharedP
                             isLongClass(objectClass) -> it.getLong(key, (defaultValue as Long?) ?: 0L)
                             isIntClass(objectClass) -> it.getInt(key, (defaultValue as Int?) ?: 0)
                             isStringClass(objectClass) -> it.getString(key, (defaultValue as String?))
-                            else -> deserialise(key, it.getString(key, null), objectClass) ?: defaultValue
+                            else -> deserialise(key, it.getString(key, null), objectClass)
+                                    ?: defaultValue
                         } as O?
                     } else defaultValue)
                 } catch (e: Exception) {
-                    logger.e(this, e, e.message)
+                    logger.e(e, e.message)
                     defaultValue
                 }
             }.also {
-                logger.d(this, "Reading entry $key -> $it")
+                logger.d("Reading entry $key -> $it")
             }
 
     protected open fun serialise(key: String,
@@ -158,7 +170,7 @@ internal open class SharedPreferenceStore(private val sharedPreferences: SharedP
                         else -> null
                     }
                 } catch (e: Serialiser.SerialisationException) {
-                    logger.e(this, e, "Could not serialise $value")
+                    logger.e(e, "Could not serialise $value")
                     null
                 }
             }

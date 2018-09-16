@@ -21,21 +21,21 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
-import android.content.SharedPreferences
 import io.reactivex.subjects.Subject
 import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 @Suppress("UNCHECKED_CAST")
-internal class EncryptedSharedPreferenceStore(sharedPreferences: SharedPreferences,
+internal class EncryptedSharedPreferenceStore(prefs: Prefs,
                                               base64Serialiser: Serialiser,
                                               customSerialiser: Serialiser?,
                                               changeSubject: Subject<String>,
                                               logger: Logger,
                                               private val encryptionManager: EncryptionManager?)
     : SharedPreferenceStore(
-        sharedPreferences,
+        prefs,
         base64Serialiser,
         customSerialiser,
         changeSubject,
