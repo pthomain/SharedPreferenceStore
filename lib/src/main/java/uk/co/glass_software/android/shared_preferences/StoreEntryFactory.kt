@@ -47,6 +47,7 @@ class StoreEntryFactory internal constructor(logger: Logger,
 
     fun <C> open(keyHolder: StoreKey.Holder): StoreEntry<C> = open(keyHolder.key)
 
+    @Suppress("UNCHECKED_CAST")
     fun <C> open(key: StoreKey): StoreEntry<C> =
             open(
                     key.uniqueKey,

@@ -55,6 +55,7 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
 
     init {
         this.keyString = keyProvider.uniqueKey
+        @Suppress("UNCHECKED_CAST")
         this.valueClass = valueClassProvider.valueClass as Class<C>
     }
 
