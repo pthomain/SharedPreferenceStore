@@ -71,11 +71,11 @@ public class StoreEntryUnitTest {
     @Test
     public void testGet() {
         String test = "test";
-        when(mockStore.getValue(eq(storeKey.getUniqueKey()), eq(String.class), eq(null))).thenReturn(test);
+        when(mockStore.getValue(eq(storeKey.getUniqueKey()), eq(String.class))).thenReturn(test);
         
         String result = target.get();
         
-        verify(mockStore).getValue(eq(storeKey.getUniqueKey()), eq(String.class), eq(null));
+        verify(mockStore).getValue(eq(storeKey.getUniqueKey()), eq(String.class));
         assertEquals("Strings don't match", test, result);
     }
     

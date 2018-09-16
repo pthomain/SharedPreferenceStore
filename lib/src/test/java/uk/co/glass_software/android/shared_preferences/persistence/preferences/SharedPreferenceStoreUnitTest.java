@@ -33,6 +33,7 @@ import java.util.Map;
 
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.boilerplate.log.Logger;
+import uk.co.glass_software.android.boilerplate.preferences.Prefs;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
 import static junit.framework.Assert.assertEquals;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 public class SharedPreferenceStoreUnitTest {
 
+    private Prefs mockSharedPrefs;
     private SharedPreferences mockSharedPreferences;
     private Serialiser mockBase64Serialiser;
     private Serialiser mockCustomSerialiser;
@@ -64,6 +66,7 @@ public class SharedPreferenceStoreUnitTest {
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
+        mockSharedPrefs = mock(Prefs.class);
         mockSharedPreferences = mock(SharedPreferences.class);
         mockBase64Serialiser = mock(Serialiser.class);
         mockCustomSerialiser = mock(Serialiser.class);
@@ -72,9 +75,10 @@ public class SharedPreferenceStoreUnitTest {
 
         mockEditor = mock(SharedPreferences.Editor.class);
         when(mockSharedPreferences.edit()).thenReturn(mockEditor);
+        when(mockSharedPrefs.getFile()).thenReturn(mockSharedPreferences);
 
         target = new SharedPreferenceStore(
-                mockSharedPreferences,
+                mockSharedPrefs,
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 behaviorSubject,
@@ -90,10 +94,11 @@ public class SharedPreferenceStoreUnitTest {
         when(mockSharedPreferences.getAll()).thenReturn(map);
         when(mockSharedPreferences.contains(eq(key))).thenReturn(true);
         when(mockSharedPreferences.getString(eq(key), isNull())).thenReturn(value);
+        when(mockSharedPrefs.getFile()).thenReturn(mockSharedPreferences);
 
         //Reset the cache
         target = new SharedPreferenceStore(
-                mockSharedPreferences,
+                mockSharedPrefs,
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 behaviorSubject,
@@ -114,7 +119,7 @@ public class SharedPreferenceStoreUnitTest {
         when(mockBase64Serialiser.canHandleType(eq(Serializable.class))).thenReturn(true);
         addValue();
 
-        target.getValue(key, Serializable.class, null);
+        target.getValue(key, Serializable.class);
 
         verify(mockBase64Serialiser).deserialise(eq(value), eq(Serializable.class));
     }
@@ -124,7 +129,7 @@ public class SharedPreferenceStoreUnitTest {
         when(mockBase64Serialiser.canHandleType(eq(Serializable.class))).thenReturn(false);
         addValue();
 
-        target.getValue(key, Serializable.class, null);
+        target.getValue(key, Serializable.class);
 
         verify(mockBase64Serialiser, never()).deserialise(any(), any());
     }

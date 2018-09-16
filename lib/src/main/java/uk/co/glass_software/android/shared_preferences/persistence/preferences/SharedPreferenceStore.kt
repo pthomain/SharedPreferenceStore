@@ -123,8 +123,8 @@ internal open class SharedPreferenceStore(internal val prefs: Prefs,
             getNullableValue(key, valueClass, defaultValue)!!
 
     private fun <O> getNullableValue(key: String,
-                             valueClass: Class<O>,
-                             defaultValue: O?): O? =
+                                     valueClass: Class<O>,
+                                     defaultValue: O?): O? =
             cacheMap[key]
                     ?.let { return it as O }
                     ?: getValueInternal(
@@ -143,9 +143,12 @@ internal open class SharedPreferenceStore(internal val prefs: Prefs,
                 try {
                     (if (it.contains(key)) {
                         when {
-                            isBooleanClass(objectClass) -> it.getBoolean(key, (defaultValue as Boolean?) ?: false)
-                            isFloatClass(objectClass) -> it.getFloat(key, (defaultValue as Float?) ?: 0f)
-                            isLongClass(objectClass) -> it.getLong(key, (defaultValue as Long?) ?: 0L)
+                            isBooleanClass(objectClass) -> it.getBoolean(key, (defaultValue as Boolean?)
+                                    ?: false)
+                            isFloatClass(objectClass) -> it.getFloat(key, (defaultValue as Float?)
+                                    ?: 0f)
+                            isLongClass(objectClass) -> it.getLong(key, (defaultValue as Long?)
+                                    ?: 0L)
                             isIntClass(objectClass) -> it.getInt(key, (defaultValue as Int?) ?: 0)
                             isStringClass(objectClass) -> it.getString(key, (defaultValue as String?))
                             else -> deserialise(key, it.getString(key, null), objectClass)

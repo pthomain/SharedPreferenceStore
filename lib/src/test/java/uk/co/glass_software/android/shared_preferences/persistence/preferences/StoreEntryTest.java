@@ -10,7 +10,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,7 @@ public class StoreEntryTest {
     
     @Test
     public void testGet() {
-        when(mockStore.getValue(eq(key.getUniqueKey()), eq(String.class), isNull())).thenReturn(someValue);
+        when(mockStore.getValue(eq(key.getUniqueKey()), eq(String.class))).thenReturn(someValue);
         
         assertEquals(someValue, target.get());
     }
