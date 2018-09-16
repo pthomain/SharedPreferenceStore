@@ -1,7 +1,7 @@
-SharedPreferenceStore  
+SharedPreferenceStore [![Codacy Badge](https://api.codacy.com/project/badge/Grade/18db4ae1588f4a89857fd76475ff5ac9)](https://app.codacy.com/app/pthomain/SharedPreferenceStore?utm_source=github.com&utm_medium=referral&utm_content=pthomain/SharedPreferenceStore&utm_campaign=Badge_Grade_Settings) [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
 =====================
 
-DAO object mapping of the Android SharedPreferences with support for encryption when available on device (API level 16+).
+Type-safe object mapping of the Android SharedPreferences with built-in (and customisable) object serialisation and support for encryption when available on device (API level 16+). 
 
 TL;DR
 -----
