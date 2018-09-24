@@ -40,7 +40,7 @@ android {
         versionCode 5
         versionName "1.2"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
         aaptOptions {
@@ -88,10 +88,9 @@ android {
 dependencies {
     implementation project(":lib")
 
-    implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
-    implementation "com.github.akarnokd:ixjava:$ixJavaVersion"
+    implementation appDependencies.supportLib
+    implementation appDependencies.customTabs
 
-    implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    implementation "com.android.support:customtabs:$supportLibVersion"
+    implementation appDependencies.gson
+    implementation appDependencies.ixJava
 }

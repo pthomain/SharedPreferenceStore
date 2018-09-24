@@ -24,9 +24,6 @@ package uk.co.glass_software.android.shared_preferences.demo
 import android.database.DataSetObserver
 import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDelegate
 import android.view.View
 import android.widget.EditText
 import android.widget.ExpandableListView

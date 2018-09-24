@@ -35,7 +35,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
@@ -70,27 +70,26 @@ artifacts {
 }
 
 dependencies {
-    implementation 'com.github.jitpack:gradle-simple:1.0'
+    implementation appDependencies.jitPack
 
-    implementation "com.google.dagger:dagger:$daggerVersion"
-    implementation "com.google.dagger:dagger-android:$daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    implementation appDependencies.dagger
+    implementation appDependencies.daggerAndroid
+    kapt appDependencies.daggerCompiler
+    kapt appDependencies.daggerAndroidProcessor
 
-    testAnnotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+    compileOnly appDependencies.jsr250
+    implementation appDependencies.supportAnnotations
 
-    compileOnly "javax.annotation:jsr250-api:$jsr250Version"
-    implementation "com.android.support:support-annotations:$supportLibVersion"
+    api appDependencies.rxJava
+    api appDependencies.rxKotlin
+    api appDependencies.rxAndroid
 
-    api "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    api "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
-    api "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    api appDependencies.kotlinJdk8
 
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    api appDependencies.boilerplate
+    api appDependencies.conceal
 
-    api "com.github.pthomain:boilerplate:$boilerplateVersion"
-    api "com.facebook.conceal:conceal:$concealVersion"
-
-    testImplementation "junit:junit:$jUnitVersion"
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation appDependencies.jUnit
+    testImplementation appDependencies.mockitoCore
+    testAnnotationProcessor appDependencies.daggerCompiler
 }
