@@ -23,7 +23,7 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager
 
 import dagger.Module
 import dagger.Provides
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealEncryptionManager
 import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealModule
 import javax.inject.Singleton

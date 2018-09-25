@@ -23,8 +23,8 @@ package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
 import uk.co.glass_software.android.boilerplate.Boilerplate
-import uk.co.glass_software.android.boilerplate.log.Logger
-import uk.co.glass_software.android.boilerplate.preferences.Prefs
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule

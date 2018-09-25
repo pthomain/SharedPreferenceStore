@@ -21,7 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 
 /**

@@ -21,6 +21,8 @@
 
 package uk.co.glass_software.android.shared_preferences.demo
 
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.database.DataSetObserver
 import android.net.Uri
 import android.os.Bundle
@@ -28,13 +30,17 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.Switch
-import io.reactivex.disposables.Disposable
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import io.reactivex.disposables.CompositeDisposable
+import uk.co.glass_software.android.boilerplate.utils.rx.RxAutoSubscriber
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RxAutoSubscriber {
+
+    override var subscriptions = CompositeDisposable()
 
     private lateinit var listAdapter: ExpandableListAdapter
     private lateinit var presenter: MainPresenter
-    private var subscription: Disposable? = null
 
     private val keyEditText by lazy { findViewById<EditText>(R.id.input_key) }
     private val valueEditText by lazy { findViewById<EditText>(R.id.input_value) }
@@ -65,13 +71,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         listAdapter.showEntries()
-        subscription = presenter.observeChanges()
-                .subscribe { _ -> listAdapter.showEntries() }
+        presenter.observeChanges().autoSubscribe { _ -> listAdapter.showEntries() }
     }
 
     override fun onPause() {
         super.onPause()
-        subscription?.dispose()
         presenter.onPause()
     }
 
@@ -87,9 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openGithub() {
-        val builder = CustomTabsIntent.Builder()
-        val customTabsIntent = builder.build()
-        customTabsIntent.launchUrl(this, Uri.parse("https://github.com/pthomain/SharedPreferenceStore"))
+        startActivity(Intent(ACTION_VIEW, Uri.parse("https://github.com/pthomain/SharedPreferenceStore")))
     }
 
     companion object {

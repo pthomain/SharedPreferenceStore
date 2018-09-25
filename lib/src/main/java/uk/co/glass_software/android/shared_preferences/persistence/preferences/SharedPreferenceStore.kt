@@ -23,8 +23,8 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.annotation.SuppressLint
 import io.reactivex.subjects.Subject
-import uk.co.glass_software.android.boilerplate.log.Logger
-import uk.co.glass_software.android.boilerplate.preferences.Prefs
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBoolean
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBooleanClass
@@ -40,7 +40,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-internal open class SharedPreferenceStore(internal val prefs: Prefs,
+internal open class SharedPreferenceStore(prefs: Prefs,
                                           private val base64Serialiser: Serialiser,
                                           private val customSerialiser: Serialiser?,
                                           private val changeSubject: Subject<String>,

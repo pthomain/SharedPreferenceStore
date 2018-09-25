@@ -22,7 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.encryption.manager
 
 import android.util.Base64
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 
 internal abstract class BaseEncryptionManager(protected val logger: Logger)
     : EncryptionManager {

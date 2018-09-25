@@ -1,7 +1,7 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.preferences.Prefs
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 
 object StoreUtils {
 

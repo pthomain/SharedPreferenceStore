@@ -22,16 +22,13 @@
 package uk.co.glass_software.android.shared_preferences.encryption.manager.conceal
 
 import android.content.Context
-
 import com.facebook.android.crypto.keychain.AndroidConceal
 import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain
 import com.facebook.crypto.CryptoConfig
-
-import javax.inject.Singleton
-
 import dagger.Module
 import dagger.Provides
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import javax.inject.Singleton
 
 @Module
 internal class ConcealModule {

@@ -88,9 +88,6 @@ android {
 dependencies {
     implementation project(":lib")
 
-    implementation appDependencies.supportLib
-    implementation appDependencies.customTabs
-
     implementation appDependencies.gson
     implementation appDependencies.ixJava
 }

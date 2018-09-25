@@ -66,7 +66,7 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
 
     @Synchronized
     override fun get() =
-            store.getValue(getKey(), valueClass)
+            store.getValue(getKey(), valueClass) ?: defaultValue
 
     @Synchronized
     override operator fun get(defaultValue: C): C =

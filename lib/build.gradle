@@ -35,7 +35,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
@@ -78,7 +78,6 @@ dependencies {
     kapt appDependencies.daggerAndroidProcessor
 
     compileOnly appDependencies.jsr250
-    implementation appDependencies.supportAnnotations
 
     api appDependencies.rxJava
     api appDependencies.rxKotlin

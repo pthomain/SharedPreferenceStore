@@ -23,14 +23,12 @@ package uk.co.glass_software.android.shared_preferences.encryption.manager.conce
 
 
 import android.content.Context
-
 import com.facebook.android.crypto.keychain.AndroidConceal
 import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain
 import com.facebook.crypto.Crypto
 import com.facebook.crypto.Entity
 import com.facebook.soloader.SoLoader
-
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.BaseEncryptionManager
 
 internal class ConcealEncryptionManager(context: Context,

@@ -22,7 +22,7 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry

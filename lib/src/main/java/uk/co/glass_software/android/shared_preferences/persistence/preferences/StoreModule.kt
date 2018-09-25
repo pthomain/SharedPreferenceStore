@@ -25,8 +25,8 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import io.reactivex.subjects.PublishSubject
-import uk.co.glass_software.android.boilerplate.log.Logger
-import uk.co.glass_software.android.boilerplate.preferences.Prefs
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule
