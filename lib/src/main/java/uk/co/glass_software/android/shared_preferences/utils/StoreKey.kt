@@ -23,9 +23,9 @@ package uk.co.glass_software.android.shared_preferences.utils
 
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-data class StoreKey(private val parent: Enum<*>,
-                    override val mode: StoreMode,
-                    override val valueClass: Class<*>)
+open class StoreKey(parent: Enum<*>,
+                    final override val mode: StoreMode,
+                    final override val valueClass: Class<*>)
     : StoreEntry.KeyClassProvider,
         StoreMode.Provider {
 
