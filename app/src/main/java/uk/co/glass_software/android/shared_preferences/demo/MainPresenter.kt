@@ -25,6 +25,8 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.Switch
 import com.google.gson.Gson
+import io.reactivex.Observable
+import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
@@ -97,5 +99,7 @@ internal class MainPresenter(context: Context) {
         override fun drop() = Unit
         override fun getKey() = ""
         override fun exists() = false
+        override fun maybe() = Optional.empty<String>()
+        override fun observe() = Observable.just(Optional.empty<String>())
     }
 }

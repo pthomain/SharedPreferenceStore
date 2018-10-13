@@ -30,8 +30,8 @@ import org.mockito.InOrder;
 import java.util.Map;
 
 import io.reactivex.subjects.BehaviorSubject;
-import uk.co.glass_software.android.boilerplate.log.Logger;
-import uk.co.glass_software.android.boilerplate.preferences.Prefs;
+import uk.co.glass_software.android.boilerplate.utils.log.Logger;
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs;
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 

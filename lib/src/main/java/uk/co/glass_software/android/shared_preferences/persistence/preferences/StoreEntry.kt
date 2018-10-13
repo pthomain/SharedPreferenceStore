@@ -21,6 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import kotlin.properties.ReadWriteProperty
@@ -73,9 +74,17 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
             store.getValue(getKey(), valueClass, defaultValue)
 
     @Synchronized
+    override fun maybe() = Optional.ofNullable(get())
+
+    @Synchronized
     override fun drop() {
         store.deleteValue(getKey())
     }
+
+    @Synchronized
+    override fun observe() = store.observeChanges()
+            .filter { it == keyString }
+            .map { maybe() }!!
 
     override fun getKey() = keyString
 

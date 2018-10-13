@@ -21,6 +21,9 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.base
 
+import io.reactivex.Observable
+import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
+
 interface KeyValueEntry<C> {
 
     fun getKey(): String
@@ -31,7 +34,12 @@ interface KeyValueEntry<C> {
 
     fun get(defaultValue: C): C
 
+    fun maybe(): Optional<C>
+
     fun drop()
 
     fun exists(): Boolean
+
+    fun observe() : Observable<Optional<C>>
+
 }
