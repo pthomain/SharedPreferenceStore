@@ -52,7 +52,7 @@ internal open class SharedPreferenceStore(prefs: Prefs,
     val cachedValues: Map<String, Any>
         @Synchronized get() = Collections.unmodifiableMap(cacheMap)
 
-    override fun observeChanges() = changeSubject
+    override fun observeChanges() = changeSubject.map{ it } // read-only
 
     @Synchronized
     override fun deleteValue(key: String) {
