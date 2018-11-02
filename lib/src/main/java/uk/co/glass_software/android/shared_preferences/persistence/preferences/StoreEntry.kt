@@ -21,21 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import io.reactivex.Observable
 import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+
+import uk.co.glass_software.android.shared_preferences.persistence.base.*
 
 open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueStore,
                                                    keyProvider: UniqueKeyProvider,
-                                                   valueClassProvider: ValueClassProvider,
+                                                   valueClassProvider: ValueClassProvider<C>,
                                                    private val defaultValue: C? = null)
-    : KeyValueEntry<C> {
-
-    private val valueClass: Class<C>
-    private val keyString: String
-
+    : KeyValueEntry<C>,
+        UniqueKeyProvider by keyProvider,
+        ValueClassProvider<C> by valueClassProvider {
     @JvmOverloads
     constructor(store: KeyValueStore,
                 key: String,
@@ -43,22 +40,20 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
                 defaultValue: C? = null)
             : this(
             store,
-            { key } as UniqueKeyProvider,
-            { valueClass } as ValueClassProvider,
+            object : UniqueKeyProvider {
+                override val uniqueKey = key
+            },
+            object : ValueClassProvider<C> {
+                override val valueClass = valueClass
+            },
             defaultValue
     )
 
     @JvmOverloads
     constructor(store: KeyValueStore,
-                keyProvider: KeyClassProvider,
+                keyProvider: KeyClassProvider<C>,
                 defaultValue: C? = null)
             : this(store, keyProvider, keyProvider, defaultValue)
-
-    init {
-        this.keyString = keyProvider.uniqueKey
-        @Suppress("UNCHECKED_CAST")
-        this.valueClass = valueClassProvider.valueClass as Class<C>
-    }
 
     @Synchronized
     override fun save(value: C?) {
@@ -82,46 +77,25 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     }
 
     @Synchronized
-    override fun observe() = store.observeChanges()
-            .filter { it == keyString }
-            .map { maybe() }!!
+    override fun <S : C> getAs(subclass: Class<S>) =
+            store.getValue(getKey(), subclass)
 
-    override fun getKey() = keyString
+    @Synchronized
+    override fun <S : C> getAs(subclass: Class<S>, defaultValue: S) =
+            store.getValue(uniqueKey, subclass, defaultValue)
+
+    override fun observe(emitCurrentValue: Boolean) =
+            store.observeChanges()
+                    .filter { it == getKey() }
+                    .map { maybe() }
+                    .let {
+                        if (emitCurrentValue) Observable.just(maybe()).mergeWith(it)
+                        else it
+                    }!!
+
+    override fun getKey() = uniqueKey
 
     override fun exists() = store.hasValue(getKey())
 
-    interface KeyClassProvider : UniqueKeyProvider, ValueClassProvider
-
-    interface UniqueKeyProvider {
-        val uniqueKey: String
-    }
-
-    interface ValueClassProvider {
-        val valueClass: Class<*>
-    }
-
-    companion object {
-
-        inline infix fun <reified T> StoreEntry<T>.delegatedDefault(defaultValue: T?) =
-                StoreEntryDelegate(this, defaultValue, true)
-
-        inline fun <reified T> StoreEntry<T>.delegated() =
-                StoreEntryDelegate(this, null, false)
-
-        class StoreEntryDelegate<T>(private val entry: KeyValueEntry<T>,
-                                    private val defaultValue: T? = null,
-                                    private val useDefaultValue: Boolean)
-            : ReadWriteProperty<Any, T?> {
-
-            override operator fun getValue(thisRef: Any,
-                                           property: KProperty<*>): T? =
-                    if (useDefaultValue && defaultValue != null) entry.get(defaultValue) else entry.get()
-
-            override operator fun setValue(thisRef: Any,
-                                           property: KProperty<*>, value: T?) {
-                entry.save(value)
-            }
-        }
-    }
 }
 

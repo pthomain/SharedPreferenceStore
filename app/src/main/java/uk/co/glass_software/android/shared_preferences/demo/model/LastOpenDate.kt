@@ -21,9 +21,15 @@
 
 package uk.co.glass_software.android.shared_preferences.demo.model
 
-import java.util.Date
-
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
+import java.util.*
 
-class LastOpenDate(store: KeyValueStore) : StoreEntry<Date>(store, Keys.LAST_OPEN_DATE.key)
+class LastOpenDate(store: KeyValueStore)
+    : StoreEntry<Date>(store, KEY, Date::class.java) {
+
+    companion object {
+        const val KEY = "last_open_date"
+    }
+
+}

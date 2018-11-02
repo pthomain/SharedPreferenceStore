@@ -30,7 +30,6 @@ buildscript {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "uk.co.glass_software.android.shared_preferences.demo"
@@ -89,5 +88,4 @@ dependencies {
     implementation project(":lib")
 
     implementation appDependencies.gson
-    implementation appDependencies.ixJava
 }

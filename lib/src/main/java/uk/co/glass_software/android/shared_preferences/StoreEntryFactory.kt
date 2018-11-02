@@ -25,10 +25,9 @@ import android.content.Context
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider
+import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry.UniqueKeyProvider
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry.ValueClassProvider
-import uk.co.glass_software.android.shared_preferences.utils.StoreKey
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode.*
 
@@ -41,16 +40,6 @@ class StoreEntryFactory internal constructor(logger: Logger,
     init {
         logger.d("Encryption supported: ${if (encryptionManager?.isEncryptionSupported == true) "TRUE" else "FALSE"}")
     }
-
-    fun <C> open(keyHolder: StoreKey.Holder): StoreEntry<C> = open(keyHolder.key)
-
-    @Suppress("UNCHECKED_CAST")
-    fun <C> open(key: StoreKey): StoreEntry<C> =
-            open(
-                    key.uniqueKey,
-                    key.mode,
-                    key.valueClass as Class<C>
-            )
 
     fun <C> open(key: String,
                  mode: StoreMode,
@@ -66,7 +55,7 @@ class StoreEntryFactory internal constructor(logger: Logger,
                         object : UniqueKeyProvider {
                             override val uniqueKey = key
                         },
-                        object : ValueClassProvider {
+                        object : ValueClassProvider<C> {
                             override val valueClass = valueClass
                         }
                 )
@@ -74,8 +63,8 @@ class StoreEntryFactory internal constructor(logger: Logger,
 
     private fun <C> open(store: KeyValueStore,
                          keyProvider: UniqueKeyProvider,
-                         valueClassProvider: ValueClassProvider) =
-            StoreEntry<C>(store, keyProvider, valueClassProvider)
+                         valueClassProvider: ValueClassProvider<C>) =
+            StoreEntry(store, keyProvider, valueClassProvider)
 
     companion object {
 

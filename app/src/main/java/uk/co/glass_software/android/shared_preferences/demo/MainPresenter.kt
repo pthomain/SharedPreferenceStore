@@ -25,8 +25,6 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.Switch
 import com.google.gson.Gson
-import io.reactivex.Observable
-import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
@@ -79,10 +77,10 @@ internal class MainPresenter(context: Context) {
     fun getKey(entry: Map.Entry<String, *>) = entry.key
 
     fun getStoreEntry(editText: EditText,
-                      encryptedSwitch: Switch): KeyValueEntry<String> {
+                      encryptedSwitch: Switch): KeyValueEntry<String>? {
         val key = editText.text.toString()
 
-        return if (key.isEmpty()) VoidEntry()
+        return if (key.isEmpty()) null
         else storeEntryFactory.open(key,
                 if (encryptedSwitch.isChecked) StoreMode.ENCRYPTED else StoreMode.PLAIN_TEXT,
                 String::class.java
@@ -92,14 +90,4 @@ internal class MainPresenter(context: Context) {
 
     fun observeChanges() = plainTextStore.observeChanges().mergeWith(encryptedStore.observeChanges())!!
 
-    private inner class VoidEntry : KeyValueEntry<String> {
-        override fun get(): String? = null
-        override fun get(defaultValue: String) = defaultValue
-        override fun save(value: String?) = Unit
-        override fun drop() = Unit
-        override fun getKey() = ""
-        override fun exists() = false
-        override fun maybe() = Optional.empty<String>()
-        override fun observe() = Observable.just(Optional.empty<String>())
-    }
 }

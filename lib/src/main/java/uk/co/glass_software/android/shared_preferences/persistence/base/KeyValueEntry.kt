@@ -34,12 +34,27 @@ interface KeyValueEntry<C> {
 
     fun get(defaultValue: C): C
 
+    fun <S : C> getAs(subclass: Class<S>): S?
+
+    fun <S : C> getAs(subclass: Class<S>,
+                      defaultValue: S): S
+
     fun maybe(): Optional<C>
 
     fun drop()
 
     fun exists(): Boolean
 
-    fun observe() : Observable<Optional<C>>
+    fun observe(emitCurrentValue: Boolean = false): Observable<Optional<C>>
 
+}
+
+interface KeyClassProvider<C> : UniqueKeyProvider, ValueClassProvider<C>
+
+interface UniqueKeyProvider {
+    val uniqueKey: String
+}
+
+interface ValueClassProvider<C> {
+    val valueClass: Class<C>
 }

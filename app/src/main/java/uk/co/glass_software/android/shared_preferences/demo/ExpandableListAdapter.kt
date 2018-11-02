@@ -24,19 +24,18 @@ package uk.co.glass_software.android.shared_preferences.demo
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
-import ix.Ix
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
-import uk.co.glass_software.android.shared_preferences.demo.model.Keys
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
+import uk.co.glass_software.android.shared_preferences.demo.model.Counter
+import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
+import uk.co.glass_software.android.shared_preferences.demo.model.Person
+import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils.openSharedPreferences
-import uk.co.glass_software.android.shared_preferences.utils.StoreKey
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import java.text.SimpleDateFormat
 import java.util.*
@@ -70,18 +69,17 @@ internal class ExpandableListAdapter(context: Context,
         addEntries("Plain text entries", plainTextPreferences.all)
 
         addEntries("Encrypted entries (as returned by the store)",
-                Ix.from(encryptedPreferences.all.keys)
-                        .map<Pair<String, KeyValueEntry<Any>>> { key ->
-                            Pair.create<String, KeyValueEntry<Any>>(
-                                    key,
+                encryptedPreferences.all.keys
+                        .associate {
+                            Pair(
+                                    it,
                                     presenter.storeEntryFactory.open(
-                                            key,
+                                            it,
                                             StoreMode.ENCRYPTED,
-                                            getValueClass(key)
-                                    )
+                                            getValueClass(it)
+                                    ).get()
                             )
                         }
-                        .toMap<String, String>({ pair -> pair.first }) { pair -> pair.second.get("[error]").toString() }
         )
 
         addEntries("Encrypted entries (as stored on disk)", encryptedPreferences.all)
@@ -89,20 +87,18 @@ internal class ExpandableListAdapter(context: Context,
         notifyDataSetChanged()
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <C> getValueClass(key: String) =
-            Ix.from(Arrays.asList(*Keys.values()))
-                    .map { keys -> keys.key }
-                    .filter { storeKey -> key == storeKey.uniqueKey }
-                    .map<Class<*>>(StoreKey::valueClass)
-                    .defaultIfEmpty(String::class.java)
-                    .first() as Class<C>
+    private fun getValueClass(key: String) =
+            when (key) {
+                Counter.KEY -> Int::class.java
+                LastOpenDate.KEY -> Date::class.java
+                PersonEntry.KEY -> Person::class.java
+                else -> String::class.java
+            }
 
     private fun addEntries(header: String,
                            entries: Map<String, *>) {
-        val list = Ix.from<Map.Entry<String, *>>(entries.entries)
+        val list = entries.entries
                 .map { entry -> presenter.getKey(entry) + " => " + entry.value }
-                .toList()
 
         addEntries(header, *list.toTypedArray())
     }

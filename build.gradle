@@ -37,7 +37,7 @@ buildscript {
 
     dependencies {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath 'com.android.tools.build:gradle:3.3.0-alpha12'
+        classpath 'com.android.tools.build:gradle:3.3.0-beta02'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -72,7 +72,6 @@ ext {
     rxKotlinVersion = '2.3.0'
     rxAndroidVersion = '2.1.0'
 
-    ixJavaVersion = '1.0.0'
     gsonVersion = '2.8.5'
     concealVersion = '2.0.2'
 
@@ -96,7 +95,6 @@ ext {
             jsr250        : "javax.annotation:jsr250-api:$jsr250Version",
 
             gson          : "com.google.code.gson:gson:$gsonVersion",
-            ixJava        : "com.github.akarnokd:ixjava:$ixJavaVersion",
 
             boilerplate   : "com.github.pthomain:boilerplate:$boilerplateVersion",
             conceal       : "com.facebook.conceal:conceal:$concealVersion",

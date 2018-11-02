@@ -24,4 +24,11 @@ package uk.co.glass_software.android.shared_preferences.demo.model
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 
-class PersonEntry(store: KeyValueStore) : StoreEntry<Person>(store, Keys.PERSON.key)
+class PersonEntry(store: KeyValueStore)
+    : StoreEntry<Person>(store, KEY, Person::class.java) {
+
+    companion object {
+        const val KEY = "person"
+    }
+
+}

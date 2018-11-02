@@ -82,12 +82,12 @@ class MainActivity : AppCompatActivity(), RxAutoSubscriber {
     private fun onSaveClicked() {
         val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
         val value = valueEditText.text.toString()
-        storeEntry.save(if (value.isEmpty()) null else value)
+        storeEntry?.save(if (value.isEmpty()) null else value)
     }
 
     private fun onDeleteClicked() {
         val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
-        storeEntry.drop()
+        storeEntry?.drop()
     }
 
     private fun openGithub() {
