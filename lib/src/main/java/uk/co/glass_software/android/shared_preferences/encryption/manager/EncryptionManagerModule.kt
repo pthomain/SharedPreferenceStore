@@ -36,9 +36,9 @@ internal class EncryptionManagerModule {
     fun provideDefaultEncryptionManager(concealEncryptionManager: ConcealEncryptionManager,
                                         logger: Logger): EncryptionManager? {
         if (concealEncryptionManager.isEncryptionSupported) {
-            logger.d("Using Conceal encryption manager")
+            logger.d(this, "Using Conceal encryption manager")
         } else {
-            logger.e("Encryption is NOT supported")
+            logger.e(this, "Encryption is NOT supported")
         }
         return concealEncryptionManager
     }

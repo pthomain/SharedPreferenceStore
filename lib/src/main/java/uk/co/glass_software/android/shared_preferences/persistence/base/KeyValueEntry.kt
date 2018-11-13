@@ -23,6 +23,7 @@ package uk.co.glass_software.android.shared_preferences.persistence.base
 
 import io.reactivex.Observable
 import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
+import uk.co.glass_software.android.boilerplate.utils.rx.On
 
 interface KeyValueEntry<C> {
 
@@ -45,7 +46,8 @@ interface KeyValueEntry<C> {
 
     fun exists(): Boolean
 
-    fun observe(emitCurrentValue: Boolean = false): Observable<Optional<C>>
+    fun observe(emitCurrentValue: Boolean = false,
+                observeOn:On = On.MainThread): Observable<Optional<C>>
 
 }
 

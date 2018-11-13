@@ -76,7 +76,7 @@ internal open class SharedPreferenceStore(prefs: Prefs,
     protected open fun saveValueInternal(key: String,
                                          value: Any?) {
         if (value == null) {
-            logger.d("Deleting entry $key")
+            logger.d(this, "Deleting entry $key")
             sharedPreferences.apply {
                 if (contains(key)) {
                     edit().remove(key).apply()
@@ -104,10 +104,10 @@ internal open class SharedPreferenceStore(prefs: Prefs,
                 apply()
             }
 
-            logger.d("Saving entry $key -> $value")
+            logger.d(this, "Saving entry $key -> $value")
             changeSubject.onNext(key)
         } catch (e: Exception) {
-            logger.e(e, e.message)
+            logger.e(this, e)
         }
     }
 
@@ -156,11 +156,11 @@ internal open class SharedPreferenceStore(prefs: Prefs,
                         } as O?
                     } else defaultValue)
                 } catch (e: Exception) {
-                    logger.e(e, e.message)
+                    logger.e(this, e)
                     defaultValue
                 }
             }.also {
-                logger.d("Reading entry $key -> $it")
+                logger.d(this, "Reading entry $key -> $it")
             }
 
     protected open fun serialise(key: String,
@@ -173,7 +173,7 @@ internal open class SharedPreferenceStore(prefs: Prefs,
                         else -> null
                     }
                 } catch (e: Serialiser.SerialisationException) {
-                    logger.e(e, "Could not serialise $value")
+                    logger.e(this, e, "Could not serialise $value")
                     null
                 }
             }

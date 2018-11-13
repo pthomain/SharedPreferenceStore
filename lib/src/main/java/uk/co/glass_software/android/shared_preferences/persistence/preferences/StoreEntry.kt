@@ -21,9 +21,8 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
-import io.reactivex.Observable
 import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
-
+import uk.co.glass_software.android.boilerplate.utils.rx.On
 import uk.co.glass_software.android.shared_preferences.persistence.base.*
 
 open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueStore,
@@ -84,14 +83,13 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     override fun <S : C> getAs(subclass: Class<S>, defaultValue: S) =
             store.getValue(uniqueKey, subclass, defaultValue)
 
-    override fun observe(emitCurrentValue: Boolean) =
+    override fun observe(emitCurrentValue: Boolean,
+                         observeOn: On) =
             store.observeChanges()
                     .filter { it == getKey() }
                     .map { maybe() }
-                    .let {
-                        if (emitCurrentValue) Observable.just(maybe()).mergeWith(it)
-                        else it
-                    }!!
+                    .let { if (emitCurrentValue) it.startWith(maybe()) else it }
+                    .observeOn(observeOn.instance)!!
 
     override fun getKey() = uniqueKey
 

@@ -35,7 +35,7 @@ internal class LenientEncryptedStore(plainTextStore: KeyValueStore,
     private val internalStore = if (isEncryptionSupported) encryptedStore else plainTextStore
 
     init {
-        logger.d("Encryption is${if (isEncryptionSupported) "" else " NOT"} supported")
+        logger.d(this, "Encryption is${if (isEncryptionSupported) "" else " NOT"} supported")
     }
 
     override fun <V> getValue(key: String,
