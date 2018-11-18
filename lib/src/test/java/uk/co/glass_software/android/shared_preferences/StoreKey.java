@@ -21,17 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences;
 
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry;
+import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider;
+import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider;
 
-public enum StoreKey implements StoreEntry.UniqueKeyProvider, StoreEntry.ValueClassProvider{
-    
+public enum StoreKey implements UniqueKeyProvider, ValueClassProvider {
+
     TEST;
-    
+
     @Override
     public String getUniqueKey() {
         return "test";
     }
-    
+
     @Override
     public Class getValueClass() {
         return String.class;

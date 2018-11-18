@@ -25,7 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.reactivex.Observable;
+import uk.co.glass_software.android.boilerplate.utils.rx.On;
 import uk.co.glass_software.android.shared_preferences.StoreKey;
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 
 import static junit.framework.Assert.assertEquals;
@@ -45,7 +47,7 @@ public class StoreEntryTest {
 
     private KeyValueStore mockStore;
 
-    private StoreEntry<String> target;
+    private KeyValueEntry<String> target;
 
     @Before
     public void setUp() throws Exception {
@@ -125,7 +127,7 @@ public class StoreEntryTest {
     public void testObserveWithWrongKey() {
         when(mockStore.observeChanges()).thenReturn(Observable.just("wrongKey"));
 
-        target.observe().subscribe();
+        target.observe(false, On.Trampoline.INSTANCE).subscribe();
 
         verify(mockStore, never()).getValue(any(), any());
     }
@@ -136,8 +138,8 @@ public class StoreEntryTest {
         when(mockStore.hasValue(eq(key.getUniqueKey()))).thenReturn(true);
         when(mockStore.getValue(eq(key.getUniqueKey()), eq(String.class))).thenReturn(someValue);
 
-        assertTrue(target.observe().blockingFirst().isPresent());
-        assertEquals(someValue, target.observe().blockingFirst().get());
+        assertTrue(target.observe(false, On.Trampoline.INSTANCE).blockingFirst().isPresent());
+        assertEquals(someValue, target.observe(false, On.Trampoline.INSTANCE).blockingFirst().get());
     }
 
 }

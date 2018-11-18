@@ -21,6 +21,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 buildscript {
     repositories {
@@ -88,4 +89,7 @@ dependencies {
     implementation project(":lib")
 
     implementation appDependencies.gson
+
+    implementation appDependencies.dagger
+    kapt appDependencies.daggerCompiler
 }

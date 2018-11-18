@@ -27,38 +27,46 @@ import android.database.DataSetObserver
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.Switch
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import io.reactivex.disposables.CompositeDisposable
-import uk.co.glass_software.android.boilerplate.utils.rx.RxAutoSubscriber
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
+import uk.co.glass_software.android.boilerplate.ui.mvp.MvpActivity
+import uk.co.glass_software.android.boilerplate.utils.resources.findLazy
+import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), RxAutoSubscriber {
+internal class MainActivity : MvpActivity<MainMvpView, MainMvpPresenter, MainViewComponent>(), MainMvpView {
 
-    override var subscriptions = CompositeDisposable()
+    @Inject
+    lateinit var listAdapter: ExpandableListAdapter
 
-    private lateinit var listAdapter: ExpandableListAdapter
-    private lateinit var presenter: MainPresenter
+    private val keyEditText by findLazy<EditText>(R.id.input_key)
+    private val valueEditText by findLazy<EditText>(R.id.input_value)
+    private val encryptedSwitch by findLazy<Switch>(R.id.encrypted_switch)
+    private val listView by findLazy<ExpandableListView>(R.id.result)
+    private val buttonSave by findLazy<Button>(R.id.button_save)
+    private val buttonDelete by findLazy<Button>(R.id.button_delete)
+    private val buttonGithub by findLazy<View>(R.id.github)
 
-    private val keyEditText by lazy { findViewById<EditText>(R.id.input_key) }
-    private val valueEditText by lazy { findViewById<EditText>(R.id.input_value) }
-    private val encryptedSwitch by lazy { findViewById<Switch>(R.id.encrypted_switch) }
-    private val listView by lazy { findViewById<ExpandableListView>(R.id.result) }
+    override fun initialiseComponent() =
+            DaggerMainMvpContract_MainViewComponent
+                    .builder()
+                    .mainViewModule(MainViewModule(this))
+                    .build()!!.apply { inject(this@MainActivity) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateMvpView(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
 
-        findViewById<View>(R.id.button_save).setOnClickListener { onSaveClicked() }
-        findViewById<View>(R.id.button_delete).setOnClickListener { onDeleteClicked() }
-        findViewById<View>(R.id.github).setOnClickListener { openGithub() }
+        buttonSave.setOnClickListener { onSaveClicked() }
+        buttonDelete.setOnClickListener { onDeleteClicked() }
+        buttonGithub.setOnClickListener { openGithub() }
+    }
 
-        presenter = MainPresenter(this)
-        listAdapter = ExpandableListAdapter(this, presenter)
+    override fun onMvpViewCreated() {
         listView.setAdapter(listAdapter)
-
         listAdapter.registerDataSetObserver(object : DataSetObserver() {
             override fun onChanged() {
                 for (i in 0 until listAdapter.groupCount) {
@@ -68,35 +76,36 @@ class MainActivity : AppCompatActivity(), RxAutoSubscriber {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun showEntries() {
         listAdapter.showEntries()
-        presenter.observeChanges().autoSubscribe { _ -> listAdapter.showEntries() }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.onPause()
     }
 
     private fun onSaveClicked() {
-        val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
-        val value = valueEditText.text.toString()
-        storeEntry?.save(if (value.isEmpty()) null else value)
+        valueEditText.text.toString().let {
+            getStoreEntry()?.save(if (it.isEmpty()) null else it)
+        }
     }
 
     private fun onDeleteClicked() {
-        val storeEntry = presenter.getStoreEntry(keyEditText, encryptedSwitch)
-        storeEntry?.drop()
+        getStoreEntry()?.drop()
     }
 
+    private fun getStoreEntry() =
+            getPresenter().getStoreEntry(
+                    keyEditText.text.toString(),
+                    encryptedSwitch.isChecked
+            )
+
     private fun openGithub() {
-        startActivity(Intent(ACTION_VIEW, Uri.parse("https://github.com/pthomain/SharedPreferenceStore")))
+        startActivity(Intent(
+                ACTION_VIEW,
+                Uri.parse("https://github.com/pthomain/SharedPreferenceStore")
+        ))
     }
 
     companion object {
         init {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            setDefaultNightMode(MODE_NIGHT_YES)
         }
     }
 }

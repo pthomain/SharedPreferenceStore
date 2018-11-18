@@ -21,7 +21,6 @@
 
 package uk.co.glass_software.android.shared_preferences.demo
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -29,40 +28,39 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
+import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils.openSharedPreferences
 import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-internal class ExpandableListAdapter(context: Context,
-                                     private val presenter: MainPresenter)
-    : BaseExpandableListAdapter() {
+internal class ExpandableListAdapter(
+        private val presenter: MainMvpContract.MainMvpPresenter,
+        private val lastOpenDate: LastOpenDate,
+        private val counter: Counter,
+        private val inflater: LayoutInflater,
+        private val simpleDateFormat: SimpleDateFormat,
+        private val plainTextPreferences: SharedPreferences,
+        private val encryptedPreferences: SharedPreferences,
+        private val storeEntryFactory: StoreEntryFactory
+) : BaseExpandableListAdapter() {
 
     private val headers: LinkedList<String> = LinkedList()
     private val children: LinkedHashMap<String, List<String>> = LinkedHashMap()
-    private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val simpleDateFormat = SimpleDateFormat("hh:mm:ss")
-    private val plainTextPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME).file
-
-    //used only to display values as stored on disk, should not be used directly in practice
-    private val encryptedPreferences: SharedPreferences = openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME).file
 
     fun showEntries() {
         headers.clear()
         children.clear()
 
-        val lastOpenDate = presenter.lastOpenDate().get()
+        val lastOpenDate = lastOpenDate.get()
         val formattedDate = lastOpenDate?.let { simpleDateFormat.format(it) }
 
         addEntries("App opened",
-                "Count: " + presenter.counter().get() + " time(s)",
+                "Count: " + counter.get() + " time(s)",
                 "Last open date: " + (formattedDate ?: "N/A")
         )
 
@@ -73,7 +71,7 @@ internal class ExpandableListAdapter(context: Context,
                         .associate {
                             Pair(
                                     it,
-                                    presenter.storeEntryFactory.open(
+                                    storeEntryFactory.open(
                                             it,
                                             StoreMode.ENCRYPTED,
                                             getValueClass(it)

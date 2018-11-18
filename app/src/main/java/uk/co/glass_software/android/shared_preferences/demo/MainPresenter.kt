@@ -21,73 +21,70 @@
 
 package uk.co.glass_software.android.shared_preferences.demo
 
-import android.content.Context
-import android.widget.EditText
-import android.widget.Switch
-import com.google.gson.Gson
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.OnLifecycleEvent
+import io.reactivex.disposables.CompositeDisposable
+import uk.co.glass_software.android.boilerplate.ui.mvp.MvpPresenter
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
+import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode.ENCRYPTED
+import uk.co.glass_software.android.shared_preferences.utils.StoreMode.PLAIN_TEXT
 import java.util.*
 
-
-internal class MainPresenter(context: Context) {
-
-    val storeEntryFactory: StoreEntryFactory = StoreEntryFactory.builder(context)
-            .customSerialiser(GsonSerialiser(Gson()))
-            .build()
-
-    private val plainTextStore = storeEntryFactory.plainTextStore
-    private val encryptedStore = storeEntryFactory.encryptedStore
-
-    private val counter = Counter(plainTextStore)
-    private val lastOpenDate = LastOpenDate(encryptedStore)
-    private val personEntry = PersonEntry(encryptedStore)
+internal class MainPresenter(mvpView: MainMvpView,
+                             private val personEntry: PersonEntry,
+                             private val counter: Counter,
+                             private val lastOpenDate: LastOpenDate,
+                             private val plainTextStore: KeyValueStore,
+                             private val encryptedStore: KeyValueStore,
+                             private val storeEntryFactory: StoreEntryFactory)
+    : MvpPresenter<MainMvpView, MainMvpPresenter, MainViewComponent>(mvpView, CompositeDisposable()),
+        MainMvpPresenter {
 
     init {
         createOrUpdatePerson()
     }
 
     private fun createOrUpdatePerson() {
-        val lastSeenDate = Date()
-
         personEntry.get(Person(
                 age = 30,
                 firstName = "John",
                 name = "Smith"
         ))
-                .copy(lastSeenDate = lastSeenDate)
+                .copy(lastSeenDate = Date())
                 .let { personEntry.save(it) }
     }
 
+    @OnLifecycleEvent(ON_PAUSE)
     fun onPause() {
         counter.save(counter.get(1).plus(1))
         lastOpenDate.save(Date())
         createOrUpdatePerson()
     }
 
-    fun counter() = counter
-
-    fun lastOpenDate() = lastOpenDate
-
-    fun getKey(entry: Map.Entry<String, *>) = entry.key
-
-    fun getStoreEntry(editText: EditText,
-                      encryptedSwitch: Switch): KeyValueEntry<String>? {
-        val key = editText.text.toString()
-
-        return if (key.isEmpty()) null
-        else storeEntryFactory.open(key,
-                if (encryptedSwitch.isChecked) StoreMode.ENCRYPTED else StoreMode.PLAIN_TEXT,
-                String::class.java
-        )
-
+    @OnLifecycleEvent(ON_RESUME)
+    fun onResume() {
+        plainTextStore.observeChanges()
+                .mergeWith(encryptedStore.observeChanges())
+                .startWith("ignore")
+                .autoSubscribe { mvpView.showEntries() }
     }
 
-    fun observeChanges() = plainTextStore.observeChanges().mergeWith(encryptedStore.observeChanges())!!
+    override fun getKey(entry: Map.Entry<String, *>) = entry.key
+
+    override fun getStoreEntry(key: String,
+                               isEncrypted: Boolean) =
+            if (key.isEmpty()) null
+            else storeEntryFactory.open(
+                    key,
+                    if (isEncrypted) ENCRYPTED else PLAIN_TEXT,
+                    String::class.java
+            )
 
 }

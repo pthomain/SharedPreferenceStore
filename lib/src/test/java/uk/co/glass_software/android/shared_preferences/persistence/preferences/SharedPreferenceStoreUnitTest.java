@@ -107,14 +107,6 @@ public class SharedPreferenceStoreUnitTest {
     }
 
     @Test
-    public void testGetChangeSubject() {
-        assertEquals("Wrong behaviour subject returned",
-                behaviorSubject,
-                target.observeChanges()
-        );
-    }
-
-    @Test
     public void testBase64Read() throws Serialiser.SerialisationException {
         when(mockBase64Serialiser.canHandleType(eq(Serializable.class))).thenReturn(true);
         addValue();

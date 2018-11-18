@@ -32,6 +32,7 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     : KeyValueEntry<C>,
         UniqueKeyProvider by keyProvider,
         ValueClassProvider<C> by valueClassProvider {
+
     @JvmOverloads
     constructor(store: KeyValueStore,
                 key: String,
