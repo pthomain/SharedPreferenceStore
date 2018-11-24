@@ -47,11 +47,13 @@ interface KeyValueEntry<C> {
     fun exists(): Boolean
 
     fun observe(emitCurrentValue: Boolean = false,
-                observeOn:On = On.MainThread): Observable<Optional<C>>
+                observeOn: On = On.MainThread): Observable<Optional<C>>
 
 }
 
 interface KeyClassProvider<C> : UniqueKeyProvider, ValueClassProvider<C>
+
+interface OptionalEntry<C> : KeyValueEntry<C>, Optional<C>
 
 interface UniqueKeyProvider {
     val uniqueKey: String

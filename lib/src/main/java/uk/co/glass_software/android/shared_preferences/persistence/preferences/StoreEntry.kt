@@ -22,6 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
+import uk.co.glass_software.android.boilerplate.utils.lambda.OptionalValue
 import uk.co.glass_software.android.boilerplate.utils.rx.On
 import uk.co.glass_software.android.shared_preferences.persistence.base.*
 
@@ -29,9 +30,15 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
                                                    keyProvider: UniqueKeyProvider,
                                                    valueClassProvider: ValueClassProvider<C>,
                                                    private val defaultValue: C? = null)
-    : KeyValueEntry<C>,
+    : OptionalEntry<C>,
         UniqueKeyProvider by keyProvider,
         ValueClassProvider<C> by valueClassProvider {
+
+    @JvmOverloads
+    constructor(store: KeyValueStore,
+                keyProvider: KeyClassProvider<C>,
+                defaultValue: C? = null)
+            : this(store, keyProvider, keyProvider, defaultValue)
 
     @JvmOverloads
     constructor(store: KeyValueStore,
@@ -49,17 +56,6 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
             defaultValue
     )
 
-    @JvmOverloads
-    constructor(store: KeyValueStore,
-                keyProvider: KeyClassProvider<C>,
-                defaultValue: C? = null)
-            : this(store, keyProvider, keyProvider, defaultValue)
-
-    @Synchronized
-    override fun save(value: C?) {
-        store.saveValue(getKey(), value)
-    }
-
     @Synchronized
     override fun get() =
             store.getValue(getKey(), valueClass) ?: defaultValue
@@ -69,14 +65,6 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
             store.getValue(getKey(), valueClass, defaultValue)
 
     @Synchronized
-    override fun maybe() = Optional.ofNullable(get())
-
-    @Synchronized
-    override fun drop() {
-        store.deleteValue(getKey())
-    }
-
-    @Synchronized
     override fun <S : C> getAs(subclass: Class<S>) =
             store.getValue(getKey(), subclass)
 
@@ -84,17 +72,55 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
     override fun <S : C> getAs(subclass: Class<S>, defaultValue: S) =
             store.getValue(uniqueKey, subclass, defaultValue)
 
+    @Synchronized
+    override fun maybe() =
+            OptionalValue.ofNullable(get()) as Optional<C>
+
+    @Synchronized
+    override fun save(value: C?) {
+        store.saveValue(getKey(), value)
+    }
+
+    @Synchronized
+    override fun drop() {
+        store.deleteValue(getKey())
+    }
+
+    override fun getKey() = uniqueKey
+
+    override fun exists() = store.hasValue(getKey())
+
     override fun observe(emitCurrentValue: Boolean,
                          observeOn: On) =
             store.observeChanges()
                     .filter { it == getKey() }
                     .map { maybe() }
-                    .let { if (emitCurrentValue) it.startWith(maybe()) else it }
+                    .compose { if (emitCurrentValue) it.startWith(maybe()) else it }
                     .observeOn(observeOn.instance)!!
 
-    override fun getKey() = uniqueKey
+    override fun isPresent() = exists()
 
-    override fun exists() = store.hasValue(getKey())
+    override fun ifPresent(consumer: (C) -> Unit) {
+        maybe().ifPresent(consumer)
+    }
+
+    override fun filter(predicate: (C) -> Boolean) =
+            maybe().filter(predicate)
+
+    override fun <U> map(mapper: (C) -> U) =
+            maybe().map(mapper)
+
+    override fun <U> flatMap(mapper: (C) -> Optional<U>) =
+            maybe().flatMap(mapper)
+
+    override fun orElse(other: C) =
+            maybe().orElse(other)
+
+    override fun orElseGet(other: () -> C) =
+            maybe().orElseGet(other)
+
+    override fun <X : Throwable> orElseThrow(exceptionSupplier: () -> X) =
+            maybe().orElseThrow(exceptionSupplier)
 
 }
 
