@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.facebook.crypto.** { *; }
+-keep class com.facebook.jni.** { *; }
+-keepclassmembers class com.facebook.cipher.jni.** { *; }
