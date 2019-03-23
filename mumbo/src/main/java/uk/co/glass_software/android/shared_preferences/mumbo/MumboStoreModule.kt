@@ -22,6 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.mumbo
 
 import android.content.Context
+import android.util.Base64
 import dagger.Module
 import dagger.Provides
 import io.reactivex.subjects.PublishSubject
@@ -33,16 +34,18 @@ import uk.co.glass_software.android.shared_preferences.mumbo.store.ForgetfulEncr
 import uk.co.glass_software.android.shared_preferences.mumbo.store.LenientEncryptedStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore
+import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Base64Serialiser
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-internal class MumboModule(private val context: Context,
-                           private val plainTextPrefs: Prefs,
-                           private val encryptedPrefs: Prefs,
-                           private val logger: Logger,
-                           private val encryptionManager: EncryptionManager) {
+internal class MumboStoreModule(private val context: Context,
+                                private val plainTextPrefs: Prefs,
+                                private val encryptedPrefs: Prefs,
+                                private val logger: Logger,
+                                private val encryptionManager: EncryptionManager,
+                                private val customSerialiser: Serialiser?) {
 
     @Provides
     @Singleton
@@ -51,7 +54,8 @@ internal class MumboModule(private val context: Context,
     @Provides
     @Singleton
     @Named(PLAIN_TEXT)
-    fun provideSharedPreferenceStore(logger: Logger): SharedPreferenceStore =
+    fun provideSharedPreferenceStore(base64Serialiser: Base64Serialiser,
+                                     logger: Logger): SharedPreferenceStore =
             SharedPreferenceStore(
                     plainTextPrefs,
                     base64Serialiser,
@@ -62,8 +66,7 @@ internal class MumboModule(private val context: Context,
 
     @Provides
     @Singleton
-    fun provideEncryptedSharedPreferenceStore(@Named(BASE_64) base64Serialiser: Serialiser,
-                                              @Named(CUSTOM) customSerialiser: Serialiser?,
+    fun provideEncryptedSharedPreferenceStore(base64Serialiser: Base64Serialiser,
                                               logger: Logger) =
             EncryptedSharedPreferenceStore(
                     encryptedPrefs,
@@ -120,14 +123,25 @@ internal class MumboModule(private val context: Context,
     @Singleton
     fun provideLogger() = logger
 
+    @Provides
+    @Singleton
+    fun provideEncryptionManager() = encryptionManager
+
+    @Provides
+    @Singleton
+    fun provideBase64Serialiser(logger: Logger) = Base64Serialiser(
+            logger,
+            object : Base64Serialiser.CustomBase64 {
+                override fun encode(input: ByteArray, flags: Int) = Base64.encodeToString(input, flags)
+                override fun decode(input: String, flags: Int) = Base64.decode(input, flags)
+            }
+    )
+
     companion object {
         const val PLAIN_TEXT = "plain_text"
         const val ENCRYPTED = "encrypted"
         const val LENIENT = "lenient"
         const val FORGETFUL = "forgetful"
-
-        const val BASE_64 = "base_64"
-        const val CUSTOM = "custom"
     }
 
 }

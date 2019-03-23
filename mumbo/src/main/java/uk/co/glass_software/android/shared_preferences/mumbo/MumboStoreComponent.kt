@@ -29,8 +29,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [MumboModule::class])
-internal interface MumboComponent {
+@Component(modules = [MumboStoreModule::class])
+internal interface MumboStoreComponent {
 
     @Named(PLAIN_TEXT)
     fun store(): KeyValueStore
