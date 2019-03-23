@@ -87,6 +87,7 @@ android {
 
 dependencies {
     implementation project(":lib")
+    implementation project(":mumbo")
 
     implementation appDependencies.gson
 

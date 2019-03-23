@@ -27,7 +27,6 @@ import dagger.Provides
 import io.reactivex.subjects.PublishSubject
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule.Companion.BASE_64
@@ -38,8 +37,7 @@ import javax.inject.Singleton
 
 @Module(includes = [SerialisationModule::class])
 internal class StoreModule(private val context: Context,
-                           private val plainTextPrefs: Prefs,
-                           private val encryptedPrefs: Prefs,
+                           private val prefs: Prefs,
                            private val logger: Logger) {
 
     @Provides
@@ -48,74 +46,21 @@ internal class StoreModule(private val context: Context,
 
     @Provides
     @Singleton
-    @Named(PLAIN_TEXT)
     fun provideSharedPreferenceStore(@Named(BASE_64) base64Serialiser: Serialiser,
                                      @Named(CUSTOM) customSerialiser: Serialiser?,
                                      logger: Logger): SharedPreferenceStore =
             SharedPreferenceStore(
-                    plainTextPrefs,
+                    prefs,
                     base64Serialiser,
                     customSerialiser,
                     PublishSubject.create(),
                     logger
             )
 
-    @Provides
-    @Singleton
-    fun provideEncryptedSharedPreferenceStore(@Named(BASE_64) base64Serialiser: Serialiser,
-                                              @Named(CUSTOM) customSerialiser: Serialiser?,
-                                              encryptionManager: EncryptionManager?,
-                                              logger: Logger) =
-            EncryptedSharedPreferenceStore(
-                    encryptedPrefs,
-                    base64Serialiser,
-                    customSerialiser,
-                    PublishSubject.create(),
-                    logger,
-                    encryptionManager
-            )
 
     @Provides
     @Singleton
-    fun provideLenientEncryptedStore(@Named(PLAIN_TEXT) plainTextStore: SharedPreferenceStore,
-                                     encryptedStore: EncryptedSharedPreferenceStore,
-                                     logger: Logger): LenientEncryptedStore =
-            LenientEncryptedStore(
-                    plainTextStore,
-                    encryptedStore,
-                    encryptedStore.isEncryptionSupported,
-                    logger
-            )
-
-    @Provides
-    @Singleton
-    fun provideForgetfulEncryptedStore(encryptedStore: EncryptedSharedPreferenceStore,
-                                       logger: Logger): ForgetfulEncryptedStore =
-            ForgetfulEncryptedStore(
-                    encryptedStore,
-                    encryptedStore.isEncryptionSupported,
-                    logger
-            )
-
-    @Provides
-    @Singleton
-    @Named(PLAIN_TEXT)
-    fun provideStore(@Named(PLAIN_TEXT) store: SharedPreferenceStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(ENCRYPTED)
-    fun provideEncryptedStore(store: EncryptedSharedPreferenceStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(LENIENT)
-    fun provideLenientStore(store: LenientEncryptedStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(FORGETFUL)
-    fun provideForgetfulStore(store: ForgetfulEncryptedStore): KeyValueStore = store
+    fun provideStore(store: SharedPreferenceStore): KeyValueStore = store
 
     @Provides
     @Singleton
@@ -123,10 +68,6 @@ internal class StoreModule(private val context: Context,
 
     companion object {
         internal const val MAX_FILE_NAME_LENGTH = 127
-        const val PLAIN_TEXT = "plain_text"
-        const val ENCRYPTED = "encrypted"
-        const val LENIENT = "lenient"
-        const val FORGETFUL = "forgetful"
     }
 
 }

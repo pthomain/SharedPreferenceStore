@@ -33,7 +33,6 @@ import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList

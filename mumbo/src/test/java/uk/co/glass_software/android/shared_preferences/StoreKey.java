@@ -19,19 +19,22 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences
+package uk.co.glass_software.android.shared_preferences;
 
-import dagger.Component
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule
-import javax.inject.Singleton
+import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider;
+import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider;
 
-@Singleton
-@Component(modules = [StoreModule::class])
-internal interface SharedPreferenceComponent {
+public enum StoreKey implements UniqueKeyProvider, ValueClassProvider {
 
-    fun store(): KeyValueStore
+    TEST;
 
-    fun logger(): Logger
+    @Override
+    public String getUniqueKey() {
+        return "test";
+    }
+
+    @Override
+    public Class getValueClass() {
+        return String.class;
+    }
 }

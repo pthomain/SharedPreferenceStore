@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.utils
+package uk.co.glass_software.android.shared_preferences.mumbo.store
 
 enum class StoreMode {
     PLAIN_TEXT,

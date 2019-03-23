@@ -19,33 +19,28 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager
+package uk.co.glass_software.android.shared_preferences.mumbo.encryption
 
-import android.util.Base64
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
-
-internal abstract class BaseEncryptionManager(protected val logger: Logger)
+class MumboEncryptionManager(private val mumboEncryptionManager: uk.co.glass_software.android.mumbo.base.EncryptionManager)
     : EncryptionManager {
+
+    override val isEncryptionSupported =
+            mumboEncryptionManager.isEncryptionSupported
 
     override fun encrypt(toEncrypt: String?,
                          dataTag: String) =
-            try {
-                toEncrypt?.let { encryptBytes(it.toByteArray(), dataTag) }
-                        ?.let { Base64.encodeToString(it, Base64.DEFAULT) }
-            } catch (e: Exception) {
-                logger.e(this, "Could not encrypt data for tag: $dataTag")
-                null
-            }
+            mumboEncryptionManager.encrypt(toEncrypt, dataTag)
+
+    override fun encryptBytes(toEncrypt: ByteArray?,
+                              dataTag: String) =
+            mumboEncryptionManager.encryptBytes(toEncrypt, dataTag)
 
     override fun decrypt(toDecrypt: String?,
                          dataTag: String) =
-            try {
-                toDecrypt?.let { Base64.decode(it.toByteArray(), Base64.DEFAULT) }
-                        ?.let { decryptBytes(it, dataTag) }
-                        ?.let { String(it) }
-            } catch (e: Exception) {
-                logger.e(this, "Could not decrypt data for tag: $dataTag")
-                null
-            }
+            mumboEncryptionManager.decrypt(toDecrypt, dataTag)
+
+    override fun decryptBytes(toDecrypt: ByteArray?,
+                              dataTag: String) =
+            mumboEncryptionManager.decryptBytes(toDecrypt, dataTag)
 
 }

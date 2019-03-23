@@ -28,18 +28,14 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 class SimpleEntry<T>(entryFactory: StoreEntryFactory,
-                     override val mode: StoreMode,
                      override val uniqueKey: String,
                      override val valueClass: Class<T>)
-    : KeyValueEntry<T> by entryFactory.open(uniqueKey, mode, valueClass),
-        KeyClassProvider<T>,
-        StoreMode.Provider
+    : KeyValueEntry<T> by entryFactory.open(uniqueKey, valueClass),
+        KeyClassProvider<T>
 
-inline fun <reified T> StoreEntryFactory.pref(uniqueKey: String,
-                                              mode: StoreMode = StoreMode.PLAIN_TEXT) =
+inline fun <reified T> StoreEntryFactory.pref(uniqueKey: String) =
         SimpleEntry(
                 this,
-                mode,
                 uniqueKey,
                 T::class.java
         )

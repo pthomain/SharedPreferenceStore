@@ -19,4 +19,4 @@
  * under the License.
  */
 
-include ':app', ':lib'
+include ':app', ':lib', ':mumbo'

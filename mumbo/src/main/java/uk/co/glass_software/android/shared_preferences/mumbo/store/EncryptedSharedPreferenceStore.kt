@@ -19,12 +19,13 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.preferences
+package uk.co.glass_software.android.shared_preferences.mumbo.store
 
 import io.reactivex.subjects.Subject
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
+import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 @Suppress("UNCHECKED_CAST")
@@ -33,7 +34,7 @@ internal class EncryptedSharedPreferenceStore(prefs: Prefs,
                                               customSerialiser: Serialiser?,
                                               changeSubject: Subject<String>,
                                               logger: Logger,
-                                              private val encryptionManager: EncryptionManager?)
+                                              private val encryptionManager: EncryptionManager)
     : SharedPreferenceStore(
         prefs,
         base64Serialiser,
@@ -41,8 +42,6 @@ internal class EncryptedSharedPreferenceStore(prefs: Prefs,
         changeSubject,
         logger
 ) {
-
-    val isEncryptionSupported by lazy { encryptionManager != null }
 
     @Synchronized
     override fun saveValueInternal(key: String,
@@ -89,7 +88,8 @@ internal class EncryptedSharedPreferenceStore(prefs: Prefs,
             checkEncryptionAvailable().decrypt(encrypted, key)
 
     private fun checkEncryptionAvailable() =
-            encryptionManager
-                    ?: throw IllegalStateException("Encryption is not supported on this device")
+            if (!encryptionManager.isEncryptionSupported)
+                throw IllegalStateException("Encryption is not supported on this device")
+            else encryptionManager
 
 }

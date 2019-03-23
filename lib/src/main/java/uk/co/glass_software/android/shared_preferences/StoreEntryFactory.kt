@@ -22,47 +22,25 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider
 import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode.*
 
-class StoreEntryFactory internal constructor(logger: Logger,
-                                             val plainTextStore: KeyValueStore,
-                                             val encryptedStore: KeyValueStore,
-                                             val lenientStore: KeyValueStore,
-                                             val forgetfulStore: KeyValueStore,
-                                             val encryptionManager: EncryptionManager?) {
-    init {
-        logger.d(
-                this,
-                "Encryption supported: ${if (encryptionManager?.isEncryptionSupported == true) "TRUE" else "FALSE"}"
-        )
-    }
+class StoreEntryFactory internal constructor(val store: KeyValueStore) {
 
     fun <C> open(key: String,
-                 mode: StoreMode,
                  valueClass: Class<C>): StoreEntry<C> =
-            when (mode) {
-                PLAIN_TEXT -> plainTextStore
-                ENCRYPTED -> encryptedStore
-                LENIENT -> lenientStore
-                FORGETFUL -> forgetfulStore
-            }.let {
-                open(
-                        it,
-                        object : UniqueKeyProvider {
-                            override val uniqueKey = key
-                        },
-                        object : ValueClassProvider<C> {
-                            override val valueClass = valueClass
-                        }
-                )
-            }
+
+            open(
+                    store,
+                    object : UniqueKeyProvider {
+                        override val uniqueKey = key
+                    },
+                    object : ValueClassProvider<C> {
+                        override val valueClass = valueClass
+                    }
+            )
 
     private fun <C> open(store: KeyValueStore,
                          keyProvider: UniqueKeyProvider,
@@ -70,11 +48,6 @@ class StoreEntryFactory internal constructor(logger: Logger,
             StoreEntry(store, keyProvider, valueClassProvider)
 
     companion object {
-
-        const val DEFAULT_PLAIN_TEXT_PREFERENCE_NAME = "plain_text_store"
-        const val DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store"
-
-        fun buildDefault(context: Context) = builder(context).build()
 
         fun builder(context: Context) = StoreEntryFactoryBuilder(
                 context.applicationContext,

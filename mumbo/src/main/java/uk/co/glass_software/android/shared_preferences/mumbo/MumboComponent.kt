@@ -19,28 +19,39 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager
+package uk.co.glass_software.android.shared_preferences.mumbo
 
-import dagger.Module
-import dagger.Provides
+import dagger.Component
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealEncryptionManager
-import uk.co.glass_software.android.shared_preferences.encryption.manager.conceal.ConcealModule
+import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import javax.inject.Named
 import javax.inject.Singleton
 
-@Module(includes = [ConcealModule::class])
-internal class EncryptionManagerModule {
+@Singleton
+@Component(modules = [MumboModule::class])
+internal interface MumboComponent {
 
-    @Provides
-    @Singleton
-    fun provideDefaultEncryptionManager(concealEncryptionManager: ConcealEncryptionManager,
-                                        logger: Logger): EncryptionManager? {
-        if (concealEncryptionManager.isEncryptionSupported) {
-            logger.d(this, "Using Conceal encryption manager")
-        } else {
-            logger.e(this, "Encryption is NOT supported")
-        }
-        return concealEncryptionManager
+    @Named(PLAIN_TEXT)
+    fun store(): KeyValueStore
+
+    @Named(ENCRYPTED)
+    fun encryptedStore(): KeyValueStore
+
+    @Named(LENIENT)
+    fun lenientStore(): KeyValueStore
+
+    @Named(FORGETFUL)
+    fun forgetfulStore(): KeyValueStore
+
+    fun encryptionManager(): EncryptionManager
+
+    fun logger(): Logger
+
+    companion object {
+        const val PLAIN_TEXT = "plain_text"
+        const val ENCRYPTED = "encrypted"
+        const val LENIENT = "lenient"
+        const val FORGETFUL = "forgetful"
     }
-
 }
