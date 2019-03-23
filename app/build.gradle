@@ -86,11 +86,13 @@ android {
 }
 
 dependencies {
-    implementation project(":lib")
     implementation project(":mumbo")
 
     implementation appDependencies.gson
+    implementation appDependencies.appcompatV7
 
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler
+    compile project(path: ':mumbo')
+    compile project(path: ':mumbo')
 }
