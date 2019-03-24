@@ -26,6 +26,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValue
 import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider
 import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
+import java.util.logging.Logger
 
 class StoreEntryFactory internal constructor(val store: KeyValueStore) {
 
@@ -48,9 +49,10 @@ class StoreEntryFactory internal constructor(val store: KeyValueStore) {
             StoreEntry(store, keyProvider, valueClassProvider)
 
     companion object {
-        fun builder(context: Context) = StoreEntryFactoryBuilder(
+        fun builder(context: Context,
+                    isDebug: Boolean = BuildConfig.DEBUG) = StoreEntryFactoryBuilder(
                 context.applicationContext,
-                BuildConfig.DEBUG
+                isDebug
         )
     }
 }

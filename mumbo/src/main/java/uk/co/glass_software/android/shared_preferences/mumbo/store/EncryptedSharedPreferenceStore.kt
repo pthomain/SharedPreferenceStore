@@ -21,63 +21,80 @@
 
 package uk.co.glass_software.android.shared_preferences.mumbo.store
 
-import io.reactivex.subjects.Subject
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
+import uk.co.glass_software.android.boilerplate.Boilerplate.logger
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-internal class EncryptedSharedPreferenceStore(prefs: Prefs,
-                                              base64Serialiser: Serialiser,
-                                              customSerialiser: Serialiser?,
-                                              changeSubject: Subject<String>,
-                                              logger: Logger,
-                                              private val encryptionManager: EncryptionManager)
-    : SharedPreferenceStore(
-        prefs,
-        base64Serialiser,
-        customSerialiser,
-        changeSubject,
-        logger
-) {
+internal class EncryptedSharedPreferenceStore(private val base64Serialiser: Serialiser,
+                                              private val customSerialiser: Serialiser?,
+                                              private val plainTextStore: KeyValueStore,
+                                              private val encryptionManager: EncryptionManager,
+                                              private val isMemoryCacheEnabled: Boolean)
+    : KeyValueStore by plainTextStore {
 
-    @Synchronized
-    override fun saveValueInternal(key: String,
-                                   value: Any?) {
-        super.saveValueInternal(
+    private val cacheMap: MutableMap<String, Any> = HashMap()
+
+    val cachedValues: Map<String, Any>
+        @Synchronized get() = Collections.unmodifiableMap(cacheMap)
+
+    override fun <V> saveValue(key: String,
+                               value: V?) {
+        saveToCache(key, value)
+
+        plainTextStore.saveValue(
                 key,
-                value?.let { serialise(key, it) }
+                value?.let { serialise(key, it as Any) }
         )
     }
 
-    @Synchronized
-    override fun <O> getValueInternal(key: String,
-                                      objectClass: Class<O>,
-                                      defaultValue: O?) =
-            super.getValueInternal(
+    override fun <V> getValue(key: String,
+                              valueClass: Class<V>): V? =
+            plainTextStore.getValue(
                     key,
-                    String::class.java,
-                    null
-            )?.let { deserialise(key, it, objectClass) }
+                    String::class.java
+            )?.let { getValueInternal(it, key, valueClass) }
 
-    override fun serialise(key: String,
-                           value: Any) =
-            encrypt(
-                    super.serialise(key, value),
-                    key
-            )
+    override fun <V> getValue(key: String,
+                              valueClass: Class<V>,
+                              defaultValue: V): V =
+            getValue(key, valueClass) ?: defaultValue
+
+    private fun <V> getValueInternal(encrypted: String,
+                                     key: String,
+                                     valueClass: Class<V>): V? =
+            decrypt(encrypted, key)?.let {
+                deserialise(it, valueClass)
+            }.also { saveToCache(key, it) }
 
     @Throws(Serialiser.SerialisationException::class)
-    override fun <O> deserialise(key: String,
-                                 serialised: String?,
-                                 objectClass: Class<O>) =
-            super.deserialise(
-                    key,
-                    decrypt(serialised, key),
-                    objectClass
-            )
+    private fun serialise(key: String,
+                          value: Any) =
+            value.javaClass.let {
+                try {
+                    when {
+                        customSerialiser?.canHandleType(it) == true -> customSerialiser.serialise(value)
+                        base64Serialiser.canHandleType(it) -> base64Serialiser.serialise(value)
+                        else -> null
+                    }
+                } catch (e: Serialiser.SerialisationException) {
+                    logger.e(this, e, "Could not serialise $value")
+                    null
+                }
+            }.let { encrypt(it, key) }
+
+    @Throws(Serialiser.SerialisationException::class)
+    private fun <O> deserialise(serialised: String?,
+                                objectClass: Class<O>) =
+            serialised?.let {
+                when {
+                    customSerialiser?.canHandleType(objectClass) == true -> customSerialiser.deserialise(serialised, objectClass)
+                    base64Serialiser.canHandleType(objectClass) -> base64Serialiser.deserialise(serialised, objectClass)
+                    else -> null
+                }
+            }
 
     private fun encrypt(clearText: String?,
                         key: String) =
@@ -91,5 +108,16 @@ internal class EncryptedSharedPreferenceStore(prefs: Prefs,
             if (!encryptionManager.isEncryptionSupported)
                 throw IllegalStateException("Encryption is not supported on this device")
             else encryptionManager
+
+    @Synchronized
+    private fun saveToCache(key: String,
+                            value: Any?) {
+        if (isMemoryCacheEnabled) {
+            if (value == null)
+                cacheMap.remove(key)
+            else
+                cacheMap[key] = value
+        }
+    }
 
 }

@@ -24,13 +24,11 @@ package uk.co.glass_software.android.shared_preferences.mumbo
 import android.content.Context
 import uk.co.glass_software.android.boilerplate.Boilerplate
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.mumbo.Mumbo
-import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
-import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
+import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
+import uk.co.glass_software.android.shared_preferences.mumbo.MemoryCache.*
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.MumboEncryptionManager
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils.openSharedPreferences
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 
@@ -39,18 +37,14 @@ class MumboEntryFactoryBuilder internal constructor(
         private val isDebug: Boolean
 ) {
 
-    private var plainTextPreferences: Prefs? = null
-    private var encryptedPreferences: Prefs? = null
+    private var preferencesFileName: String = "shared_preference_store"
     private var logger: Logger? = null
     private var customSerialiser: Serialiser? = null
     private var encryptionManager: EncryptionManager? = null
+    private var isMemoryCacheEnabled: MemoryCache = BOTH
 
-    fun plainTextPreferences(preferencesFileName: String) = apply {
-        this.plainTextPreferences = Prefs.with(preferencesFileName)
-    }
-
-    fun encryptedPreferences(preferencesFileName: String) = apply {
-        this.encryptedPreferences = Prefs.with(preferencesFileName)
+    fun preferencesFileName(preferencesFileName: String) = apply {
+        this.preferencesFileName = preferencesFileName
     }
 
     fun logger(logger: Logger) = apply {
@@ -65,38 +59,56 @@ class MumboEntryFactoryBuilder internal constructor(
         this.encryptionManager = encryptionManager
     }
 
-    private fun noLogger() = object : Logger {
-        override fun d(tagOrCaller: Any, message: String) = Unit
-        override fun e(tagOrCaller: Any, message: String) = Unit
-        override fun e(tagOrCaller: Any, t: Throwable, message: String?) = Unit
+    fun setMemoryCacheEnabled(isMemoryCacheEnabled: MemoryCache = BOTH) = apply {
+        this.isMemoryCacheEnabled = isMemoryCacheEnabled
     }
 
     fun build(): MumboEntryFactory {
-        Boilerplate.init(context, isDebug, "PrefStoreLog")
-        val logger = logger ?: noLogger()
+        val mumboPreferencesFileName = "mumbo_$preferencesFileName"
+
+        val plainTextStore = newStoreEntryFactory(
+                preferencesFileName,
+                isMemoryCacheEnabled != ENCRYPTED_ONLY
+        ).store
+
+        val delegatedStore = newStoreEntryFactory(
+                mumboPreferencesFileName,
+                false
+        ).store
+
+        val logger = logger ?: Boilerplate.logger
+        val encryptionManager = getEncryptionManager(logger)
 
         val component = DaggerMumboStoreComponent
                 .builder()
                 .mumboStoreModule(MumboStoreModule(
                         context,
-                        plainTextPreferences
-                                ?: openSharedPreferences(context, DEFAULT_PLAIN_TEXT_PREFERENCE_NAME),
-                        encryptedPreferences
-                                ?: openSharedPreferences(context, DEFAULT_ENCRYPTED_PREFERENCE_NAME),
                         logger,
-                        getEncryptionManager(logger),
-                        customSerialiser
-                ))
-                .build()
+                        plainTextStore,
+                        delegatedStore,
+                        encryptionManager,
+                        customSerialiser,
+                        isMemoryCacheEnabled != PLAIN_TEXT_ONLY
+                )).build()
 
         return MumboEntryFactory(
                 component.logger(),
-                component.store(),
+                component.plainTextStore(),
                 component.encryptedStore(),
                 component.lenientStore(),
                 component.forgetfulStore(),
-                component.encryptionManager()
+                encryptionManager
         )
+    }
+
+    private fun newStoreEntryFactory(preferencesFileName: String,
+                                     isMemoryCacheEnabled: Boolean): StoreEntryFactory {
+        return StoreEntryFactory.builder(context, isDebug).apply {
+            customSerialiser?.let { customSerialiser(it) }
+            logger?.let { logger(it) }
+            preferences(preferencesFileName)
+            setMemoryCacheEnabled(isMemoryCacheEnabled)
+        }.build()
     }
 
     private fun getEncryptionManager(logger: Logger) =

@@ -82,7 +82,8 @@ public class SharedPreferenceStoreUnitTest {
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 behaviorSubject,
-                mockLogger
+                mockLogger,
+                true
         );
     }
 
@@ -102,7 +103,8 @@ public class SharedPreferenceStoreUnitTest {
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 behaviorSubject,
-                mockLogger
+                mockLogger,
+                true
         );
     }
 

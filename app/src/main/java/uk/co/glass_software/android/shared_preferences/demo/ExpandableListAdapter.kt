@@ -125,11 +125,11 @@ internal class ExpandableListAdapter(
                               isExpanded: Boolean,
                               convertView: View?,
                               parent: ViewGroup): View {
-        val headerTitle = getGroup(groupPosition)
         val view = convertView ?: inflater.inflate(R.layout.list_group, parent, false)
-        val lblListHeader = view.findViewById<TextView>(R.id.lblListHeader)
-        lblListHeader.setTypeface(null, Typeface.BOLD)
-        lblListHeader.text = headerTitle
+        with(view.findViewById<TextView>(R.id.lblListHeader)) {
+            setTypeface(null, Typeface.BOLD)
+            text = getGroup(groupPosition)
+        }
         return view
     }
 
@@ -138,10 +138,8 @@ internal class ExpandableListAdapter(
                               isLastChild: Boolean,
                               convertView: View?,
                               parent: ViewGroup): View {
-        val childText = getChild(groupPosition, childPosition) as String
         val view = convertView ?: inflater.inflate(R.layout.list_item, parent, false)
-        val txtListChild = view.findViewById<TextView>(R.id.lblListItem)
-        txtListChild.text = childText
+        view.findViewById<TextView>(R.id.lblListItem).text = getChild(groupPosition, childPosition) as String
         return view
     }
 

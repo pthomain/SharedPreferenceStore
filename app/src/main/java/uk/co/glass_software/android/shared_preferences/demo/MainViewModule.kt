@@ -28,12 +28,11 @@ import android.view.LayoutInflater
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
 import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
-import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
-import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils
 import java.text.SimpleDateFormat
@@ -46,23 +45,23 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
     companion object {
         private const val PLAIN_TEXT = "PLAIN_TEXT"
         private const val ENCRYPTED = "ENCRYPTED"
+        private const val PREFS_FILENAME = "store"
     }
 
     @Provides
     @Singleton
-    fun provideGson() =
-            Gson()
+    fun provideGson() = Gson()
 
     @Provides
     @Singleton
-    fun provideGsonSerialiser() =
-            GsonSerialiser(Gson())
+    fun provideGsonSerialiser(gson: Gson) = GsonSerialiser(gson)
 
     @Provides
     @Singleton
     fun providerStoreEntryFactory(serialiser: GsonSerialiser) =
             MumboEntryFactory.builder(mainActivity)
                     .customSerialiser(serialiser)
+                    .preferencesFileName(PREFS_FILENAME)
                     .build()
 
     @Provides
@@ -107,20 +106,14 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
     @Singleton
     @Named(PLAIN_TEXT)
     fun providePlainTextPreferences() =
-            StoreUtils.openSharedPreferences(
-                    mainActivity,
-                    DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
-            ).file
+            Prefs.with(PREFS_FILENAME).file
 
     @Provides
     @Singleton
     @Named(ENCRYPTED)
     //used only to display values as stored on disk, should not be used directly in practice
     fun provideEncryptedPreferences() =
-            StoreUtils.openSharedPreferences(
-                    mainActivity,
-                    DEFAULT_ENCRYPTED_PREFERENCE_NAME
-            ).file
+            Prefs.with("mumbo_$PREFS_FILENAME").file
 
     @Provides
     @Singleton
