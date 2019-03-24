@@ -41,7 +41,8 @@ internal class MumboStoreModule(private val context: Context,
                                 private val logger: Logger,
                                 private val plainTextStore: KeyValueStore,
                                 private val encryptionManager: EncryptionManager,
-                                private val customSerialiser: Serialiser?) {
+                                private val customSerialiser: Serialiser?,
+                                private val isMemoryCacheEnabled: Boolean) {
     @Provides
     @Singleton
     fun provideContext() = context
@@ -60,7 +61,8 @@ internal class MumboStoreModule(private val context: Context,
                     base64Serialiser,
                     customSerialiser,
                     plainTextStore,
-                    encryptionManager
+                    encryptionManager,
+                    isMemoryCacheEnabled
             )
 
     @Provides

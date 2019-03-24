@@ -38,7 +38,8 @@ import javax.inject.Singleton
 @Module(includes = [SerialisationModule::class])
 internal class StoreModule(private val context: Context,
                            private val prefs: Prefs,
-                           private val logger: Logger) {
+                           private val logger: Logger,
+                           private val isMemoryCacheEnabled: Boolean) {
 
     @Provides
     @Singleton
@@ -54,7 +55,8 @@ internal class StoreModule(private val context: Context,
                     base64Serialiser,
                     customSerialiser,
                     PublishSubject.create(),
-                    logger
+                    logger,
+                    isMemoryCacheEnabled
             )
 
 

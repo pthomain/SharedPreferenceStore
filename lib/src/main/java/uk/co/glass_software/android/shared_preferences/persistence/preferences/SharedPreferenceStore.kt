@@ -44,7 +44,8 @@ internal class SharedPreferenceStore(prefs: Prefs,
                                      private val base64Serialiser: Serialiser,
                                      private val customSerialiser: Serialiser?,
                                      private val changeSubject: Subject<String>,
-                                     private val logger: Logger) : KeyValueStore {
+                                     private val logger: Logger,
+                                     private val isMemoryCacheEnabled: Boolean) : KeyValueStore {
 
     private val sharedPreferences = prefs.file
     private val cacheMap: MutableMap<String, Any> = HashMap()
@@ -120,9 +121,8 @@ internal class SharedPreferenceStore(prefs: Prefs,
                             key,
                             valueClass,
                             defaultValue
-                    )?.also {
-                        saveToCache(key, it)
-                    } ?: defaultValue
+                    )?.also { saveToCache(key, it) }
+                    ?: defaultValue
 
     @Synchronized
     private fun <O> getValueInternal(key: String,
@@ -177,10 +177,12 @@ internal class SharedPreferenceStore(prefs: Prefs,
     @Synchronized
     private fun saveToCache(key: String,
                             value: Any?) {
-        if (value == null)
-            cacheMap.remove(key)
-        else
-            cacheMap[key] = value
+        if (isMemoryCacheEnabled) {
+            if (value == null)
+                cacheMap.remove(key)
+            else
+                cacheMap[key] = value
+        }
     }
 
     @Synchronized

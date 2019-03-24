@@ -25,13 +25,30 @@ import uk.co.glass_software.android.boilerplate.Boilerplate.logger
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import java.util.*
 
 @Suppress("UNCHECKED_CAST")
 internal class EncryptedSharedPreferenceStore(private val base64Serialiser: Serialiser,
                                               private val customSerialiser: Serialiser?,
                                               private val plainTextStore: KeyValueStore,
-                                              private val encryptionManager: EncryptionManager)
+                                              private val encryptionManager: EncryptionManager,
+                                              private val isMemoryCacheEnabled: Boolean)
     : KeyValueStore by plainTextStore {
+
+    private val cacheMap: MutableMap<String, Any> = HashMap()
+
+    val cachedValues: Map<String, Any>
+        @Synchronized get() = Collections.unmodifiableMap(cacheMap)
+
+    override fun <V> saveValue(key: String,
+                               value: V?) {
+        saveToCache(key, value)
+
+        plainTextStore.saveValue(
+                key,
+                value?.let { serialise(key, it as Any) }
+        )
+    }
 
     override fun <V> getValue(key: String,
                               valueClass: Class<V>): V? =
@@ -50,15 +67,7 @@ internal class EncryptedSharedPreferenceStore(private val base64Serialiser: Seri
                                      valueClass: Class<V>): V? =
             decrypt(encrypted, key)?.let {
                 deserialise(it, valueClass)
-            }
-
-    override fun <V> saveValue(key: String,
-                               value: V?) {
-        plainTextStore.saveValue(
-                key,
-                value?.let { serialise(key, it as Any) }
-        )
-    }
+            }.also { saveToCache(key, it) }
 
     @Throws(Serialiser.SerialisationException::class)
     private fun serialise(key: String,
@@ -99,5 +108,16 @@ internal class EncryptedSharedPreferenceStore(private val base64Serialiser: Seri
             if (!encryptionManager.isEncryptionSupported)
                 throw IllegalStateException("Encryption is not supported on this device")
             else encryptionManager
+
+    @Synchronized
+    private fun saveToCache(key: String,
+                            value: Any?) {
+        if (isMemoryCacheEnabled) {
+            if (value == null)
+                cacheMap.remove(key)
+            else
+                cacheMap[key] = value
+        }
+    }
 
 }

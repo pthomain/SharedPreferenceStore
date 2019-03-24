@@ -39,6 +39,7 @@ class StoreEntryFactoryBuilder internal constructor(
     private var prefs: Prefs? = null
     private var logger: Logger? = null
     private var customSerialiser: Serialiser? = null
+    private var isMemoryCacheEnabled: Boolean = true
 
     fun preferences(preferencesFileName: String) = apply {
         this.prefs = Prefs.with(preferencesFileName)
@@ -52,6 +53,10 @@ class StoreEntryFactoryBuilder internal constructor(
         this.customSerialiser = customSerialiser
     }
 
+    fun setMemoryCacheEnabled(isMemoryCacheEnabled: Boolean) = apply {
+        this.isMemoryCacheEnabled = isMemoryCacheEnabled
+    }
+
     fun build(): StoreEntryFactory {
         Boilerplate.init(context, isDebug, "PrefStoreLog")
 
@@ -60,7 +65,8 @@ class StoreEntryFactoryBuilder internal constructor(
                 .storeModule(StoreModule(
                         context,
                         prefs ?: openSharedPreferences(context, "shared_preference_store"),
-                        logger ?: Boilerplate.logger
+                        logger ?: Boilerplate.logger,
+                        isMemoryCacheEnabled
                 ))
                 .serialisationModule(SerialisationModule(customSerialiser))
                 .build()
