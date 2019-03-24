@@ -75,7 +75,7 @@ allprojects {
  
  ```
 dependencies {
-    compile 'com.github.pthomain:SharedPreferenceStore:1.0.9'
+    compile 'com.github.pthomain:SharedPreferenceStore:1.2.2'
 }
 ```
 
