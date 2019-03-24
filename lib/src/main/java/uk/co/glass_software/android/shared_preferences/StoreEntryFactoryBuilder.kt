@@ -31,8 +31,10 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 
-class StoreEntryFactoryBuilder internal constructor(private val context: Context,
-                                                    private val isDebug: Boolean) {
+class StoreEntryFactoryBuilder internal constructor(
+        private val context: Context,
+        private val isDebug: Boolean
+) {
 
     private var prefs: Prefs? = null
     private var logger: Logger? = null

@@ -73,8 +73,6 @@ dependencies {
     api project(":lib")
     implementation appDependencies.jitPack
 
-    implementation appDependencies.mumbo
-
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler
 
@@ -85,6 +83,8 @@ dependencies {
     api appDependencies.rxAndroid
 
     api appDependencies.kotlinJdk8
+
+    implementation appDependencies.mumbo
 
     testImplementation appDependencies.jUnit
     testImplementation appDependencies.mockitoCore

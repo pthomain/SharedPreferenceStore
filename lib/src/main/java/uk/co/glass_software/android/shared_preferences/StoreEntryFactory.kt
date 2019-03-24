@@ -48,7 +48,6 @@ class StoreEntryFactory internal constructor(val store: KeyValueStore) {
             StoreEntry(store, keyProvider, valueClassProvider)
 
     companion object {
-
         fun builder(context: Context) = StoreEntryFactoryBuilder(
                 context.applicationContext,
                 BuildConfig.DEBUG

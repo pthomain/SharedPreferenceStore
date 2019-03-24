@@ -23,6 +23,7 @@ package uk.co.glass_software.android.shared_preferences.mumbo
 
 import android.content.Context
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.shared_preferences.BuildConfig
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.store.StoreMode
 import uk.co.glass_software.android.shared_preferences.mumbo.store.StoreMode.*
@@ -75,7 +76,8 @@ class MumboEntryFactory internal constructor(logger: Logger,
         const val DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store"
 
         fun builder(context: Context) = MumboEntryFactoryBuilder(
-                context.applicationContext
+                context.applicationContext,
+                BuildConfig.DEBUG
         )
     }
 }

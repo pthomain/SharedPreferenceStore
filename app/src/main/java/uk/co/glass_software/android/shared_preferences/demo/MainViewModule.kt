@@ -31,6 +31,11 @@ import dagger.Provides
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
+import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils
 import java.text.SimpleDateFormat
 import javax.inject.Named
 import javax.inject.Singleton

@@ -26,15 +26,15 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
 import uk.co.glass_software.android.boilerplate.ui.mvp.MvpPresenter
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
+import uk.co.glass_software.android.shared_preferences.mumbo.store.StoreMode.ENCRYPTED
+import uk.co.glass_software.android.shared_preferences.mumbo.store.StoreMode.PLAIN_TEXT
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode.ENCRYPTED
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode.PLAIN_TEXT
 import java.util.*
 
 internal class MainPresenter(mvpView: MainMvpView,
@@ -43,7 +43,7 @@ internal class MainPresenter(mvpView: MainMvpView,
                              private val lastOpenDate: LastOpenDate,
                              private val plainTextStore: KeyValueStore,
                              private val encryptedStore: KeyValueStore,
-                             private val storeEntryFactory: StoreEntryFactory)
+                             private val storeEntryFactory: MumboEntryFactory)
     : MvpPresenter<MainMvpView, MainMvpPresenter, MainViewComponent>(mvpView, CompositeDisposable()),
         MainMvpPresenter {
 

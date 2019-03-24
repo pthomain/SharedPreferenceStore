@@ -22,6 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.mumbo
 
 import android.content.Context
+import uk.co.glass_software.android.boilerplate.Boilerplate
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.mumbo.Mumbo
@@ -33,7 +34,10 @@ import uk.co.glass_software.android.shared_preferences.persistence.preferences.S
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 
 
-class MumboEntryFactoryBuilder internal constructor(private val context: Context) {
+class MumboEntryFactoryBuilder internal constructor(
+        private val context: Context,
+        private val isDebug: Boolean
+) {
 
     private var plainTextPreferences: Prefs? = null
     private var encryptedPreferences: Prefs? = null
@@ -68,6 +72,7 @@ class MumboEntryFactoryBuilder internal constructor(private val context: Context
     }
 
     fun build(): MumboEntryFactory {
+        Boilerplate.init(context, isDebug, "PrefStoreLog")
         val logger = logger ?: noLogger()
 
         val component = DaggerMumboStoreComponent
