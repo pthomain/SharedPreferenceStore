@@ -28,12 +28,12 @@ import android.view.LayoutInflater
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_ENCRYPTED_PREFERENCE_NAME
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory.Companion.DEFAULT_PLAIN_TEXT_PREFERENCE_NAME
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils
 import java.text.SimpleDateFormat
@@ -61,20 +61,20 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
     @Provides
     @Singleton
     fun providerStoreEntryFactory(serialiser: GsonSerialiser) =
-            StoreEntryFactory.builder(mainActivity)
+            MumboEntryFactory.builder(mainActivity)
                     .customSerialiser(serialiser)
                     .build()
 
     @Provides
     @Singleton
     @Named(PLAIN_TEXT)
-    fun providePlainTextStore(storeEntryFactory: StoreEntryFactory) =
+    fun providePlainTextStore(storeEntryFactory: MumboEntryFactory) =
             storeEntryFactory.plainTextStore
 
     @Provides
     @Singleton
     @Named(ENCRYPTED)
-    fun provideEncryptedStore(storeEntryFactory: StoreEntryFactory) =
+    fun provideEncryptedStore(storeEntryFactory: MumboEntryFactory) =
             storeEntryFactory.encryptedStore
 
     @Provides
@@ -129,7 +129,7 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
                              lastOpenDate: LastOpenDate,
                              @Named(PLAIN_TEXT) plainTextStore: KeyValueStore,
                              @Named(ENCRYPTED) encryptedStore: KeyValueStore,
-                             storeEntryFactory: StoreEntryFactory): MainMvpContract.MainMvpPresenter =
+                             storeEntryFactory: MumboEntryFactory): MainMvpContract.MainMvpPresenter =
             MainPresenter(
                     mainActivity,
                     personEntry,
@@ -149,7 +149,7 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
                                      simpleDateFormat: SimpleDateFormat,
                                      @Named(PLAIN_TEXT) plainTextPreferences: SharedPreferences,
                                      @Named(ENCRYPTED) encryptedPreferences: SharedPreferences,
-                                     storeEntryFactory: StoreEntryFactory) =
+                                     storeEntryFactory: MumboEntryFactory) =
             ExpandableListAdapter(
                     presenter,
                     lastOpenDate,

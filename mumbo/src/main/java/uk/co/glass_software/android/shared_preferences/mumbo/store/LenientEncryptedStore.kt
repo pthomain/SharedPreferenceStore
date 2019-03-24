@@ -19,21 +19,20 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.persistence.preferences
+package uk.co.glass_software.android.shared_preferences.mumbo.store
 
-import io.reactivex.Observable
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 
 /**
- * This class will attempt to encrypt and save given values
- * BUT will silently fail if encryption isn't supported and NEVER save anything in plain-text.
+ * This class will attempt to encrypt and save a given value
+ * BUT will save in PLAIN-TEXT silently if encryption isn't supported.
  */
-internal class ForgetfulEncryptedStore(encryptedStore: KeyValueStore,
-                                       isEncryptionSupported: Boolean,
-                                       logger: Logger) : KeyValueStore {
-
-    private val internalStore = if (isEncryptionSupported) encryptedStore else null
+internal class LenientEncryptedStore(plainTextStore: KeyValueStore,
+                                     encryptedStore: KeyValueStore,
+                                     isEncryptionSupported: Boolean,
+                                     logger: Logger) : KeyValueStore {
+    private val internalStore = if (isEncryptionSupported) encryptedStore else plainTextStore
 
     init {
         logger.d(this, "Encryption is${if (isEncryptionSupported) "" else " NOT"} supported")
@@ -41,24 +40,23 @@ internal class ForgetfulEncryptedStore(encryptedStore: KeyValueStore,
 
     override fun <V> getValue(key: String,
                               valueClass: Class<V>) =
-            internalStore?.getValue(key, valueClass)
+            internalStore.getValue(key, valueClass)
 
     override fun <V> getValue(key: String,
                               valueClass: Class<V>,
                               defaultValue: V) =
-            internalStore?.getValue(key, valueClass, defaultValue) ?: defaultValue
+            internalStore.getValue(key, valueClass, defaultValue)
 
     override fun <V> saveValue(key: String,
                                value: V?) {
-        internalStore?.saveValue(key, value)
+        internalStore.saveValue(key, value)
     }
 
-    override fun hasValue(key: String) = internalStore?.hasValue(key) ?: false
+    override fun hasValue(key: String) = internalStore.hasValue(key)
 
     override fun deleteValue(key: String) {
-        internalStore?.deleteValue(key)
+        internalStore.deleteValue(key)
     }
 
-    override fun observeChanges() =
-            internalStore?.observeChanges() ?: Observable.empty()
+    override fun observeChanges() = internalStore.observeChanges()
 }

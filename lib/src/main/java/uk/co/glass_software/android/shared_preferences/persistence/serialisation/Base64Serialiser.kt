@@ -25,8 +25,8 @@ import android.util.Base64
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import java.io.*
 
-internal class Base64Serialiser(private val logger: Logger,
-                                private val base64: CustomBase64) : Serialiser {
+class Base64Serialiser(private val logger: Logger,
+                       private val base64: CustomBase64) : Serialiser {
 
     override fun canHandleType(targetClass: Class<*>) = Serializable::class.java.isAssignableFrom(targetClass)
 
@@ -100,7 +100,7 @@ internal class Base64Serialiser(private val logger: Logger,
         throw IllegalArgumentException("Not a Base64 string: $base64")
     }
 
-    internal interface CustomBase64 {
+    interface CustomBase64 {
         fun encode(input: ByteArray, flags: Int): String
         fun decode(input: String, flags: Int): ByteArray
     }

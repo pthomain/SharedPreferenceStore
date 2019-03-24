@@ -32,7 +32,8 @@ import java.util.Map;
 import io.reactivex.subjects.BehaviorSubject;
 import uk.co.glass_software.android.boilerplate.utils.log.Logger;
 import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs;
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager;
+import uk.co.glass_software.android.shared_preferences.mumbo.store.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser;
 
 import static junit.framework.Assert.assertEquals;
@@ -91,7 +92,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
 
         when(mockEncryptionManager.decrypt(eq(encryptedValue), eq(key))).thenReturn(value);
         when(mockEncryptionManager.encrypt(eq(value), eq(key))).thenReturn(encryptedValue);
-
+        when(mockEncryptionManager.isEncryptionSupported()).thenReturn(true);
     }
 
     @Test

@@ -23,34 +23,15 @@ package uk.co.glass_software.android.shared_preferences
 
 import dagger.Component
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManager
-import uk.co.glass_software.android.shared_preferences.encryption.manager.EncryptionManagerModule
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.Companion.ENCRYPTED
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.Companion.FORGETFUL
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.Companion.LENIENT
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule.Companion.PLAIN_TEXT
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [EncryptionManagerModule::class, StoreModule::class])
+@Component(modules = [StoreModule::class])
 internal interface SharedPreferenceComponent {
 
-    @Named(PLAIN_TEXT)
     fun store(): KeyValueStore
-
-    @Named(ENCRYPTED)
-    fun encryptedStore(): KeyValueStore
-
-    @Named(LENIENT)
-    fun lenientStore(): KeyValueStore
-
-    @Named(FORGETFUL)
-    fun forgetfulStore(): KeyValueStore
-
-    fun keyStoreManager(): EncryptionManager?
 
     fun logger(): Logger
 }

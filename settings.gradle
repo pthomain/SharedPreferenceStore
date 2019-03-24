@@ -19,4 +19,5 @@
  * under the License.
  */
 
-include ':app', ':lib'
+include ':app', ':lib', ':mumbo_store'
+project(':mumbo_store').projectDir = new File('mumbo')

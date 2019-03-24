@@ -28,12 +28,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
-import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.Person
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
-import uk.co.glass_software.android.shared_preferences.utils.StoreMode
+import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
+import uk.co.glass_software.android.shared_preferences.mumbo.store.StoreMode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,7 +46,7 @@ internal class ExpandableListAdapter(
         private val simpleDateFormat: SimpleDateFormat,
         private val plainTextPreferences: SharedPreferences,
         private val encryptedPreferences: SharedPreferences,
-        private val storeEntryFactory: StoreEntryFactory
+        private val storeEntryFactory: MumboEntryFactory
 ) : BaseExpandableListAdapter() {
 
     private val headers: LinkedList<String> = LinkedList()

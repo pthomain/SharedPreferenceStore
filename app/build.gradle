@@ -79,6 +79,7 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
         exclude 'META-INF/eclipse.inf'
+        exclude 'META-INF/app_release.kotlin_module'
         exclude 'about_files/LICENSE-2.0.txt'
         exclude 'plugin.xml'
         exclude 'plugin.properties'
@@ -86,9 +87,10 @@ android {
 }
 
 dependencies {
-    implementation project(":lib")
+    implementation project(":mumbo_store")
 
     implementation appDependencies.gson
+    implementation appDependencies.appcompatV7
 
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler

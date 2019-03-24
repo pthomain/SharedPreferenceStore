@@ -40,11 +40,11 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-internal open class SharedPreferenceStore(prefs: Prefs,
-                                          private val base64Serialiser: Serialiser,
-                                          private val customSerialiser: Serialiser?,
-                                          private val changeSubject: Subject<String>,
-                                          private val logger: Logger) : KeyValueStore {
+open class SharedPreferenceStore(prefs: Prefs,
+                                 private val base64Serialiser: Serialiser,
+                                 private val customSerialiser: Serialiser?,
+                                 private val changeSubject: Subject<String>,
+                                 private val logger: Logger) : KeyValueStore {
 
     private val sharedPreferences = prefs.file
     private val cacheMap: MutableMap<String, Any> = HashMap()

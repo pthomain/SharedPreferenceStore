@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences.encryption.manager
+package uk.co.glass_software.android.shared_preferences.mumbo.encryption
 
 interface EncryptionManager {
 
