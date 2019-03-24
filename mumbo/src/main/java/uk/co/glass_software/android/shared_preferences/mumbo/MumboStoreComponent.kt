@@ -44,8 +44,6 @@ internal interface MumboStoreComponent {
     @Named(FORGETFUL)
     fun forgetfulStore(): KeyValueStore
 
-    fun encryptionManager(): EncryptionManager
-
     fun logger(): Logger
 
     companion object {

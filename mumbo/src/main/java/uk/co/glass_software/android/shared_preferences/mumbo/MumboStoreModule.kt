@@ -25,15 +25,12 @@ import android.content.Context
 import android.util.Base64
 import dagger.Module
 import dagger.Provides
-import io.reactivex.subjects.PublishSubject
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.store.EncryptedSharedPreferenceStore
 import uk.co.glass_software.android.shared_preferences.mumbo.store.ForgetfulEncryptedStore
 import uk.co.glass_software.android.shared_preferences.mumbo.store.LenientEncryptedStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
-import uk.co.glass_software.android.shared_preferences.persistence.preferences.SharedPreferenceStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Base64Serialiser
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 import javax.inject.Named
@@ -41,12 +38,10 @@ import javax.inject.Singleton
 
 @Module
 internal class MumboStoreModule(private val context: Context,
-                                private val plainTextPrefs: Prefs,
-                                private val encryptedPrefs: Prefs,
                                 private val logger: Logger,
+                                private val plainTextStore: KeyValueStore,
                                 private val encryptionManager: EncryptionManager,
                                 private val customSerialiser: Serialiser?) {
-
     @Provides
     @Singleton
     fun provideContext() = context
@@ -54,34 +49,26 @@ internal class MumboStoreModule(private val context: Context,
     @Provides
     @Singleton
     @Named(PLAIN_TEXT)
-    fun provideSharedPreferenceStore(base64Serialiser: Base64Serialiser,
-                                     logger: Logger): SharedPreferenceStore =
-            SharedPreferenceStore(
-                    plainTextPrefs,
-                    base64Serialiser,
-                    customSerialiser,
-                    PublishSubject.create(),
-                    logger
-            )
+    fun provideSharedPreferenceStore() = plainTextStore
 
     @Provides
     @Singleton
+    @Named(ENCRYPTED)
     fun provideEncryptedSharedPreferenceStore(base64Serialiser: Base64Serialiser,
-                                              logger: Logger) =
+                                              @Named(PLAIN_TEXT) plainTextStore: KeyValueStore): KeyValueStore =
             EncryptedSharedPreferenceStore(
-                    encryptedPrefs,
                     base64Serialiser,
                     customSerialiser,
-                    PublishSubject.create(),
-                    logger,
+                    plainTextStore,
                     encryptionManager
             )
 
     @Provides
     @Singleton
-    fun provideLenientEncryptedStore(@Named(PLAIN_TEXT) plainTextStore: SharedPreferenceStore,
-                                     encryptedStore: EncryptedSharedPreferenceStore,
-                                     logger: Logger): LenientEncryptedStore =
+    @Named(LENIENT)
+    fun provideLenientEncryptedStore(@Named(PLAIN_TEXT) plainTextStore: KeyValueStore,
+                                     @Named(ENCRYPTED) encryptedStore: KeyValueStore,
+                                     logger: Logger): KeyValueStore =
             LenientEncryptedStore(
                     plainTextStore,
                     encryptedStore,
@@ -91,33 +78,14 @@ internal class MumboStoreModule(private val context: Context,
 
     @Provides
     @Singleton
-    fun provideForgetfulEncryptedStore(encryptedStore: EncryptedSharedPreferenceStore,
-                                       logger: Logger): ForgetfulEncryptedStore =
+    @Named(FORGETFUL)
+    fun provideForgetfulEncryptedStore(@Named(ENCRYPTED) encryptedStore: KeyValueStore,
+                                       logger: Logger): KeyValueStore =
             ForgetfulEncryptedStore(
                     encryptedStore,
                     encryptionManager.isEncryptionSupported,
                     logger
             )
-
-    @Provides
-    @Singleton
-    @Named(PLAIN_TEXT)
-    fun provideStore(@Named(PLAIN_TEXT) store: SharedPreferenceStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(ENCRYPTED)
-    fun provideEncryptedStore(store: EncryptedSharedPreferenceStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(LENIENT)
-    fun provideLenientStore(store: LenientEncryptedStore): KeyValueStore = store
-
-    @Provides
-    @Singleton
-    @Named(FORGETFUL)
-    fun provideForgetfulStore(store: ForgetfulEncryptedStore): KeyValueStore = store
 
     @Provides
     @Singleton
