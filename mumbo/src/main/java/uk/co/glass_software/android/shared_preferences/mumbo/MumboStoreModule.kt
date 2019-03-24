@@ -40,6 +40,7 @@ import javax.inject.Singleton
 internal class MumboStoreModule(private val context: Context,
                                 private val logger: Logger,
                                 private val plainTextStore: KeyValueStore,
+                                private val delegatePlainTextStore: KeyValueStore,
                                 private val encryptionManager: EncryptionManager,
                                 private val customSerialiser: Serialiser?,
                                 private val isMemoryCacheEnabled: Boolean) {
@@ -55,12 +56,11 @@ internal class MumboStoreModule(private val context: Context,
     @Provides
     @Singleton
     @Named(ENCRYPTED)
-    fun provideEncryptedSharedPreferenceStore(base64Serialiser: Base64Serialiser,
-                                              @Named(PLAIN_TEXT) plainTextStore: KeyValueStore): KeyValueStore =
+    fun provideEncryptedSharedPreferenceStore(base64Serialiser: Base64Serialiser): KeyValueStore =
             EncryptedSharedPreferenceStore(
                     base64Serialiser,
                     customSerialiser,
-                    plainTextStore,
+                    delegatePlainTextStore,
                     encryptionManager,
                     isMemoryCacheEnabled
             )

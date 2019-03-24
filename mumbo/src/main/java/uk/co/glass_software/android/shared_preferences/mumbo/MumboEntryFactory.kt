@@ -71,10 +71,6 @@ class MumboEntryFactory internal constructor(logger: Logger,
             StoreEntry(store, keyProvider, valueClassProvider)
 
     companion object {
-
-        const val DEFAULT_PLAIN_TEXT_PREFERENCE_NAME = "plain_text_store"
-        const val DEFAULT_ENCRYPTED_PREFERENCE_NAME = "encrypted_store"
-
         fun builder(context: Context) = MumboEntryFactoryBuilder(
                 context.applicationContext,
                 BuildConfig.DEBUG

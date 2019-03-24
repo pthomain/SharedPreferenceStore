@@ -23,7 +23,6 @@ package uk.co.glass_software.android.shared_preferences.mumbo
 
 import dagger.Component
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import javax.inject.Named
 import javax.inject.Singleton
@@ -33,7 +32,7 @@ import javax.inject.Singleton
 internal interface MumboStoreComponent {
 
     @Named(PLAIN_TEXT)
-    fun store(): KeyValueStore
+    fun plainTextStore(): KeyValueStore
 
     @Named(ENCRYPTED)
     fun encryptedStore(): KeyValueStore
