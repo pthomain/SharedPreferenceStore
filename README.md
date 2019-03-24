@@ -26,13 +26,13 @@ Define your dependencies in your Dagger modules:
 ```java
 @Provides
 @Singleton
-StoreEntryFactory provideStoreEntryFactory(Context context){
-    return StoreEntryFactory.buildDefault(context);
+MumboEntryFactory provideStoreEntryFactory(Context context){
+    return MumboEntryFactory.builder(context);
 }
      
 @Provides
 @Singleton
-KeyValueEntry<String> provideAddressEntry(StoreEntryFactory storeEntryFactory){
+KeyValueEntry<String> provideAddressEntry(MumboEntryFactory storeEntryFactory){
     return storeEntryFactory.open(
         "address_key",
         Address.class,
@@ -44,7 +44,7 @@ KeyValueEntry<String> provideAddressEntry(StoreEntryFactory storeEntryFactory){
 If you don't use dependency injection:
 
 ```java
-KeyValueEntry<Address> address = StoreEntryFactory.buildDefault(context)
+KeyValueEntry<Address> address = MumboEntryFactory.buildDefault(context)
                                                   .open("address_key", 
                                                         Address.class, 
                                                         StoreMode.PLAIN_TEXT);
@@ -75,7 +75,9 @@ allprojects {
  
  ```
 dependencies {
-    compile 'com.github.pthomain:SharedPreferenceStore:1.0.9'
+    compile 'com.github.pthomain.SharedPreferenceStore:lib:1.2.2' //plain-text only
+    //or
+    compile 'com.github.pthomain.SharedPreferenceStore:mumbo_store:1.2.2' //plain-text and encryption support
 }
 ```
 

@@ -37,11 +37,11 @@ class MumboEntryFactory internal constructor(logger: Logger,
                                              val encryptedStore: KeyValueStore,
                                              val lenientStore: KeyValueStore,
                                              val forgetfulStore: KeyValueStore,
-                                             encryptionManager: EncryptionManager?) {
+                                             encryptionManager: EncryptionManager) {
     init {
         logger.d(
                 this,
-                "Encryption supported: ${if (encryptionManager?.isEncryptionSupported == true) "TRUE" else "FALSE"}"
+                "Encryption supported: ${if (encryptionManager.isEncryptionSupported) "TRUE" else "FALSE"}"
         )
     }
 

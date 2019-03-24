@@ -26,8 +26,4 @@ enum class StoreMode {
     ENCRYPTED,
     LENIENT,    //will try to encrypt but falls back to plain-text if encryption isn't supported, see LenientEncryptedStore
     FORGETFUL;  //will try to encrypt but won't save anything if encryption isn't supported, see ForgetfulEncryptedStore
-
-    interface Provider {
-        val mode: StoreMode
-    }
 }
