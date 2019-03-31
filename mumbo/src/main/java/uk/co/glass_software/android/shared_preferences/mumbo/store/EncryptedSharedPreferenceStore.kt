@@ -21,14 +21,15 @@
 
 package uk.co.glass_software.android.shared_preferences.mumbo.store
 
-import uk.co.glass_software.android.boilerplate.Boilerplate.logger
+import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-internal class EncryptedSharedPreferenceStore(private val base64Serialiser: Serialiser,
+internal class EncryptedSharedPreferenceStore(private val logger: Logger,
+                                              private val base64Serialiser: Serialiser,
                                               private val customSerialiser: Serialiser?,
                                               private val plainTextStore: KeyValueStore,
                                               private val encryptionManager: EncryptionManager,

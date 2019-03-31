@@ -47,8 +47,6 @@ internal interface MainMvpContract {
     @Component(modules = [MainViewModule::class])
     interface MainViewComponent : ViewComponent<MainMvpView, MainMvpPresenter, MainViewComponent> {
 
-        fun expandableListAdapter(): ExpandableListAdapter
-
         fun inject(mainActivity: MainActivity)
     }
 

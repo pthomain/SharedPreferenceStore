@@ -23,8 +23,8 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.annotation.SuppressLint
 import io.reactivex.subjects.Subject
+import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBoolean
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.TypeUtils.isBooleanClass

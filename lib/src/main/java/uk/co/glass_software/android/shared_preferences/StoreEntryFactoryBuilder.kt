@@ -22,19 +22,17 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.Boilerplate
+import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs
+import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs.Companion.prefs
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.utils.preferences.Prefs
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils.openSharedPreferences
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
 
 
-class StoreEntryFactoryBuilder internal constructor(
-        private val context: Context,
-        private val isDebug: Boolean
-) {
+class StoreEntryFactoryBuilder internal constructor(private val context: Context) {
 
     private var prefs: Prefs? = null
     private var logger: Logger? = null
@@ -42,7 +40,7 @@ class StoreEntryFactoryBuilder internal constructor(
     private var isMemoryCacheEnabled: Boolean = true
 
     fun preferences(preferencesFileName: String) = apply {
-        this.prefs = Prefs.with(preferencesFileName)
+        this.prefs = context.prefs(preferencesFileName)
     }
 
     fun logger(logger: Logger) = apply {
@@ -58,14 +56,12 @@ class StoreEntryFactoryBuilder internal constructor(
     }
 
     fun build(): StoreEntryFactory {
-        Boilerplate.init(context, isDebug, "PrefStoreLog")
-
         val component = DaggerSharedPreferenceComponent
                 .builder()
                 .storeModule(StoreModule(
                         context,
                         prefs ?: openSharedPreferences(context, "shared_preference_store"),
-                        logger ?: Boilerplate.logger,
+                        logger ?: VoidLogger(),
                         isMemoryCacheEnabled
                 ))
                 .serialisationModule(SerialisationModule(customSerialiser))
@@ -73,4 +69,5 @@ class StoreEntryFactoryBuilder internal constructor(
 
         return StoreEntryFactory(component.store())
     }
+
 }
