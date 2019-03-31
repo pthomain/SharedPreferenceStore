@@ -32,10 +32,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.serialisation
 import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
 
 
-class MumboEntryFactoryBuilder internal constructor(
-        private val context: Context,
-        private val isDebug: Boolean
-) {
+class MumboEntryFactoryBuilder internal constructor(private val context: Context) {
 
     private var preferencesFileName: String = "shared_preference_store"
     private var logger: Logger? = null
