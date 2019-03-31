@@ -58,6 +58,7 @@ internal class MumboStoreModule(private val context: Context,
     @Named(ENCRYPTED)
     fun provideEncryptedSharedPreferenceStore(base64Serialiser: Base64Serialiser): KeyValueStore =
             EncryptedSharedPreferenceStore(
+                    logger,
                     base64Serialiser,
                     customSerialiser,
                     delegatePlainTextStore,

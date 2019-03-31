@@ -22,7 +22,6 @@
 package uk.co.glass_software.android.shared_preferences.mumbo
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.Boilerplate
 import uk.co.glass_software.android.boilerplate.utils.log.Logger
 import uk.co.glass_software.android.mumbo.Mumbo
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
@@ -30,6 +29,7 @@ import uk.co.glass_software.android.shared_preferences.mumbo.MemoryCache.*
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.MumboEncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
 
 
 class MumboEntryFactoryBuilder internal constructor(
@@ -76,7 +76,7 @@ class MumboEntryFactoryBuilder internal constructor(
                 false
         ).store
 
-        val logger = logger ?: Boilerplate.logger
+        val logger = logger ?: VoidLogger()
         val encryptionManager = getEncryptionManager(logger)
 
         val component = DaggerMumboStoreComponent
@@ -103,7 +103,7 @@ class MumboEntryFactoryBuilder internal constructor(
 
     private fun newStoreEntryFactory(preferencesFileName: String,
                                      isMemoryCacheEnabled: Boolean): StoreEntryFactory {
-        return StoreEntryFactory.builder(context, isDebug).apply {
+        return StoreEntryFactory.builder(context).apply {
             customSerialiser?.let { customSerialiser(it) }
             logger?.let { logger(it) }
             preferences(preferencesFileName)

@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import uk.co.glass_software.android.boilerplate.utils.log.Logger;
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager;
 import uk.co.glass_software.android.shared_preferences.mumbo.store.EncryptedSharedPreferenceStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
@@ -66,6 +67,7 @@ public class EncryptedSharedPreferenceStoreUnitTest {
         when(mockEncryptionManager.isEncryptionSupported()).thenReturn(true);
 
         target = new EncryptedSharedPreferenceStore(
+                mock(Logger.class),
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 mockDelegateStore,
