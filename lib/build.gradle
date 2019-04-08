@@ -83,7 +83,7 @@ dependencies {
 
     api appDependencies.kotlinJdk8
 
-    api appDependencies.boilerplate
+    api appDependencies.boilerplateCore
 
     testImplementation appDependencies.jUnit
     testImplementation appDependencies.mockitoCore

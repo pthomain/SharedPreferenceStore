@@ -21,7 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences.utils
 
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 
 class VoidLogger : Logger {
     override fun d(tagOrCaller: Any, message: String) = Unit

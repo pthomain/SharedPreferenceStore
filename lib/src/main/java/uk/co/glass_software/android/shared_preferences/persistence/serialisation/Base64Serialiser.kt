@@ -22,7 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.persistence.serialisation
 
 import android.util.Base64
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import java.io.*
 
 class Base64Serialiser(private val logger: Logger,

@@ -33,8 +33,9 @@ import android.widget.ExpandableListView
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
-import uk.co.glass_software.android.boilerplate.ui.mvp.MvpActivity
-import uk.co.glass_software.android.boilerplate.utils.resources.findLazy
+import uk.co.glass_software.android.boilerplate.core.mvp.MvpActivity
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.resources.findLazy
 import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
 import javax.inject.Inject
 
@@ -50,6 +51,7 @@ internal class MainActivity : MvpActivity<MainMvpView, MainMvpPresenter, MainVie
     private val buttonSave by findLazy<Button>(R.id.button_save)
     private val buttonDelete by findLazy<Button>(R.id.button_delete)
     private val buttonGithub by findLazy<View>(R.id.github)
+    private lateinit var logger: Logger
 
     override fun initialiseComponent() =
             DaggerMainMvpContract_MainViewComponent
@@ -102,6 +104,8 @@ internal class MainActivity : MvpActivity<MainMvpView, MainMvpPresenter, MainVie
                 Uri.parse("https://github.com/pthomain/SharedPreferenceStore")
         ))
     }
+
+    override fun logger() = getPresenter().logger()
 
     companion object {
         init {

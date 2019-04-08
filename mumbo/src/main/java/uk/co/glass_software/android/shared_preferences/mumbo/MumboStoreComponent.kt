@@ -22,7 +22,7 @@
 package uk.co.glass_software.android.shared_preferences.mumbo
 
 import dagger.Component
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import javax.inject.Named
 import javax.inject.Singleton

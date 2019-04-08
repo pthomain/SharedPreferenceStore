@@ -22,7 +22,8 @@
 package uk.co.glass_software.android.shared_preferences.demo
 
 import dagger.Component
-import uk.co.glass_software.android.boilerplate.ui.mvp.base.MvpContract.*
+import uk.co.glass_software.android.boilerplate.core.mvp.base.MvpContract.*
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 import javax.inject.Singleton
 
@@ -40,6 +41,8 @@ internal interface MainMvpContract {
 
         fun getStoreEntry(key: String,
                           isEncrypted: Boolean): KeyValueEntry<String>?
+
+        fun logger(): Logger
 
     }
 

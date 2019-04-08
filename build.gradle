@@ -67,42 +67,43 @@ ext {
     daggerVersion = '2.21'
     jsr250Version = '1.0'
 
-    boilerplateVersion = '2.5'
+    boilerplateVersion = '2.6'
 
     rxJavaVersion = '2.2.7'
     rxKotlinVersion = '2.3.0'
     rxAndroidVersion = '2.1.1'
 
     gsonVersion = '2.8.5'
-    mumboVersion = '1.0'
+    mumboVersion = '1.1'
 
     jUnitVersion = '4.13-beta-2'
     mockitoVersion = '2.25.1'
     supportLibVersion = '27.1.1'
 
     appDependencies = [
-            jitPack       : "com.github.jitpack:gradle-simple:$jitPackVersion",
+            jitPack        : "com.github.jitpack:gradle-simple:$jitPackVersion",
 
-            kotlinJdk8    : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
-            kotlinReflect : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            kotlinJdk8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+            kotlinReflect  : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
 
-            appcompatV7   : "androidx.appcompat:appcompat:$supportLibraryVersion",
+            appcompatV7    : "androidx.appcompat:appcompat:$supportLibraryVersion",
 
-            rxJava        : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
-            rxKotlin      : "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion",
-            rxAndroid     : "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion",
+            rxJava         : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
+            rxKotlin       : "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion",
+            rxAndroid      : "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion",
 
-            dagger        : "com.google.dagger:dagger:$daggerVersion",
-            daggerCompiler: "com.google.dagger:dagger-compiler:$daggerVersion",
+            dagger         : "com.google.dagger:dagger:$daggerVersion",
+            daggerCompiler : "com.google.dagger:dagger-compiler:$daggerVersion",
 
-            jsr250        : "javax.annotation:jsr250-api:$jsr250Version",
+            jsr250         : "javax.annotation:jsr250-api:$jsr250Version",
 
-            gson          : "com.google.code.gson:gson:$gsonVersion",
+            gson           : "com.google.code.gson:gson:$gsonVersion",
 
-            boilerplate   : "com.github.pthomain:boilerplate:$boilerplateVersion",
-            mumbo         : "com.github.pthomain:mumbo:$mumboVersion",
+            boilerplateCore: "com.github.pthomain.boilerplate:core:$boilerplateVersion",
+            boilerplateUi  : "com.github.pthomain.boilerplate:ui:$boilerplateVersion",
+            mumbo          : "com.github.pthomain:mumbo:$mumboVersion",
 
-            jUnit         : "junit:junit:$jUnitVersion",
-            mockitoCore   : "org.mockito:mockito-core:$mockitoVersion"
+            jUnit          : "junit:junit:$jUnitVersion",
+            mockitoCore    : "org.mockito:mockito-core:$mockitoVersion"
     ]
 }

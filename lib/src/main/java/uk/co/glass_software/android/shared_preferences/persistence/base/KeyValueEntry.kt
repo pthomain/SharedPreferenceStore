@@ -22,8 +22,8 @@
 package uk.co.glass_software.android.shared_preferences.persistence.base
 
 import io.reactivex.Observable
-import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
-import uk.co.glass_software.android.boilerplate.utils.rx.On
+import uk.co.glass_software.android.boilerplate.core.utils.lambda.Optional
+import uk.co.glass_software.android.boilerplate.core.utils.rx.On
 
 interface KeyValueEntry<C> {
 

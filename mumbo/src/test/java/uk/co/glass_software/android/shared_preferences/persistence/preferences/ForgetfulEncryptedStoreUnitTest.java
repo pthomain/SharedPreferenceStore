@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.co.glass_software.android.boilerplate.utils.log.Logger;
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger;
 import uk.co.glass_software.android.shared_preferences.mumbo.store.ForgetfulEncryptedStore;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;
 

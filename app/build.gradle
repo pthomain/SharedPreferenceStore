@@ -91,6 +91,7 @@ dependencies {
 
     implementation appDependencies.gson
     implementation appDependencies.appcompatV7
+    implementation appDependencies.boilerplateUi
 
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler
