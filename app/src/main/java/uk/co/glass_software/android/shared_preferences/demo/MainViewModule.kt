@@ -28,12 +28,13 @@ import android.view.LayoutInflater
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs.Companion.prefs
+import uk.co.glass_software.android.boilerplate.core.utils.delegates.Prefs.Companion.prefs
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
 import uk.co.glass_software.android.shared_preferences.mumbo.MumboEntryFactory
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
 import java.text.SimpleDateFormat
 import javax.inject.Named
 import javax.inject.Singleton
@@ -105,14 +106,14 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
     @Singleton
     @Named(PLAIN_TEXT)
     fun providePlainTextPreferences() =
-            mainActivity.prefs(PREFS_FILENAME).file
+            mainActivity.context().prefs(PREFS_FILENAME).file
 
     @Provides
     @Singleton
     @Named(ENCRYPTED)
     //used only to display values as stored on disk, should not be used directly in practice
     fun provideEncryptedPreferences() =
-            mainActivity.prefs("mumbo_$PREFS_FILENAME").file
+            mainActivity.context().prefs("mumbo_$PREFS_FILENAME").file
 
     @Provides
     @Singleton
@@ -124,6 +125,7 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
                              storeEntryFactory: MumboEntryFactory): MainMvpContract.MainMvpPresenter =
             MainPresenter(
                     mainActivity,
+                    VoidLogger(),
                     personEntry,
                     counter,
                     lastOpenDate,

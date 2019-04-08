@@ -25,7 +25,7 @@ class MumboEncryptionManager(private val mumboEncryptionManager: uk.co.glass_sof
     : EncryptionManager {
 
     override val isEncryptionSupported =
-            mumboEncryptionManager.isEncryptionSupported
+            mumboEncryptionManager.isEncryptionAvailable
 
     override fun encrypt(toEncrypt: String?,
                          dataTag: String) =

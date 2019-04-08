@@ -25,7 +25,7 @@ import android.content.Context
 import android.util.Base64
 import dagger.Module
 import dagger.Provides
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.store.EncryptedSharedPreferenceStore
 import uk.co.glass_software.android.shared_preferences.mumbo.store.ForgetfulEncryptedStore

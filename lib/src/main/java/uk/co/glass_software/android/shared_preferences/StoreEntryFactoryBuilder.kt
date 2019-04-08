@@ -22,15 +22,14 @@
 package uk.co.glass_software.android.shared_preferences
 
 import android.content.Context
-import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs
-import uk.co.glass_software.android.boilerplate.utils.delegates.Prefs.Companion.prefs
-import uk.co.glass_software.android.boilerplate.utils.log.Logger
+import uk.co.glass_software.android.boilerplate.core.utils.delegates.Prefs
+import uk.co.glass_software.android.boilerplate.core.utils.delegates.Prefs.Companion.prefs
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreModule
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreUtils.openSharedPreferences
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.SerialisationModule
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
-
 
 class StoreEntryFactoryBuilder internal constructor(private val context: Context) {
 

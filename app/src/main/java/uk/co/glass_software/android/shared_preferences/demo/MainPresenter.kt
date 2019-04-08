@@ -25,7 +25,8 @@ import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
 import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
-import uk.co.glass_software.android.boilerplate.ui.mvp.MvpPresenter
+import uk.co.glass_software.android.boilerplate.core.mvp.MvpPresenter
+import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
@@ -38,6 +39,7 @@ import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValue
 import java.util.*
 
 internal class MainPresenter(mvpView: MainMvpView,
+                             private val logger: Logger,
                              private val personEntry: PersonEntry,
                              private val counter: Counter,
                              private val lastOpenDate: LastOpenDate,
@@ -86,5 +88,7 @@ internal class MainPresenter(mvpView: MainMvpView,
                     if (isEncrypted) ENCRYPTED else PLAIN_TEXT,
                     String::class.java
             )
+
+    override fun logger() = logger
 
 }

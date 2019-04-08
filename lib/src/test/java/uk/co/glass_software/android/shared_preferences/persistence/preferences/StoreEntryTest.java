@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.reactivex.Observable;
-import uk.co.glass_software.android.boilerplate.utils.rx.On;
+import uk.co.glass_software.android.boilerplate.core.utils.rx.On;
 import uk.co.glass_software.android.shared_preferences.StoreKey;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry;
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore;

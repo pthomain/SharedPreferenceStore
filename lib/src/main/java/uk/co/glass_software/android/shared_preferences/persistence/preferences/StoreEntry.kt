@@ -21,9 +21,9 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
-import uk.co.glass_software.android.boilerplate.utils.lambda.Optional
-import uk.co.glass_software.android.boilerplate.utils.lambda.OptionalValue
-import uk.co.glass_software.android.boilerplate.utils.rx.On
+import uk.co.glass_software.android.boilerplate.core.utils.lambda.Optional
+import uk.co.glass_software.android.boilerplate.core.utils.lambda.OptionalValue
+import uk.co.glass_software.android.boilerplate.core.utils.rx.On
 import uk.co.glass_software.android.shared_preferences.persistence.base.*
 
 open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueStore,
@@ -74,7 +74,7 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
 
     @Synchronized
     override fun maybe() =
-            OptionalValue.ofNullable(get()) as Optional<C>
+            OptionalValue.ofNullable(get())
 
     @Synchronized
     override fun save(value: C?) {
