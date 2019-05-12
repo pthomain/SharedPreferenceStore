@@ -24,9 +24,9 @@ package uk.co.glass_software.android.shared_preferences.mumbo
 import android.content.Context
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.mumbo.Mumbo
+import uk.co.glass_software.android.mumbo.base.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.StoreEntryFactory
 import uk.co.glass_software.android.shared_preferences.mumbo.MemoryCache.*
-import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.MumboEncryptionManager
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
 import uk.co.glass_software.android.shared_preferences.utils.VoidLogger
@@ -37,7 +37,6 @@ class MumboEntryFactoryBuilder internal constructor(private val context: Context
     private var preferencesFileName: String = "shared_preference_store"
     private var logger: Logger? = null
     private var customSerialiser: Serialiser? = null
-    private var encryptionManager: EncryptionManager? = null
     private var isMemoryCacheEnabled: MemoryCache = BOTH
 
     fun preferencesFileName(preferencesFileName: String) = apply {
@@ -52,15 +51,11 @@ class MumboEntryFactoryBuilder internal constructor(private val context: Context
         this.customSerialiser = customSerialiser
     }
 
-    fun encryptionManager(encryptionManager: EncryptionManager) = apply {
-        this.encryptionManager = encryptionManager
-    }
-
     fun setMemoryCacheEnabled(isMemoryCacheEnabled: MemoryCache = BOTH) = apply {
         this.isMemoryCacheEnabled = isMemoryCacheEnabled
     }
 
-    fun build(): MumboEntryFactory {
+    fun build(mumboPicker: (Mumbo) -> EncryptionManager): MumboEntryFactory {
         val mumboPreferencesFileName = "mumbo_$preferencesFileName"
 
         val plainTextStore = newStoreEntryFactory(
@@ -74,7 +69,8 @@ class MumboEntryFactoryBuilder internal constructor(private val context: Context
         ).store
 
         val logger = logger ?: VoidLogger()
-        val encryptionManager = getEncryptionManager(logger)
+        val mumbo = Mumbo(context, logger)
+        val encryptionManager = MumboEncryptionManager(mumboPicker(mumbo))
 
         val component = DaggerMumboStoreComponent
                 .builder()
@@ -107,8 +103,5 @@ class MumboEntryFactoryBuilder internal constructor(private val context: Context
             setMemoryCacheEnabled(isMemoryCacheEnabled)
         }.build()
     }
-
-    private fun getEncryptionManager(logger: Logger) =
-            encryptionManager ?: MumboEncryptionManager(Mumbo(context, logger).conceal())
 
 }

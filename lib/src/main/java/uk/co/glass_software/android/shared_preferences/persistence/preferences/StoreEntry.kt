@@ -96,7 +96,7 @@ open class StoreEntry<C> @JvmOverloads constructor(private val store: KeyValueSt
                     .filter { it == getKey() }
                     .map { maybe() }
                     .compose { if (emitCurrentValue) it.startWith(maybe()) else it }
-                    .observeOn(observeOn.instance)!!
+                    .observeOn(observeOn())!!
 
     override fun isPresent() = exists()
 

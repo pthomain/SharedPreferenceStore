@@ -19,4 +19,7 @@
   ~ under the License.
   -->
 
-<manifest package="uk.co.glass_software.android.shared_preferences"/>
+<manifest package="uk.co.glass_software.android.shared_preferences"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-sdk tools:overrideLibrary="androidx.security" />
+</manifest>
