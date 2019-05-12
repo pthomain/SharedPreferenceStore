@@ -29,6 +29,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import uk.co.glass_software.android.boilerplate.core.utils.delegates.Prefs.Companion.prefs
+import uk.co.glass_software.android.mumbo.Mumbo
 import uk.co.glass_software.android.shared_preferences.demo.model.Counter
 import uk.co.glass_software.android.shared_preferences.demo.model.LastOpenDate
 import uk.co.glass_software.android.shared_preferences.demo.model.PersonEntry
@@ -62,7 +63,7 @@ internal class MainViewModule(private val mainActivity: MainActivity) {
             MumboEntryFactory.builder(mainActivity)
                     .customSerialiser(serialiser)
                     .preferencesFileName(PREFS_FILENAME)
-                    .build()
+                    .build(Mumbo::tink)
 
     @Provides
     @Singleton

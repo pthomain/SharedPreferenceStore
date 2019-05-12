@@ -84,7 +84,7 @@ dependencies {
 
     api appDependencies.kotlinJdk8
 
-    implementation appDependencies.mumbo
+    api appDependencies.mumbo
 
     testImplementation appDependencies.jUnit
     testImplementation appDependencies.mockitoCore

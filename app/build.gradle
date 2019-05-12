@@ -39,6 +39,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
         versionName "1.2"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -92,6 +93,7 @@ dependencies {
     implementation appDependencies.gson
     implementation appDependencies.appcompatV7
     implementation appDependencies.boilerplateUi
+    implementation appDependencies.multidex
 
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler
