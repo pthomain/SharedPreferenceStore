@@ -91,9 +91,8 @@ dependencies {
     implementation project(":mumbo_store")
 
     implementation appDependencies.gson
-    implementation appDependencies.appcompatV7
     implementation appDependencies.boilerplateUi
-    implementation appDependencies.multidex
+    implementation appDependencies.appCompat
 
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler

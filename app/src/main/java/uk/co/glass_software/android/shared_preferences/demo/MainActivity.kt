@@ -21,6 +21,7 @@
 
 package uk.co.glass_software.android.shared_preferences.demo
 
+import android.app.UiModeManager.MODE_NIGHT_YES
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.database.DataSetObserver
@@ -31,11 +32,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.Switch
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import uk.co.glass_software.android.boilerplate.core.mvp.MvpActivity
+import uk.co.glass_software.android.boilerplate.core.utils.findLazy
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
-import uk.co.glass_software.android.boilerplate.core.utils.resources.findLazy
 import uk.co.glass_software.android.shared_preferences.demo.MainMvpContract.*
 import javax.inject.Inject
 
