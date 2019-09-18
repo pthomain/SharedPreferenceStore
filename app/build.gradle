@@ -94,6 +94,8 @@ dependencies {
     implementation appDependencies.boilerplateUi
     implementation appDependencies.appCompat
 
+    implementation appDependencies.multidex
+
     implementation appDependencies.dagger
     kapt appDependencies.daggerCompiler
 }

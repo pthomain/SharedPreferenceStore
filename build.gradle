@@ -86,6 +86,7 @@ ext {
             kotlinReflect  : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
 
             appCompat    : "androidx.appcompat:appcompat:$supportLibraryVersion",
+            multidex       : "com.android.support:multidex:$multidexVersion",
 
             rxJava         : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
             rxKotlin       : "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion",
