@@ -80,7 +80,6 @@ dependencies {
 
     api appDependencies.rxJava
     api appDependencies.rxKotlin
-    api appDependencies.rxAndroid
 
     api appDependencies.kotlinJdk8
 

@@ -21,8 +21,8 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
-import uk.co.glass_software.android.boilerplate.core.utils.lambda.Optional
-import uk.co.glass_software.android.boilerplate.core.utils.lambda.OptionalValue
+import uk.co.glass_software.android.boilerplate.core.utils.optional.Optional
+import uk.co.glass_software.android.boilerplate.core.utils.optional.OptionalValue
 import uk.co.glass_software.android.boilerplate.core.utils.rx.On
 import uk.co.glass_software.android.shared_preferences.persistence.base.*
 
