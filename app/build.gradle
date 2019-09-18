@@ -39,7 +39,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
         versionName "1.2"
-        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -56,8 +55,14 @@ android {
     }
 
     buildTypes {
-        release {
+        debug{
+            multiDexEnabled true
             minifyEnabled false
+        }
+
+        release {
+            multiDexEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

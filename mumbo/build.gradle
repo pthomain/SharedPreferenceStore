@@ -36,6 +36,8 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        multiDexEnabled true
+
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -47,8 +49,14 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
+            multiDexEnabled true
             minifyEnabled false
+        }
+
+        release {
+            multiDexEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'proguard-rules.pro'
         }
