@@ -1,4 +1,4 @@
-SharedPreferenceStore [![Codacy Badge](https://api.codacy.com/project/badge/Grade/18db4ae1588f4a89857fd76475ff5ac9)](https://app.codacy.com/app/pthomain/SharedPreferenceStore?utm_source=github.com&utm_medium=referral&utm_content=pthomain/SharedPreferenceStore&utm_campaign=Badge_Grade_Settings) [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore)
+SharedPreferenceStore [![Codacy Badge](https://api.codacy.com/project/badge/Grade/18db4ae1588f4a89857fd76475ff5ac9)](https://app.codacy.com/app/pthomain/SharedPreferenceStore?utm_source=github.com&utm_medium=referral&utm_content=pthomain/SharedPreferenceStore&utm_campaign=Badge_Grade_Settings) [![](https://jitpack.io/v/pthomain/SharedPreferenceStore.svg)](https://jitpack.io/#pthomain/SharedPreferenceStore) [![Known Vulnerabilities](https://snyk.io/test/github/pthomain/SharedPreferenceStore/badge.svg)](https://snyk.io/test/github/pthomain/SharedPreferenceStore)
 =====================
 
 Strongly-typed and Observable access to the Android SharedPreferences with custom object serialisation and encryption support (down to API level 16). 

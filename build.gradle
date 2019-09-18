@@ -63,6 +63,7 @@ ext {
 
     jitPackVersion = '1.0'
     supportLibraryVersion = '1.0.0-beta01'
+    multidexVersion = '1.0.3'
 
     daggerVersion = '2.24'
     jsr250Version = '1.0'
