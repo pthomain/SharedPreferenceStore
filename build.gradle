@@ -78,6 +78,7 @@ ext {
 
     jUnitVersion = '4.13-beta-3'
     mockitoVersion = '3.0.0'
+    mockitoKotlinVersion = '2.0.0'
 
     appDependencies = [
             jitPack        : "com.github.jitpack:gradle-simple:$jitPackVersion",
@@ -85,7 +86,7 @@ ext {
             kotlinJdk8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
             kotlinReflect  : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
 
-            appCompat    : "androidx.appcompat:appcompat:$supportLibraryVersion",
+            appCompat      : "androidx.appcompat:appcompat:$supportLibraryVersion",
             multidex       : "com.android.support:multidex:$multidexVersion",
 
             rxJava         : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
@@ -103,6 +104,8 @@ ext {
             mumbo          : "com.github.pthomain:mumbo:$mumboVersion",
 
             jUnit          : "junit:junit:$jUnitVersion",
-            mockitoCore    : "org.mockito:mockito-core:$mockitoVersion"
+            mockitoCore    : "org.mockito:mockito-core:$mockitoVersion",
+            mockitoKotlin  : "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
+
     ]
 }

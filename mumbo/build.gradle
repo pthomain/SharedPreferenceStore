@@ -36,11 +36,10 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        multiDexEnabled true
-
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
         }
     }
 
@@ -62,9 +61,29 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
     }
 }
 
@@ -95,5 +114,7 @@ dependencies {
 
     testImplementation appDependencies.jUnit
     testImplementation appDependencies.mockitoCore
+    testImplementation appDependencies.mockitoKotlin
+
     testAnnotationProcessor appDependencies.daggerCompiler
 }

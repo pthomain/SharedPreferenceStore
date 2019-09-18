@@ -19,22 +19,16 @@
  * under the License.
  */
 
-package uk.co.glass_software.android.shared_preferences;
+package uk.co.glass_software.android.shared_preferences
 
-import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider;
-import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider;
+import uk.co.glass_software.android.shared_preferences.persistence.base.UniqueKeyProvider
+import uk.co.glass_software.android.shared_preferences.persistence.base.ValueClassProvider
 
-public enum StoreKey implements UniqueKeyProvider, ValueClassProvider {
+enum class StoreKey : UniqueKeyProvider, ValueClassProvider<String> {
 
     TEST;
 
-    @Override
-    public String getUniqueKey() {
-        return "test";
-    }
+    override val uniqueKey = "test"
 
-    @Override
-    public Class getValueClass() {
-        return String.class;
-    }
+    override val valueClass = String::class.java
 }
