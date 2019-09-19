@@ -21,12 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.reset
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.ArgumentMatchers.anyString
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.mumbo.store.LenientEncryptedStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.test.verifyNeverWithContext
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 
 class LenientEncryptedStoreUnitTest {
 
@@ -39,9 +45,9 @@ class LenientEncryptedStoreUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockPlainTextStore = mock(KeyValueStore::class.java)
-        mockEncryptedStore = mock(KeyValueStore::class.java)
-        mockLogger = mock(Logger::class.java)
+        mockPlainTextStore = mock()
+        mockEncryptedStore = mock()
+        mockLogger = mock()
     }
 
     private fun prepareTarget(isEncryptionSupported: Boolean) {
@@ -53,7 +59,7 @@ class LenientEncryptedStoreUnitTest {
         )
     }
 
-    private fun reset() {
+    private fun resetMocks() {
         reset(
                 mockPlainTextStore,
                 mockEncryptedStore
@@ -87,40 +93,41 @@ class LenientEncryptedStoreUnitTest {
 
         target.hasValue(someKey)
 
-        verify(storeToUse).hasValue(eq(someKey))
-        verify(storeNotToUse, never()).hasValue(any())
+        verifyWithContext(storeToUse).hasValue(eq(someKey))
+        verifyNeverWithContext(storeNotToUse).hasValue(any())
 
-        reset()
+        resetMocks()
 
         target.saveValue<Any>(someKey, someValue)
 
-        verify(storeToUse).saveValue(
+        verifyWithContext(storeToUse).saveValue(
                 eq(someKey),
                 eq(someValue)
         )
 
-        verify(storeNotToUse, never()).saveValue(
+        verifyNeverWithContext(storeNotToUse).saveValue(
                 anyString(),
                 any<Any>()
         )
 
-        reset()
+        resetMocks()
 
         target.getValue(someKey, String::class.java, someValue)
 
-        verify(storeToUse).getValue(eq(someKey), eq(String::class.java), eq(someValue))
-        verify(storeNotToUse, never())
+        verifyWithContext(storeToUse).getValue(eq(someKey), eq(String::class.java), eq(someValue))
+        verifyNeverWithContext(storeNotToUse)
                 .getValue(
                         anyString(),
                         any(),
                         any<Any>()
                 )
 
-        reset()
+        resetMocks()
 
         target.deleteValue(someKey)
 
-        verify(storeToUse).deleteValue(eq(someKey))
-        verify(storeNotToUse, never()).deleteValue(any())
+        verifyWithContext(storeToUse).deleteValue(eq(someKey))
+        verifyNeverWithContext(storeNotToUse).deleteValue(any())
     }
+
 }

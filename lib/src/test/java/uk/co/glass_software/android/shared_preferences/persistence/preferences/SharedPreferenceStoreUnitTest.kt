@@ -23,14 +23,17 @@ package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.subjects.BehaviorSubject
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.ArgumentMatchers.anyString
 import uk.co.glass_software.android.boilerplate.core.utils.delegates.Prefs
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import uk.co.glass_software.android.shared_preferences.test.verifyNeverWithContext
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 import java.io.Serializable
 
 class SharedPreferenceStoreUnitTest {
@@ -51,19 +54,19 @@ class SharedPreferenceStoreUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockSharedPrefs = mock(Prefs::class.java)
-        mockSharedPreferences = mock(SharedPreferences::class.java)
-        mockBase64Serialiser = mock(Serialiser::class.java)
-        mockCustomSerialiser = mock(Serialiser::class.java)
+        mockSharedPrefs = mock()
+        mockSharedPreferences = mock()
+        mockBase64Serialiser = mock()
+        mockCustomSerialiser = mock()
         behaviorSubject = BehaviorSubject.create<String>()
 
-        mockLogger = mock(Logger::class.java)
-        mockEditor = mock(Editor::class.java)
+        mockLogger = mock()
+        mockEditor = mock()
 
-        `when`(mockSharedPreferences.edit())
+        whenever(mockSharedPreferences.edit())
                 .thenReturn(mockEditor)
 
-        `when`(mockSharedPrefs.file)
+        whenever(mockSharedPrefs.file)
                 .thenReturn(mockSharedPreferences)
 
         target = SharedPreferenceStore(
@@ -79,18 +82,18 @@ class SharedPreferenceStoreUnitTest {
     private fun addValue() {
         val map = mapOf(key to value)
 
-        `when`(mockSharedPreferences.all)
+        whenever(mockSharedPreferences.all)
                 .thenReturn(map)
 
-        `when`(mockSharedPreferences.contains(eq(key)))
+        whenever(mockSharedPreferences.contains(eq(key)))
                 .thenReturn(true)
 
-        `when`<String>(mockSharedPreferences.getString(
+        whenever(mockSharedPreferences.getString(
                 eq(key),
                 isNull()
         )).thenReturn(value)
 
-        `when`(mockSharedPrefs.file)
+        whenever(mockSharedPrefs.file)
                 .thenReturn(mockSharedPreferences)
 
         //Reset the cache
@@ -107,7 +110,7 @@ class SharedPreferenceStoreUnitTest {
     @Test
     @Throws(Serialiser.SerialisationException::class)
     fun testBase64Read() {
-        `when`(
+        whenever(
                 mockBase64Serialiser.canHandleType(eq(Serializable::class.java))
         ).thenReturn(true)
 
@@ -115,7 +118,7 @@ class SharedPreferenceStoreUnitTest {
 
         target.getValue(key, Serializable::class.java)
 
-        verify(mockBase64Serialiser)
+        verifyWithContext(mockBase64Serialiser)
                 .deserialise(
                         eq(value),
                         eq(Serializable::class.java)
@@ -125,7 +128,7 @@ class SharedPreferenceStoreUnitTest {
     @Test
     @Throws(Serialiser.SerialisationException::class)
     fun testNotBase64Read() {
-        `when`(
+        whenever(
                 mockBase64Serialiser.canHandleType(eq(Serializable::class.java))
         ).thenReturn(false)
 
@@ -133,7 +136,7 @@ class SharedPreferenceStoreUnitTest {
 
         target.getValue(key, Serializable::class.java)
 
-        verify(mockBase64Serialiser, never())
+        verifyNeverWithContext(mockBase64Serialiser)
                 .deserialise<Any>(anyString(), any())
     }
 
@@ -141,10 +144,10 @@ class SharedPreferenceStoreUnitTest {
     fun testDeleteValue() {
         addValue()
 
-        `when`(mockSharedPreferences.contains(eq(key)))
+        whenever(mockSharedPreferences.contains(eq(key)))
                 .thenReturn(true)
 
-        `when`(mockEditor.remove(eq(key)))
+        whenever(mockEditor.remove(eq(key)))
                 .thenReturn(mockEditor)
 
         target.deleteValue(key)
@@ -163,10 +166,10 @@ class SharedPreferenceStoreUnitTest {
         val cachedValues = target.cachedValues
         assertFalse("Cached values should not contain the key", cachedValues.containsKey(key))
 
-        `when`(mockSharedPreferences.contains(eq(key)))
+        whenever(mockSharedPreferences.contains(eq(key)))
                 .thenReturn(false)
 
-        `when`<Editor>(mockEditor.putString(
+        whenever(mockEditor.putString(
                 eq(key),
                 eq(value)
         )).thenReturn(mockEditor)

@@ -21,18 +21,20 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Observable
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.ArgumentMatchers.anyString
 import uk.co.glass_software.android.boilerplate.core.utils.rx.On
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueEntry
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.test.verifyNeverWithContext
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 
 class StoreEntryTest {
 
@@ -45,7 +47,7 @@ class StoreEntryTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockStore = mock(KeyValueStore::class.java)
+        mockStore = mock()
         target = StoreEntry(
                 mockStore,
                 KEY,
@@ -57,7 +59,7 @@ class StoreEntryTest {
     fun testSave() {
         target.save(someValue)
 
-        verify<KeyValueStore>(mockStore).saveValue(
+        verifyWithContext(mockStore).saveValue(
                 eq(KEY),
                 eq(someValue)
         )
@@ -65,7 +67,7 @@ class StoreEntryTest {
 
     @Test
     fun testGet() {
-        `when`<String>(
+        whenever(
                 mockStore.getValue(
                         eq(KEY),
                         eq(String::class.java)
@@ -79,7 +81,7 @@ class StoreEntryTest {
     fun testGetWithDefaultValue() {
         val defaultValue = "defaultValue"
 
-        `when`(
+        whenever(
                 mockStore.getValue(
                         eq(KEY),
                         eq(String::class.java),
@@ -94,7 +96,7 @@ class StoreEntryTest {
     fun testDrop() {
         target.drop()
 
-        verify(mockStore).deleteValue(eq(KEY))
+        verifyWithContext(mockStore).deleteValue(eq(KEY))
     }
 
     @Test
@@ -104,7 +106,7 @@ class StoreEntryTest {
 
     @Test
     fun testExistsTrue() {
-        `when`(
+        whenever(
                 mockStore.hasValue(eq(KEY))
         ).thenReturn(true)
 
@@ -113,7 +115,7 @@ class StoreEntryTest {
 
     @Test
     fun testExistsFalse() {
-        `when`(
+        whenever(
                 mockStore.hasValue(eq(KEY))
         ).thenReturn(false)
 
@@ -122,7 +124,7 @@ class StoreEntryTest {
 
     @Test
     fun testMaybeEmpty() {
-        `when`(
+        whenever(
                 mockStore.hasValue(eq(KEY))
         ).thenReturn(false)
 
@@ -131,10 +133,10 @@ class StoreEntryTest {
 
     @Test
     fun testMaybe() {
-        `when`(mockStore.hasValue(eq(KEY)))
+        whenever(mockStore.hasValue(eq(KEY)))
                 .thenReturn(true)
 
-        `when`(
+        whenever(
                 mockStore.getValue(
                         eq(KEY),
                         eq(String::class.java)
@@ -146,24 +148,24 @@ class StoreEntryTest {
 
     @Test
     fun testObserveWithWrongKey() {
-        `when`(mockStore.observeChanges())
+        whenever(mockStore.observeChanges())
                 .thenReturn(Observable.just("wrongKey"))
 
         target.observe(false, On.Trampoline).subscribe()
 
-        verify(mockStore, never())
+        verifyNeverWithContext(mockStore)
                 .getValue(anyString(), any<Class<*>>())
     }
 
     @Test
     fun testObserve() {
-        `when`(mockStore.observeChanges())
+        whenever(mockStore.observeChanges())
                 .thenReturn(Observable.just(KEY))
 
-        `when`(mockStore.hasValue(eq(KEY)))
+        whenever(mockStore.hasValue(eq(KEY)))
                 .thenReturn(true)
 
-        `when`(mockStore.getValue(
+        whenever(mockStore.getValue(
                 eq(KEY),
                 eq(String::class.java)
         )).thenReturn(someValue)

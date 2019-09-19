@@ -21,16 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.reset
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.ArgumentMatchers.anyString
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.mumbo.store.ForgetfulEncryptedStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
+import uk.co.glass_software.android.shared_preferences.test.verifyNeverWithContext
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 
 class ForgetfulEncryptedStoreUnitTest {
 
@@ -42,8 +44,8 @@ class ForgetfulEncryptedStoreUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockEncryptedStore = mock(KeyValueStore::class.java)
-        mockLogger = mock(Logger::class.java)
+        mockEncryptedStore = mock()
+        mockLogger = mock()
     }
 
     private fun prepareTarget(isEncryptionSupported: Boolean) {
@@ -54,8 +56,8 @@ class ForgetfulEncryptedStoreUnitTest {
         )
     }
 
-    private fun reset() {
-        Mockito.reset(mockEncryptedStore)
+    private fun resetMocks() {
+        reset(mockEncryptedStore)
     }
 
     @Test
@@ -79,42 +81,42 @@ class ForgetfulEncryptedStoreUnitTest {
         target.hasValue(someKey)
 
         if (shouldUseInternalStore) {
-            verify(mockEncryptedStore).hasValue(eq(someKey))
+            verifyWithContext(mockEncryptedStore).hasValue(eq(someKey))
         } else {
-            verify(mockEncryptedStore, never()).hasValue(any())
+            verifyNeverWithContext(mockEncryptedStore).hasValue(any())
         }
 
-        reset()
+        resetMocks()
 
         target.saveValue<Any>(someKey, someValue)
 
         if (shouldUseInternalStore) {
-            verify(mockEncryptedStore)
+            verifyWithContext(mockEncryptedStore)
                     .saveValue(
                             eq(someKey),
                             eq(someValue)
                     )
         } else {
-            verify(mockEncryptedStore, never())
+            verifyNeverWithContext(mockEncryptedStore)
                     .saveValue(
                             anyString(),
                             any<Any>()
                     )
         }
 
-        reset()
+        resetMocks()
 
         target.getValue(someKey, String::class.java, someValue)
 
         if (shouldUseInternalStore) {
-            verify(mockEncryptedStore)
+            verifyWithContext(mockEncryptedStore)
                     .getValue(
                             eq(someKey),
                             eq(String::class.java),
                             eq(someValue)
                     )
         } else {
-            verify(mockEncryptedStore, never())
+            verifyNeverWithContext(mockEncryptedStore)
                     .getValue(
                             anyString(),
                             any(),
@@ -122,14 +124,14 @@ class ForgetfulEncryptedStoreUnitTest {
                     )
         }
 
-        reset()
+        resetMocks()
 
         target.deleteValue(someKey)
 
         if (shouldUseInternalStore) {
-            verify(mockEncryptedStore).deleteValue(eq(someKey))
+            verifyWithContext(mockEncryptedStore).deleteValue(eq(someKey))
         } else {
-            verify(mockEncryptedStore, never()).deleteValue(any())
+            verifyNeverWithContext(mockEncryptedStore).deleteValue(any())
         }
     }
 }

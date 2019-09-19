@@ -132,13 +132,13 @@ internal class SharedPreferenceStore(prefs: Prefs,
                 try {
                     (if (it.contains(key)) {
                         when {
-                            isBooleanClass(objectClass) -> it.getBoolean(key, (defaultValue as Boolean?) ?: false)
-                            isFloatClass(objectClass) -> it.getFloat(key, (defaultValue as Float?) ?: 0f)
-                            isLongClass(objectClass) -> it.getLong(key, (defaultValue as Long?) ?: 0L)
-                            isIntClass(objectClass) -> it.getInt(key, (defaultValue as Int?) ?: 0)
-                            isStringClass(objectClass) -> it.getString(key, (defaultValue as String?))
-                            else -> deserialise(it.getString(key, null), objectClass) ?: defaultValue
-                        } as O?
+                            isBooleanClass(objectClass) -> it.getBoolean(key, false)
+                            isFloatClass(objectClass) -> it.getFloat(key, 0f)
+                            isLongClass(objectClass) -> it.getLong(key, 0L)
+                            isIntClass(objectClass) -> it.getInt(key, 0)
+                            isStringClass(objectClass) -> it.getString(key, null)
+                            else -> deserialise(it.getString(key, null), objectClass)
+                        } as O? ?: defaultValue
                     } else defaultValue)
                 } catch (e: Exception) {
                     logger.e(this, e)

@@ -21,17 +21,18 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.preferences
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.*
-import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.mumbo.encryption.EncryptionManager
 import uk.co.glass_software.android.shared_preferences.mumbo.store.EncryptedSharedPreferenceStore
 import uk.co.glass_software.android.shared_preferences.persistence.base.KeyValueStore
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Serialiser
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 
 class EncryptedSharedPreferenceStoreUnitTest {
 
@@ -50,17 +51,17 @@ class EncryptedSharedPreferenceStoreUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockBase64Serialiser = mock(Serialiser::class.java)
-        mockCustomSerialiser = mock(Serialiser::class.java)
-        mockEncryptionManager = mock(EncryptionManager::class.java)
-        mockDelegateStore = mock(KeyValueStore::class.java)
+        mockBase64Serialiser = mock()
+        mockCustomSerialiser = mock()
+        mockEncryptionManager = mock()
+        mockDelegateStore = mock()
 
-        `when`(mockCustomSerialiser.canHandleSerialisedFormat(any())).thenReturn(true)
-        `when`(mockCustomSerialiser.canHandleType(any())).thenReturn(true)
-        `when`(mockEncryptionManager.isEncryptionSupported).thenReturn(true)
+        whenever(mockCustomSerialiser.canHandleSerialisedFormat(any())).thenReturn(true)
+        whenever(mockCustomSerialiser.canHandleType(any())).thenReturn(true)
+        whenever(mockEncryptionManager.isEncryptionSupported).thenReturn(true)
 
         target = EncryptedSharedPreferenceStore(
-                mock(Logger::class.java),
+                mock(),
                 mockBase64Serialiser,
                 mockCustomSerialiser,
                 mockDelegateStore,
@@ -75,12 +76,12 @@ class EncryptedSharedPreferenceStoreUnitTest {
         val cachedValues = target.cachedValues
         assertFalse("Cached values should not contain the key", cachedValues.containsKey(key))
 
-        `when`(mockCustomSerialiser.serialise<Any>(eq(value))).thenReturn(serialised)
-        `when`(mockEncryptionManager.encrypt(eq(serialised), eq(key))).thenReturn(encryptedValue)
+        whenever(mockCustomSerialiser.serialise<Any>(eq(value))).thenReturn(serialised)
+        whenever(mockEncryptionManager.encrypt(eq(serialised), eq(key))).thenReturn(encryptedValue)
 
         target.saveValue<Any>(key, value)
 
-        verify(mockDelegateStore).saveValue<Any>(eq(key), eq(encryptedValue))
+        verifyWithContext(mockDelegateStore).saveValue(eq(key), eq(encryptedValue))
 
         val cachedValuesAfter = target.cachedValues
         assertTrue("Cached values did not contain the key", cachedValuesAfter.containsKey(key))
@@ -90,21 +91,21 @@ class EncryptedSharedPreferenceStoreUnitTest {
     @Test
     @Throws(Serialiser.SerialisationException::class)
     fun testGetValue() {
-        `when`(
+        whenever(
                 mockDelegateStore.getValue(
                         eq(key),
                         eq(String::class.java)
                 )
         ).thenReturn(encryptedValue)
 
-        `when`(
+        whenever(
                 mockEncryptionManager.decrypt(
                         eq(encryptedValue),
                         eq(key)
                 )
         ).thenReturn(serialised)
 
-        `when`(
+        whenever(
                 mockCustomSerialiser.deserialise(
                         eq(serialised),
                         eq(String::class.java)

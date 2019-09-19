@@ -22,12 +22,12 @@
 package uk.co.glass_software.android.shared_preferences.persistence.serialisation
 
 import android.util.Base64
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import uk.co.glass_software.android.boilerplate.core.utils.log.Logger
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
 import uk.co.glass_software.android.shared_preferences.persistence.serialisation.Base64Serialiser.CustomBase64
@@ -46,10 +46,10 @@ class Base64SerialiserUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockBase64 = mock(CustomBase64::class.java)
+        mockBase64 = mock()
 
         target = Base64Serialiser(
-                mock(Logger::class.java),
+                mock(),
                 mockBase64
         )
     }
@@ -82,7 +82,7 @@ class Base64SerialiserUnitTest {
 
         val bytes = getBytes(originalValue)
 
-        `when`(
+        whenever(
                 mockBase64.encode(
                         eq(bytes),
                         eq(Base64.DEFAULT)
@@ -102,7 +102,7 @@ class Base64SerialiserUnitTest {
         val base64 = "base64"
         val objectBytes = getBytes(originalValue)
 
-        `when`(
+        whenever(
                 mockBase64.decode(
                         eq(base64),
                         eq(Base64.DEFAULT)

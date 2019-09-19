@@ -21,12 +21,15 @@
 
 package uk.co.glass_software.android.shared_preferences.persistence.base
 
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.isNull
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Matchers.eq
-import org.mockito.Mockito.*
 import uk.co.glass_software.android.shared_preferences.persistence.preferences.StoreEntry
+import uk.co.glass_software.android.shared_preferences.test.verifyWithContext
 
 class StoreEntryUnitTest {
 
@@ -43,7 +46,7 @@ class StoreEntryUnitTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockStore = mock(KeyValueStore::class.java)
+        mockStore = mock()
         target = TestEntry(mockStore)
     }
 
@@ -51,9 +54,9 @@ class StoreEntryUnitTest {
     fun testSaveNull() {
         target.save(null)
 
-        verify(mockStore).saveValue<Any>(
+        verifyWithContext(mockStore).saveValue<Any>(
                 eq(KEY),
-                eq(null)
+                isNull()
         )
     }
 
@@ -63,7 +66,7 @@ class StoreEntryUnitTest {
 
         target.save(value)
 
-        verify<KeyValueStore>(mockStore).saveValue<Any>(
+        verifyWithContext(mockStore).saveValue(
                 eq(KEY),
                 eq(value)
         )
@@ -73,14 +76,14 @@ class StoreEntryUnitTest {
     fun testGet() {
         val test = "test"
 
-        `when`<String>(mockStore.getValue(
+        whenever(mockStore.getValue(
                 eq(KEY),
                 eq(String::class.java)
         )).thenReturn(test)
 
         val result = target.get()
 
-        verify<KeyValueStore>(mockStore).getValue(
+        verifyWithContext(mockStore).getValue(
                 eq(KEY),
                 eq(String::class.java)
         )
@@ -93,7 +96,7 @@ class StoreEntryUnitTest {
         val string = "abc"
         val defaultValue = "default"
 
-        `when`(mockStore.getValue(
+        whenever(mockStore.getValue(
                 eq(KEY),
                 eq(String::class.java),
                 eq(defaultValue)
@@ -101,7 +104,7 @@ class StoreEntryUnitTest {
 
         val result = target.get(defaultValue)
 
-        verify<KeyValueStore>(mockStore).getValue(
+        verifyWithContext(mockStore).getValue(
                 eq(KEY),
                 eq(String::class.java),
                 eq(defaultValue)
@@ -114,7 +117,7 @@ class StoreEntryUnitTest {
     fun testDrop() {
         target.drop()
 
-        verify<KeyValueStore>(mockStore)
+        verifyWithContext(mockStore)
                 .deleteValue(eq(KEY))
     }
 
@@ -128,22 +131,19 @@ class StoreEntryUnitTest {
     @Test
     @Throws(Exception::class)
     fun testExists() {
-        `when`(
+        whenever(
                 mockStore.hasValue(eq(KEY))
         ).thenReturn(true)
 
         assertTrue("Entry should exists", target.exists())
 
-        `when`(
+        whenever(
                 mockStore.hasValue(eq(KEY))
         ).thenReturn(false)
 
         assertFalse("Entry should exists", target.exists())
 
-        verify<KeyValueStore>(
-                mockStore,
-                times(2)
-        ).hasValue(eq(KEY))
+        verifyWithContext(mockStore).hasValue(eq(KEY))
     }
 
     companion object {

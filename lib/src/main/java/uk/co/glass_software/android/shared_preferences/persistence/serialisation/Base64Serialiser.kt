@@ -28,7 +28,8 @@ import java.io.*
 class Base64Serialiser(private val logger: Logger,
                        private val base64: CustomBase64) : Serialiser {
 
-    override fun canHandleType(targetClass: Class<*>) = Serializable::class.java.isAssignableFrom(targetClass)
+    override fun canHandleType(targetClass: Class<*>) =
+            targetClass.isPrimitive || Serializable::class.java.isAssignableFrom(targetClass)
 
     override fun canHandleSerialisedFormat(serialised: String) =
             serialised.startsWith(PREFIX) && serialised.contains(DELIMITER)
@@ -37,8 +38,8 @@ class Base64Serialiser(private val logger: Logger,
     override fun <O : Any> serialise(deserialised: O): String {
         val targetClass = deserialised::class.java
 
-        if (!canHandleType(targetClass)) {
-            throw IllegalArgumentException("Cannot serialise objects of type:$targetClass")
+        require(canHandleType(targetClass)) {
+            "Cannot serialise objects of type:$targetClass"
         }
 
         try {
@@ -106,7 +107,7 @@ class Base64Serialiser(private val logger: Logger,
     }
 
     private companion object {
-        private val PREFIX = "BASE_64_"
-        private val DELIMITER = "_START_DATA_"
+        private const val PREFIX = "BASE_64_"
+        private const val DELIMITER = "_START_DATA_"
     }
 }
